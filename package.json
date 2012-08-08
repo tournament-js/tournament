@@ -1,0 +1,30 @@
+{
+  "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
+  "name": "tournament",
+  "description": "Tournament management library",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/clux/tournament.git"
+  },
+  "main": "tournament.js",
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "scripts": {
+    "test": "tap ./test"
+  },
+  "dependencies": {
+    "autonomy": "~0.3.0",
+    "deep-equal": "~0.0.0",
+    "typr": "~0.1.3"
+  },
+  "devDependencies": {
+    "tap": "~0.2.5"
+  },
+  "bugs": {
+    "url": "http://github.com/clux/tournament/issues"
+  },
+  "license": "MIT",
+  "optionalDependencies": {}
+}
