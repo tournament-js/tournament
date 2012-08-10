@@ -226,7 +226,7 @@ T.right = function (p, last, id, longLbGf) {
     return null;
   }
   // special case of WB winner moving to LB GF G1
-  if (last >= LB && br === WB && r === p) {
+  if (last >= LB && b === WB && r === p) {
     return [gId(LB, 2*p - 1, 1), 0];
   }
   // LB GF G1 won by WB winner => no GF G2
@@ -266,11 +266,11 @@ T.down = function (p, last, id, longLbGf) {
   // is player out?
   if (last === WB) {
     return null;
-  };
+  }
 
   if (r === 2*p - 1) {
     // if double final, then loser moves to the bottom
-    return (longLbGf) ? [gId(LB, 2*p, 1), 1] : null;
+    return (longLbGf) ? [gId(LB, 2 * p, 1), 1] : null;
   }
 
   // remaining out cases + invalids
@@ -291,7 +291,7 @@ T.down = function (p, last, id, longLbGf) {
 };
 
 // updates matches by updating the given match, and propagate the winners/losers
-T.scoreDuel = function (ms, p, last, id, score) {
+T.scoreDuel = function (gs, p, last, id, score) {
   // sanity
   if (!Array.isArray(score) || score.length !== 2)  {
     throw new Error("invalid scores: must be array of length 2 - got: " + JSON.stringify(score));
@@ -300,45 +300,64 @@ T.scoreDuel = function (ms, p, last, id, score) {
     throw new Error("invalid player scores: both must be numeric and different - got: " + JSON.stringify(score));
   }
 
+  // 1. score given game
+  var m = $.firstBy(T.byId.bind(null, id), gs);
+  if (!m) {
+    throw new Error(T.representation(id) + " match not found in tournament");
+  }
+  if (m.p[0] === WO || m.p[1] === WO) {
+    console.error("cannot override score walkover'd game: " + T.representation(id));
+    return gs;
+  }
+  m.s = score;
+
   // calculate winner and loser for progression
   var w = (score[0] > score[1]) ? m.p[0] : m.p[1]
     , l = (score[0] > score[1]) ? m.p[1] : m.p[0];
 
-  // 1. score given game
-  var m = $.firstBy(T.byId.bind(null, id), ms);
-  if (!m) {
-    throw new Error(T.representation(id) + " match not found in tournament");
-  }
-  m.s = score;
+  // did underdog win GF1? Then override and force progression fns to move to GF2.
+  var longLbGf = (id.b === LB && id.r === 2*p - 1 && score[1] > score[0]);
+
+  //TODO: if right/down is truthy but nxtM/dnM is not, tournament is corrupt, warn!
+  var playerInsert = function (where, adv) {
+    if (!where) {
+      return; // nothing to do
+    }
+
+    // we got valid results from progression function, we should be able to insert
+    var id = where[0]
+      , pos = where[1]
+      , insertM = $.firstBy(T.byId.bind(null, id), gs);
+
+    if (!insertM) {
+      console.error("tournament corrupt: " + T.representation(id) + " not found!");
+      return;
+    }
+    insertM.p[pos] = adv;
+    if (insertM.p[(pos + 1) % 2] === WO) {
+      // insertM.s = (pos) ? [0, 1] : [1, 0]; // set WO score (unnecessary)
+
+      // return id and wo winner so that it can be forwarded on
+      return [insertM.id, adv];
+    }
+  };
 
   // 2. move winner right
-  var right = T.right(p, last, id, false)
-  if (right) {
-    var nxtId = right[0]
-      , rPos = right[1];
-
-    var nxtM = $.firstBy(T.byId.bind(null, nxtId), ms);
-    if (nxtM) {
-      nxtM.p[rPos] = w;
-    }
-  }
+  var rprog = T.right(p, last, id, longLbGf);
+  playerInsert(rprog, w);
 
   // 3. move loser down if applicable
-  var down = T.down(p, last, id)
-  if (down) {
-    var dnId = down[0]
-      , dPos = down[1];
+  var dprog = T.down(p, last, id, longLbGf);
+  var dres = playerInsert(dprog, l);
 
-    var dnM = $.firstBy(T.byId.bind(null, dnId), ms);
-    if (dnM) {
-      dnM.p[dPos] = l;
-    }
+  // 4. check if loser must be forwarded from existing WO in LBR1/LBR2
+  // only WO fw case, non-WO match winner can never T.right onto a WO match
+  if (dres) {
+    var dprog2 = T.right(p, last, dres[0], false);
+    playerInsert(dprog2, dres[1]);
   }
 
-
-  // 4. check if loser needs WO from LBR1
-  // 5. check if loser needs WO from LBR2
-  return ms;
+  return gs;
 };
 
 module.exports = T;

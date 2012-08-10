@@ -4,7 +4,6 @@ var tap = require('tap')
   , T = require('../');
 
 test("groups", function (t) {
-  // TODO: eventually buff these numbers to test all cases..
   var nums = $.range(200)
     , gsizes = $.range(16);
 
