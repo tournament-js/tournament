@@ -38,7 +38,7 @@ test("placement", function (t) {
 
 test("elimination", function (t) {
   // try scoring everything in order
-  var gs = T.elimination(T.LB, 5);
+  var gs = T.duelElimination(T.LB, 5);
   var p = 3;
   var lastM = gs[gs.length-1];
   t.ok(!lastM.m, "no map scores recorded for last match yet");
