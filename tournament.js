@@ -71,9 +71,10 @@ T.robin = function (n) {  // num players
 // constants for tournaments
 /*const WB = 1
     , LB = 2
-    , WO = -1;*/
+    , WO = -1
+    , NA = 0*/
 
-var WB = 1, LB = 2, WO = -1;
+var WB = 1, LB = 2, WO = -1, NA = 0;
 
 // export constants
 T.WB = WB;
@@ -127,7 +128,7 @@ var seeds = function (i, pow, num_players) {
 // return an array of games for a tournament
 // a match has the form {p: playerArray, b: bracketNum, r: roundNum, g: gameNum}
 // bracket, round and game number are 1 indexed
-T.elimination = function (last, num_players) {
+T.duelElimination = function (last, num_players) {
   if (num_players < 4) {
     return [];
   }
@@ -152,11 +153,11 @@ T.elimination = function (last, num_players) {
       // create shells for WBR2, LBR1 & LBR2
       if (!isEven) {
         var next = (i+1) / 2;
-        wbm2 = {id: gId(WB, 2, next), p: [0, 0]};
+        wbm2 = {id: gId(WB, 2, next), p: [NA, NA]};
 
         if (last >= LB) {
-          lbm1 = {id: gId(LB, 1, next), p: [0, 0]};
-          lbm2 = {id: gId(LB, 2, next), p: [0, 0]};
+          lbm1 = {id: gId(LB, 1, next), p: [NA, NA]};
+          lbm2 = {id: gId(LB, 2, next), p: [NA, NA]};
         }
       }
 
@@ -188,7 +189,7 @@ T.elimination = function (last, num_players) {
   if (n >= 3) {
     for (var r = 3; r <= n; r += 1) {
       for (var g = 1; g <= Math.pow(2, n - r); g += 1) {
-        games.push({id: gId(WB, r, g), p: [0, 0]});
+        games.push({id: gId(WB, r, g), p: [NA, NA]});
       }
     }
   }
@@ -198,12 +199,12 @@ T.elimination = function (last, num_players) {
       for (var r = 3; r <= 2*n - 2; r += 1) {
         // number of games halves every odd round in losers bracket
         for (var g = 1; g <= Math.pow(2, n - 1 - Math.floor((r + 1) / 2)); g += 1) {
-          games.push({id: gId(LB, r, g), p: [0, 0]});
+          games.push({id: gId(LB, r, g), p: [NA, NA]});
         }
       }
     }
-    games.push({id: gId(LB, 2*n - 1, 1), p: [0, 0]}); // grand final game 1
-    games.push({id: gId(LB, 2*n, 1), p: [0, 0]});     // grand final game 2
+    games.push({id: gId(LB, 2*n - 1, 1), p: [NA, NA]}); // grand final game 1
+    games.push({id: gId(LB, 2*n, 1), p: [NA, NA]});     // grand final game 2
   }
   return games.sort(compareGames); // sort so they can be scored in order
 };
@@ -355,8 +356,6 @@ T.scoreDuel = function (last, p, gs, id, score) {
   if (dres) {
     playerInsert(T.right(last, p, dres[0], false), dres[1]);
   }
-
-  return gs;
 };
 
 T.scorable = function (last, p, id) {
@@ -441,12 +440,12 @@ T.duelResults = function (last, p, gs) {
   , r   : {type: Number, required: true, min: 1, max: 256}
   , g   : {type: Number, required: true, min: 1, max: 128}
   }
-, r  : String // straingt from T.representation
+, r  : String // straigt from T.representation
 , d  : Date   // scheduled play date
 
   // the following are ordered jointly and can be zipped
 , p  : [Number]   // should be between 1 and 128 to match nice seed numbers
-, m  : [Number]   // map wins, not actual map scores [if non-existent => not played]
+, m  : [Number]   // map wins in duel and overall / summed result in ffa
 , s  : [[Number]] // scores list of map results one score list per player
 });
 
@@ -454,15 +453,16 @@ T.duelResults = function (last, p, gs) {
 var Tournament = new Schema({
   games   : [Game]
 , ongoing : Boolean
-, results : [Results] // results array if !on
+, results : [PlayerResult] // from one of the results functions
 , system  : Number    // scoring system: time asc, time desc, points asc, points desc
 , size    : Number    // number of players (keeps structure simple and disjoint from invitemaps..)
 });
 
-var Results = new Schema({
+var PlayerResult = new Schema({
   seed   : Number // in {1, .. , size}
 , pos    : Number // final tournament position
-, maps   : Number // number of maps taken
+, maps   : Number // number of maps taken in duel
+, sum    : Number // sum of results in ffa
 , best   : Number // best game score (from all matching game.r entries)
 , wins   : Number // number of game wins
 });*/
@@ -470,45 +470,223 @@ var Results = new Schema({
 // -----------------------------------------------------------------------------
 // ffa tournaments
 
-T.ffaElimination = function (gs, adv, np) {
-  if (np <= 2 || gs <= 2 || np <= gs || adv >= gs || adv <= 0) {
-    console.error("invalid ffa configuration: players=" + np + ", groupsize=" + gs + ", advancing=" + adv);
+var zeroOut = function (grps) {
+  return grps.map(function (grp) {
+    return $.replicate(grp.length, NA);
+  });
+};
+
+T.ffaElimination = function (grs, adv, np) {
+  if (np <= 2 || grs <= 2 || np <= grs || adv >= grs || adv <= 0) {
+    console.error("invalid ffa configuration: players=" + np + ", groupsize=" + grs + ", advancing=" + adv);
     return;
   }
-  var matches = []
-    , grps = T.groups(np, gs);
+  var games = []
+    , grps = T.groups(np, grs);
 
   // create each round iteratively
   for (var r = 1; grps.length > 1; r += 1) {
-    for (var i = 1; i <= grps.length; i += 1) {
-      matches.push({id: {b: WB, r: r, g: i}, p: grps[i-1]});
+    if (r > 1) {
+      grps = zeroOut(grps);
+    }
+    for (var i = 0; i < grps.length; i += 1) {
+      games.push({id: {b: WB, r: r, g: i + 1}, p: grps[i]}); // +1 as game numbers are 1-indexed
     }
 
-    // prepare for the next round, T.groups may adjust gs internally, we find best adv
+    // prepare for the next round, T.groups may adjust grs internally, we find best adv
     var minsize = $.minimum($.pluck('length', grps));
 
     // metric to determine the best adv for the next groups call uses 2 factors:
     // - distance from requested adv => best - adv
-    // - how close the groups are to filled => (best * grps.length) % gs
+    // - how close the groups are to filled => (best * grps.length) % grs
     // we weight these factors by 2 and 1 resp.
-    var bestA = Math.max(1, adv - (gs - minsize)); // ok starting point, 1 adv worst case fallback
-    var bestMetric = 2*Math.abs(bestA - adv) + ((bestA * grps.length) % gs)
+    var bestA = Math.max(1, adv - (grs - minsize)); // ok starting point, 1 adv worst case fallback
+    var bestMetric = 2*Math.abs(bestA - adv) + ((bestA * grps.length) % grs);
     for (var a = adv; a > 0; a -= 1) {
       if (a >= minsize) {
         continue; // need to actually eliminate something in each match..
       }
-      var nMetric = 2*Math.abs(a - adv) + ((a * grps.length) % gs);
+      var nMetric = 2*Math.abs(a - adv) + ((a * grps.length) % grs);
       if (nMetric < bestMetric) { // better candidate
         bestMetric = nMetric;
         bestA = a;
       }
     }
-    grps = T.groups(grps.length * bestA, gs);
+    grps = zeroOut(T.groups(grps.length * bestA, grs));
   }
-  matches.push({id: {b: WB, r: r, g: 1}, p: grps[0]}); // grand final
-
-  return matches;
+  games.push({id: {b: WB, r: r, g: 1}, p: grps[0]}); // grand final
+  return games;
 };
+
+// how many advances from the current round (filter of gs) to the next round (ditto)
+// returns adv which is <= what was requested due to model optimization
+var advancing = function (currRnd, nxtRnd) {
+  var slots = $.flatten($.pluck('p', nxtRnd)).length; // how many that's expected
+  var adv = slots / currRnd.length; // how many to take from each group (is always divisible)
+  return adv;
+};
+
+// like other score function, modifies gs
+T.scoreFfa = function (gs, id, score) {
+  // 1. score given game
+  var m = $.firstBy(T.byId.bind(null, id), gs);
+  if (!m) {
+    throw new Error(T.representation(id) + " match not found in tournament");
+  }
+
+  // sanity
+  if (!Array.isArray(score) || score.length !== m.p.length)  {
+    throw new Error("invalid scores: must be array of player length - got: " + JSON.stringify(score));
+  }
+  if (!score.every(t.isNumber) || !score.every(t.isNumeric)) {
+    throw new Error("invalid player scores: all must be numeric - got: " + JSON.stringify(score));
+  }
+
+  if (m.p.some($.eq(NA))) {
+    console.error("cannot score not fully filled in game: " + T.representation(id));
+    return gs;
+  }
+
+  m.m = score; // only map scores are relevant for progression
+
+  // if all games in this round were scored, fill in next round's slots with the advancing players
+  var currRnd = gs.filter(function (g) {
+    return g.id.r === id.r;
+  });
+  var rndScored = currRnd.every(function (g) {
+    return g.m; // map score exists
+  });
+
+  // TODO: checks that nxtRnd isn't scored before doing this?
+  if (rndScored) {
+    var nxtRnd = gs.filter(function (g) {
+      return (g.id.r === id.r + 1);
+    });
+    var adv = advancing(currRnd, nxtRnd);
+
+    var top = [];
+    for (var i = 0; i < currRnd.length; i += 1) {
+      var topAdv = $.zip(currRnd[i].p, currRnd[i].m).sort($.comparing('1', -1)).slice(0, adv);
+      top = top.concat(topAdv);
+    }
+    top = $.pluck(0, top.sort($.comparing('1', -1))); // sorted overalls, serves as a replacement seed map
+
+    // safe to recreate groups using a possibly smaller group size than the original requested
+    // because it was determined during construction that the model needed reducing then!
+    var grs = $.maximum($.pluck('length', $.pluck('p', nxtRnd)));
+    var nextSeeded = T.groups(top.length, grs);
+
+    // now loop through these and match each group up with the right game in nxtRnd
+    for (var k = 0; k < nextSeeded.length; k += 1) {
+      nxtRnd[k].p = []; // reset the player array in this match, will re-add in inner loop
+
+      var match = nextSeeded[k];
+      for (var j = 0; j < match.length; j += 1) {
+        var seed = match[j];
+        // nextSeeded is a group in T.groups so elements are seed numbers
+        // map it to the corr. top position from last round and add to player array
+        nxtRnd[k].p.push(top[seed - 1]);
+      }
+    }
+  }
+};
+
+
+T.ffaResults = function (gs, size) {
+  // size = maximal player number found in tournament round 1, passed in for now..
+
+  var res = [];
+  for (var s = 0; s < size; s += 1) {
+    res[s] = {
+      seed : s + 1
+    , sum : 0
+    //, best : 0  // not clear what is best, need the system to come in here or reference instead
+    , wins : 0
+    , pos  : size // initialize to last place if no rounds played
+    };
+  }
+  var maxround = $.maximumBy(function (x, y) {
+    return x.id.r - y.id.r;
+  }, gs).id.r;
+
+  for (var i = 0; i < gs.length; i += 1) {
+    var g = gs[i];
+    if (!g.m) {
+      continue; // only count played games (WO markers don't exist in FFA)
+    }
+
+    var top = $.zip(g.p, g.m).sort($.comparing('1', -1));
+    for (var j = 0; j < top.length; j += 1) {
+      var pJ = top[j][0] - 1  // convert seed -> zero indexed player number
+        , mJ = top[j][1];     // map wins for pJ
+
+      // inc wins
+      res[pJ].wins += top.length - j - 1; // ffa wins === number of player below
+      res[pJ].sum += mJ;
+    }
+  }
+
+  // push top X from each round backwards from last round
+  var posCtr = 1; // start with winner and go down
+  var uncounted = 0; // number of players in skipped rounds
+  // helpers for round loop
+  var isReady = function (rnd) {
+    return rnd.every(function (g) {
+      return g.m;
+    });
+  };
+  var getRnd = function (r) {
+    return gs.filter(function (g) {
+      return g.id.r === r;
+    });
+  };
+  var getRndSize = function (rnd) {
+    return $.sum(rnd.map(function (g) {
+      return g.p.length;
+    }));
+  };
+  var getRndTop = function (rnd) {
+    var rndZip = rnd.map(function (g) {
+      return $.zip(g.p, g.m);
+    });
+    return $.flatten(rndZip).sort($.comparing('1', -1));
+  };
+
+  for (var k = maxround; k > 0 ; k -= 1) { // round 1-indexed
+    var rnd = getRnd(k);
+    var roundSize = getRndSize(rnd);
+
+    if (!isReady(rnd)) {
+      posCtr += roundSize;
+      uncounted += roundSize;
+      continue;
+    }
+
+    var rndTop = getRndTop(rnd);
+
+    // store round winners in order (the ones not stored already) the .pos in res[seed-1]
+    for (var l = 0; l < rndTop.length; l += 1) {
+      var resIdx = rndTop[0][l] - 1; // === seed - 1;
+      if (res[resIdx].pos !== size) {
+        res[resIdx].pos = posCtr;
+
+        // first finished round all tie at position equal to the sum of players meant to go further
+        // by keeping track of how many in each round above, and only incrementing pos after exhausting those
+        if (uncounted > 0) {
+          uncounted -= 1;
+        }
+        else {
+          posCtr += 1;
+        }
+      }
+      // otherwise already stored in later round, dont mess with their position
+    }
+  }
+  // if (uncounted === size) return res.sort($.comparing('maps')) // first round not finished?
+
+  return res.sort($.comparing('pos'));
+};
+
 
 
 
