@@ -4,13 +4,14 @@ var tap = require('tap')
   , T = require('../');
 
 test("groups", function (t) {
-  var nums = $.range(200)
+  var nums = $.range(100)
     , gsizes = $.range(16);
 
   nums.forEach(function (np) {
     gsizes.forEach(function (s) {
       var grps = T.groups(np, s);
-      t.ok($.maximum($.pluck('length', grps)) <= s, "group sizes <= input size");
+      var maxsize = $.maximum($.pluck('length', grps));
+      t.ok(maxsize <= s, "group sizes <= input size");
 
       var pls = $.flatten(grps);
       t.equal(pls.length, np, "right number of players included");
@@ -25,6 +26,14 @@ test("groups", function (t) {
           // a group is perfect if groups are full and only filled with pairs!
           t.equal($.minimum(gsums), $.maximum(gsums), "sum of seeds zero difference in perfect groups");
         }
+      }
+
+      if (maxsize < s) {
+        // group size model was reduced as all groups non-full, so:
+        // calling T.groups with the gs reduced to maxsize should produce same output
+        var grpsClone = T.groups(np, maxsize);
+        var errModel = np + " players, groupsize " + s + " reduced to " +  maxsize
+        t.deepEqual(grps, grpsClone, "reduced model in deterministic way: " + errModel);
       }
     });
   });
