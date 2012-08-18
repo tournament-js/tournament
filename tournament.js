@@ -80,6 +80,7 @@ var WB = 1, LB = 2, WO = -1, NA = 0;
 T.WB = WB;
 T.LB = LB;
 T.WO = WO;
+T.NA = NA;
 
 // mark players that had to be added to fit model as WO's
 var woMark = function (ps, num_players) {
@@ -445,7 +446,7 @@ T.duelResults = function (last, p, gs) {
 
   // the following are ordered jointly and can be zipped
 , p  : [Number]   // should be between 1 and 128 to match nice seed numbers
-, m  : [Number]   // map wins in duel and overall / summed result in ffa
+, m  : [Number]   // map wins in duel and sum/overall game result in ffa
 , s  : [[Number]] // scores list of map results one score list per player
 });
 
@@ -593,8 +594,6 @@ T.scoreFfa = function (gs, id, score) {
 
 
 T.ffaResults = function (gs, size) {
-  // size = maximal player number found in tournament round 1, passed in for now..
-
   var res = [];
   for (var s = 0; s < size; s += 1) {
     res[s] = {
@@ -626,15 +625,12 @@ T.ffaResults = function (gs, size) {
     }
   }
 
-  // push top X from each round backwards from last round
-  var posCtr = 1; // start with winner and go down
-  var uncounted = 0; // number of players in skipped rounds
   // helpers for round loop
   var isReady = function (rnd) {
-    return rnd.every(function (g) {
-      return g.m;
-    });
-  };
+    return rnd.some(function (g) { // suffices to use .some since scoreFfa only propagates at end
+      return g.p.some($.neq(NA));  // players exist => previous round is scored
+    })
+  }
   var getRnd = function (r) {
     return gs.filter(function (g) {
       return g.id.r === r;
@@ -645,49 +641,41 @@ T.ffaResults = function (gs, size) {
       return g.p.length;
     }));
   };
-  var getRndTop = function (rnd) {
-    var rndZip = rnd.map(function (g) {
-      return $.zip(g.p, g.m);
-    });
-    return $.flatten(rndZip).sort($.comparing('1', -1));
-  };
 
+  // push top X from each round backwards from last round
+  var posCtr = 1; // start with winner and go down
+  var prevRoundSize = 0;
   for (var k = maxround; k > 0 ; k -= 1) { // round 1-indexed
     var rnd = getRnd(k);
     var roundSize = getRndSize(rnd);
+    var resEl;
 
-    if (!isReady(rnd)) {
-      posCtr += roundSize;
-      uncounted += roundSize;
-      continue;
+    if (k === maxround && rnd[0].m) {
+      var winners = $.zip(g.p, g.m).sort($.comparing('1', -1));
+      for (var w = 0; w < winners.length; w += 1) {
+        resEl = res[winners[w][0] - 1]; // winners[w][0] gets a seed number then 0 index it
+        resEl.pos = w + 1;
+      }
     }
-
-    var rndTop = getRndTop(rnd);
-
-    // store round winners in order (the ones not stored already) the .pos in res[seed-1]
-    for (var l = 0; l < rndTop.length; l += 1) {
-      var resIdx = rndTop[0][l] - 1; // === seed - 1;
-      if (res[resIdx].pos !== size) {
-        res[resIdx].pos = posCtr;
-
-        // first finished round all tie at position equal to the sum of players meant to go further
-        // by keeping track of how many in each round above, and only incrementing pos after exhausting those
-        if (uncounted > 0) {
-          uncounted -= 1;
+    else if (isReady(rnd)) {
+      var rndPls = $.flatten($.pluck('p', rnd));
+      // store round winners in order (the ones not stored already) the .pos in res[seed-1]
+      for (var l = 0; l < rndPls.length; l += 1) {
+        resEl = res[rndPls[l] - 1];
+        if (k === maxround) {
+          resEl.pos = rnd[0].p.length; // let final match tie at last place before scoring
         }
-        else {
-          posCtr += 1;
+        else if (resEl.pos === size) {
+          resEl.pos = posCtr;
         }
       }
-      // otherwise already stored in later round, dont mess with their position
     }
+    posCtr += roundSize - prevRoundSize;
+    prevRoundSize = roundSize;
   }
-  // if (uncounted === size) return res.sort($.comparing('maps')) // first round not finished?
 
   return res.sort($.comparing('pos'));
 };
-
-
 
 
 module.exports = T;
