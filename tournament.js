@@ -604,9 +604,6 @@ T.ffaResults = function (gs, size) {
     , pos  : size // initialize to last place if no rounds played
     };
   }
-  var maxround = $.maximumBy(function (x, y) {
-    return x.id.r - y.id.r;
-  }, gs).id.r;
 
   for (var i = 0; i < gs.length; i += 1) {
     var g = gs[i];
@@ -625,15 +622,17 @@ T.ffaResults = function (gs, size) {
     }
   }
 
+  var rounds = [];
+  gs.forEach(function (g) {
+    rounds[g.id.r - 1] || (rounds[g.id.r - 1] = []);
+    rounds[g.id.r - 1].push(g);
+  });
+  var maxround = rounds.length;
+
   // helpers for round loop
   var isReady = function (rnd) {
     return rnd.some(function (g) { // suffices to use .some since scoreFfa only propagates at end
       return g.p.some($.neq(NA));  // players exist => previous round is scored
-    })
-  }
-  var getRnd = function (r) {
-    return gs.filter(function (g) {
-      return g.id.r === r;
     });
   };
   var getRndSize = function (rnd) {
@@ -646,12 +645,13 @@ T.ffaResults = function (gs, size) {
   var posCtr = 1; // start with winner and go down
   var prevRoundSize = 0;
   for (var k = maxround; k > 0 ; k -= 1) { // round 1-indexed
-    var rnd = getRnd(k);
+    var rnd = rounds[k - 1];
     var roundSize = getRndSize(rnd);
     var resEl;
 
     if (k === maxround && rnd[0].m) {
-      var winners = $.zip(g.p, g.m).sort($.comparing('1', -1));
+      var gf = rnd[0];
+      var winners = $.zip(gf.p, gf.m).sort($.comparing('1', -1));
       for (var w = 0; w < winners.length; w += 1) {
         resEl = res[winners[w][0] - 1]; // winners[w][0] gets a seed number then 0 index it
         resEl.pos = w + 1;
@@ -673,7 +673,6 @@ T.ffaResults = function (gs, size) {
     posCtr += roundSize - prevRoundSize;
     prevRoundSize = roundSize;
   }
-
   return res.sort($.comparing('pos'));
 };
 
