@@ -44,18 +44,22 @@ Necessary here?
 Computes the results array for the current state of the tournament. Contains useful statistics like the final or currently obtained: placement, score sum and game wins.
 
 
-### Tournament Serialization
-Both tournament types are serializable directly via the `instance.games` array available on both types. Suppose the games have been stored elsewhere, to continue scoring hte tournament reload up the tournament instance via either:
-#### T.FFA.fromGames(games) :: ffaTournament
-#### T.Duel.fromGames(games) :: duelTournament
-
-
 ### Group Stages
 The basic algorithms for how group stages work. Generally, not necessary to use directly, but useful for intuition or if more control is required.
 #### T.groups(numPlayers, groupSize) :: [Group]
 #### T.robin(numPlayers [, playerArray]) :: [Round]
 
 TODO: actually create a full groupstage from these two functions.
+
+### Tournament Serialization
+Both tournament types are serializable directly via the `instance.games` array available on both types. Suppose the games have been stored elsewhere, to continue scoring hte tournament reload up the tournament instance via either:
+#### T.FFA.fromGames(games) :: ffaTournament
+#### T.Duel.fromGames(games) :: duelTournament
+
+### Tracking Players
+TODO:
+#### tInst.upcoming(playerId) :: Maybe Id
+Players can be tracked through the tournaments via this function. By allowing/forcing each player to score all ids returned by this function, the tournament will eventually finish by itself without the need for any more elaborate user interface.
 
 
 ## Installation
