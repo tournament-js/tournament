@@ -8,13 +8,8 @@ Tournament is a library for creating and managing data structures related to com
 var T = require('tournament')
 ````
 
-## General Helpers
-#### T.groups(numPlayers, groupSize) :: [Group]
-#### T.robin(numPlayers) :: [Round]
-
-## Elimination Tournaments
-### Helpers
-#### ? T.byId(games) :: Game
+### API
+TODO: document the types some here
 #### T.representation(id) :: String
 ### Constants
 #### T.WB :: Winner Bracket
@@ -23,71 +18,44 @@ var T = require('tournament')
 #### T.NA :: Player Not Ready
 
 ### Duel Elimination
-In this section, a parameter named
+#### new T.Duel(numPlayers, lastBracket) :: duelTournament
+#### duel.score(id, mapScore) :: Boolean
+Updates the `duel.games` array and propagates the winner to the next game, and (if applicable) the loser to the lower bracket.
 
-- `last` refer to the last bracket in play, either `T.WB` for _Single Elimination_ or `T.LB` for _Double Elimination_.
-- `p` refer to the power of a tournament === ceil(log2(numPlayers))
+Note: if called with an `id` that's been scored ages ago, it's possible that the wrong winner appears two rounds later, so that the next game must also be rescored so that the right winner is propagated again.
 
-#### T.duelElimination(last, numPlayers) :: [Game]
-#### T.scoreDuel(last, p, games, id, score) :: Undefined
-#### T.duelScorable(last, p, games, id) :: Boolean
-#### T.duelResults(last, p, games) :: [Result]
+#### duel.scorable(id) :: Boolean
+Provides an extra safety check that `duel.score` will not leave the tournament in an inconsistent state described above.
 
+#### duel.results() :: [Result]
+Computes the results array for the current state of the tournament. Contains useful statistics like the final or currently obtained: placement, map wins and game wins.
 
 ### FFA Elimination
-#### T.ffaElimination(numPlayers, groupSize, advancers) :: [Game]
-#### T.scoreFfa(games, id, score) :: Undefined
-#### T.ffaScorable(games, id) :: Boolean
-#### T.ffaResults(numPlayers, games) :: [Result]
+#### new T.FFA(numPlayers, groupSize, advancers) :: ffaTournament
+#### ffa.score(id, mapScore) :: Boolean
+Updates the `ffa.games` array and, if it's the last game of the round, the winners will be propagated to the next round.
 
+TODO: maybe see if possible to propagate always
 
-TODO: create `T.upcoming` to be nicer than `right`, `down` and work for all types.
-I.e. it may not give an answer (in ffa tournaments), but will give the id of the next.
-And it wont have to deal with `longLbGf`, and return UNDECIDED pre-round ffa scores.
+#### ffa.scorable(id) :: Boolean
+Necessary here?
 
-### Alternative API
-#### new T.FFA(numPlayers, groupSize, advancers) :: ffaObj
-#### new T.FFA(games) :: ffaObj
-#### ffa.score(id, mapScore)
 #### ffa.results() :: [Result]
-#### ffa.byId(id) :: Game
-#### ffa.games() :: [Game]
-
-#### T.Duel(lastBracket, numPlayers) :: duelObj
-#### T.Duel(games) :: duelObj
-#### duel.score(id, score)
-#### duel.results() :: [Result]
-#### duel.byId(id) :: Game
-#### duel.games() :: [Game]
-
-### Alternative API 3
-Create an elimination object via either the FFA or the Duel constructor.
-
-Need to store the constructor params regardless really, otherwise
-info about the tournament would be lackluster. Would simplify some calculations
-as well to have groupSize and advancers
-
-#### T.FFA(numPlayers, groupSize, advancers)
-#### T.FFA(games)
-#### T.Duel(numPlayers, lastBracket)
-#### T.Duel(games)
-
-Then the following methods are available
-#### t.score(id, mapScore) :: Undefined
-Sets the given `mapScore` on the game with given `id` if it exists and is scorable.
-#### t.scorable(id) :: Boolean
-Returns whether or not the game with given `id` is currently scorable in `t`.
-#### t.byId(id) :: Game
-Fetches the game with given `id` in `t` if it exists. Otherwise returns `null`.
-#### t.games() :: [Game]
-Fetches all the games in `t` for external storage. Can be used to reconstruct a `Duel` or `FFA` instance directly.
-#### t.results() :: [Result]
-Fetches current result
+Computes the results array for the current state of the tournament. Contains useful statistics like the final or currently obtained: placement, score sum and game wins.
 
 
+### Tournament Serialization
+Both tournament types are serializable directly via the `instance.games` array available on both types. Suppose the games have been stored elsewhere, to continue scoring hte tournament reload up the tournament instance via either:
+#### T.FFA.fromGames(games) :: ffaTournament
+#### T.Duel.fromGames(games) :: duelTournament
 
 
+### Group Stages
+The basic algorithms for how group stages work. Generally, not necessary to use directly, but useful for intuition or if more control is required.
+#### T.groups(numPlayers, groupSize) :: [Group]
+#### T.robin(numPlayers [, playerArray]) :: [Round]
 
+TODO: actually create a full groupstage from these two functions.
 
 
 ## Installation
