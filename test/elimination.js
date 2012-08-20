@@ -3,49 +3,20 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
-test("placement", function (t) {
-  t.equal(T.placement(T.WB, 2, 1), 3, "placement 2 1");
-  t.equal(T.placement(T.WB, 2, 2), 2, "placement 2 2");
-  t.equal(T.placement(T.WB, 2, 3), 1, "placement 2 3");
+test("duel WB general", function (t) {
+  var duel = new T.Duel(32, T.WB)
+    , gs = duel.games
+    , p = duel.p;
 
-  t.equal(T.placement(T.WB, 3, 1), 5, "placement 3 1");
-  t.equal(T.placement(T.WB, 3, 2), 3, "placement 3 2");
-  t.equal(T.placement(T.WB, 3, 3), 2, "placement 3 3");
-  t.equal(T.placement(T.WB, 3, 4), 1, "placement 3 4");
+  // size == sizeof wb (powers of two consecutively)
+  t.equal(gs.length, Math.pow(2, p) - 1, "size of big t");
 
-  t.equal(T.placement(T.WB, 4, 5), 1, "placement 4 5");
-  t.equal(T.placement(T.WB, 4, 4), 2, "placement 4 4");
-
-  t.equal(T.placement(T.LB, 2, 1), 4, "placement LB 2 1");
-  t.equal(T.placement(T.LB, 2, 2), 3, "placement LB 2 2");
-  t.equal(T.placement(T.LB, 2, 3), 2, "placement LB 2 3");
-  t.equal(T.placement(T.LB, 2, 4), 2, "placement LB 2 4");
-  t.equal(T.placement(T.LB, 2, 5), 1, "placement LB 2 5");
-
-  t.equal(T.placement(T.LB, 3, 1), 7, "placement LB 3 1");
-  t.equal(T.placement(T.LB, 3, 2), 5, "placement LB 3 2");
-  t.equal(T.placement(T.LB, 3, 3), 4, "placement LB 3 3");
-  t.equal(T.placement(T.LB, 3, 4), 3, "placement LB 3 4");
-  t.equal(T.placement(T.LB, 3, 5), 2, "placement LB 3 5");
-  t.equal(T.placement(T.LB, 3, 6), 2, "placement LB 3 6");
-  t.equal(T.placement(T.LB, 3, 7), 1, "placement LB 3 7");
-
-  t.equal(T.placement(T.LB, 4, 8), 2, "placement LB 4 8");
-  t.equal(T.placement(T.LB, 4, 9), 1, "placement LB 4 9");
-
-  t.end();
-});
-
-test("duel", function (t) {
-  // try scoring everything in order
-  var gs = T.duelElimination(T.LB, 5);
-  var p = 3;
   var lastM = gs[gs.length-1];
   t.ok(!lastM.m, "no map scores recorded for last match yet");
 
   gs.forEach(function (g) {
     // will produce some warnings when there are WO markers present
-    T.scoreDuel(T.LB, p, gs, g.id, [0, 2]);
+    duel.score(g.id, [0, 2]);
   });
 
   t.ok(lastM.m, "map scores recorded for last match");
@@ -55,20 +26,115 @@ test("duel", function (t) {
   // note this only true because this case gets a double final
   t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
 
-  var res = T.duelResults(T.LB, 3, gs);
-  //t.deepEqual(res, {}, "r"); // TODO: proper test that things progressed as expected
+  var res = duel.results(T.WB, p, gs);
   t.ok(res, "results produced");
+  t.equal(res.length, 32, "all players included in results");
 
   t.end();
 });
 
-// full test of a 4 2 16 ffa tournament
-test("ffa 4 2 16", function (t) {
-  var gs = T.ffaElimination(4, 2, 16);
+
+test("duel LB general", function (t) {
+  var duel = new T.Duel(32, T.LB)
+    , gs = duel.games
+    , p = duel.p;
+
+  // size == sizeof wb (powers of two consecutively)
+  // += size of lb == 2x size of smaller WB (gfs cancels out 2x -1s)
+  t.equal(gs.length, Math.pow(2, p) - 1 + 2*Math.pow(2, p - 1), "size of big t");
+
+  var lastM = gs[gs.length-1];
+  t.ok(!lastM.m, "no map scores recorded for last match yet");
+
+  gs.forEach(function (g) {
+    // will produce some warnings when there are WO markers present
+    duel.score(g.id, [0, 2]);
+  });
+
+  t.ok(lastM.m, "map scores recorded for last match");
+  var lastPls = lastM.p.filter(function (n) {
+    return (n !== 0 && n !== T.WO);
+  });
+  // note this only true because this case gets a double final
+  t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
+
+  var res = duel.results();
+  t.ok(res, "results produced");
+  t.equal(res.length, 32, "all players included in results");
+
+  t.end();
+});
+
+test("duel detailed", function (t) {
+  // try scoring everything in order
+  var duel = new T.Duel(5, T.LB)
+    , gs = duel.games
+    , p = 3;
+
+  var lastM = gs[gs.length-1];
+  t.ok(!lastM.m, "no map scores recorded for last match yet");
+
+  gs.forEach(function (g) {
+    // will produce some warnings when there are WO markers present
+    duel.score(g.id, [0, 2]);
+  });
+
+  t.ok(lastM.m, "map scores recorded for last match");
+  var lastPls = lastM.p.filter(function (n) {
+    return (n !== 0 && n !== T.WO);
+  });
+  // note this only true because this case gets a double final
+  t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
+
+  var res = duel.results();
+  t.ok(res, "results produced");
+
+  res.forEach(function (p) {
+    if (p.seed === 2) {
+      t.equal(p.pos, 1, "player 2 gets 1st");
+      t.equal(p.wins, 3, "player 2 win count");
+      t.equal(p.maps, 3*2, "player 2 map count");
+    }
+    else if (p.seed === 3) {
+      t.equal(p.pos, 2, "player 3 gets 2nd");
+      t.equal(p.wins, 3, "player 3 win count");
+      t.equal(p.maps, 3*2, "player 3 map count");
+    }
+    else if (p.seed === 4) {
+      t.equal(p.pos, 3, "player 4 gets 3rd");
+      t.equal(p.wins, 2, "player 4 win count");
+      t.equal(p.maps, 2*2, "player 4 map count");
+    }
+    else if (p.seed === 5) {
+      t.equal(p.pos, 4, "player 5 gets 4th");
+      t.equal(p.wins, 1, "player 5 win count");
+      t.equal(p.maps, 1*2, "player 5 map count");
+    }
+    else if (p.seed === 1) {
+      t.equal(p.pos, 5, "player 1 gets 5-6th");
+      t.equal(p.wins, 0, "player 1 win count");
+      t.equal(p.maps, 0*2, "player 1 map count");
+    }
+    else {
+      t.ok(false, "should not be any other players in results");
+    }
+  })
+
+  var sorted = $.pluck('seed', res);
+  t.deepEqual(sorted, [2, 3, 4, 5, 1], "results sorted after position");
+
+  t.end();
+});
+
+// full test of a 16 4 2 ffa tournament
+test("ffa 16 4 2", function (t) {
+  var ffa = new T.FFA(16, 4, 2)
+    , gs = ffa.games;
+
   t.equal(gs.length, 4 + 2 + 1, "ffa right number of games");
 
   // ffaResults init tests
-  var res = T.ffaResults(gs, 16);
+  var res = ffa.results();
   t.equal(res.length, 16, "all players had stats computed before scoring");
 
   var poss = $.nub($.pluck('pos', res));
@@ -90,7 +156,7 @@ test("ffa 4 2 16", function (t) {
 
   // now score the first round
   $.range(4).forEach(function (g) {
-    T.scoreFfa(gs, {b: T.WB, r: 1, g: g}, [4, 3, 2, 1]); // in the order of their seeds
+    ffa.score({b: T.WB, r: 1, g: g}, [4, 3, 2, 1]); // in the order of their seeds
   });
 
   // verify snd round filled in
@@ -102,7 +168,7 @@ test("ffa 4 2 16", function (t) {
   t.deepEqual(r2p, $.range(8), "r2 players are winners of r1");
 
   // check r2 stats computed correctly
-  var res2 = T.ffaResults(gs, 16);
+  var res2 = ffa.results();
   t.ok(res2, "got results 2");
 
   res2.forEach(function (p) {
@@ -125,7 +191,7 @@ test("ffa 4 2 16", function (t) {
   });
 
   $.range(2).forEach(function (g) {
-    T.scoreFfa(gs, {b: T.WB, r: 2, g: g}, [4, 3, 2, 1]);
+    ffa.score({b: T.WB, r: 2, g: g}, [4, 3, 2, 1]);
   });
 
     // verify snd round filled in
@@ -136,7 +202,7 @@ test("ffa 4 2 16", function (t) {
   var r3p = $.flatten($.pluck('p', r3)).sort($.compare());
   t.deepEqual(r3p, $.range(4), "r3 players are winners of r2");
 
-  var res3 = T.ffaResults(gs, 16);
+  var res3 = ffa.results();
   t.ok(res3, "got results 3");
 
   res3.forEach(function (p) {
@@ -170,8 +236,8 @@ test("ffa 4 2 16", function (t) {
   });
 
   // score final
-  T.scoreFfa(gs, {b: T.WB, r: 3, g: 1}, [4, 3, 2, 1]);
-  var res4 = T.ffaResults(gs, 16);
+  ffa.score({b: T.WB, r: 3, g: 1}, [4, 3, 2, 1]);
+  var res4 = ffa.results();
   t.ok(res4, "got results 4");
 
   res4.forEach(function (p) {
@@ -200,3 +266,66 @@ test("ffa 4 2 16", function (t) {
   t.end();
 });
 
+/*
+probably chuck these tests: they test too deeply
+test("right", function (t) {
+  var r = T.right(T.WB, 2, {b: T.WB, r: 1, g: 1});
+  t.deepEqual(r[0], {b: T.WB, r: 2, g: 1}, "1 1 -> 2 1");
+  t.equal(r[1], 0, "1 1 -> next upper");
+
+  r = T.right(T.WB, 2, {b: T.WB, r: 1, g: 2});
+  t.deepEqual(r[0], {b: T.WB, r: 2, g: 1}, "1 2 -> 2 1");
+  t.equal(r[1], 1, "1 1 -> next lower");
+
+  r = T.right(T.WB, 2, {b: T.WB, r: 2, g: 1});
+  t.equal(r, null, "2 1 is final at p=2, no right");
+
+  r = T.right(T.WB, 5, {b: T.WB, r: 3, g: 3});
+  t.deepEqual(r[0], {b: T.WB, r: 4, g: 2}, "3 3 -> 4 2");
+  t.equal(r[1], 0, "3 3 -> next upper");
+
+  r = T.right(T.LB, 5, {b: T.WB, r: 3, g: 3});
+  t.deepEqual(r[0], {b: T.WB, r: 4, g: 2}, "3 3 -> 4 2");
+  t.equal(r[1], 0, "3 3 -> next upper");
+
+  r = T.right(T.LB, 3, {b: T.LB, r: 3, g: 2});
+  t.deepEqual(r[0], {b: T.LB, r: 4, g: 2}, "LB 3 2 -> 4 2");
+  t.equal(r[1], 1, "LB 3 2 -> next lower (upper from WB)");
+
+  r = T.right(T.LB, 3, {b: T.LB, r: 4, g: 2});
+  t.deepEqual(r[0], {b: T.LB, r: 5, g: 1}, "LB 4 2 -> 5 1");
+  t.equal(r[1], 1, "LB 4 2 -> next lower (upper from WB)");
+
+  r = T.right(T.LB, 3, {b: T.LB, r: 5, g: 1}, false);
+  t.equal(r, null, "no gf2 unless fourth parameter indicates need for it");
+
+  r = T.right(T.LB, 3, {b: T.LB, r: 5, g: 1}, true);
+  t.deepEqual(r[0], {b: T.LB, r: 6, g: 1}, "LB 5 1 -> 6 1");
+  t.equal(r[1], 0, "LB 5 1 -> next upper (GF2 switch)");
+
+  t.end();
+});
+
+test("down", function (t) {
+  var d = T.down(T.LB, 2, {b: T.WB, r: 1, g: 1});
+  t.deepEqual(d[0], {b: T.LB, r: 1, g: 1}, "1 1 -> LB 1 1");
+  t.equal(d[1], 0, "1 1 -> LB down upper");
+
+  d = T.down(T.LB, 2, {b: T.WB, r: 1, g: 2});
+  t.deepEqual(d[0], {b: T.LB, r: 1, g: 1}, "1 2 -> LB 1 1");
+  t.equal(d[1], 1, "1 1 -> LB down lower");
+
+  d = T.down(T.WB, 2, {b: T.WB, r: 1, g: 1});
+  t.equal(d, null, "no downs from WB in single elim");
+
+  d = T.down(T.LB, 3, {b: T.WB, r: 3, g: 1});
+  t.deepEqual(d[0], {b: T.LB, r: 4, g: 1}, "3 1 -> LB 4 1");
+  t.equal(d[1], 0, "3 1 -> LB down upper");
+
+  d = T.down(T.LB, 3, {b: T.LB, r: 5, g: 1}, true);
+  t.deepEqual(d[0], {b: T.LB, r: 6, g: 1}, "LB 5 1 -> LB 6 1");
+  t.equal(d[1], 1, "LB 5 1 -> LB lower (gf1 loser to bottom)");
+
+  t.end();
+});
+*/

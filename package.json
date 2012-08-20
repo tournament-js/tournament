@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git://github.com/clux/tournament.git"
   },
-  "main": "tournament.js",
+  "main": "./lib/tournament.js",
   "engines": {
     "node": ">=0.6.0"
   },
