@@ -49,12 +49,16 @@ The basic algorithms for how group stages work. Generally, not necessary to use 
 #### T.groups(numPlayers, groupSize) :: [Group]
 #### T.robin(numPlayers [, playerArray]) :: [Round]
 
-TODO: actually create a full groupstage from these two functions.
+#### new T.GroupStage(numPlayers, groupSize) :: groupStage
+#### group.score(id, mapScore) :: Boolean
+#### group.scorable(id) :: Boolean
+#### group.results() :: [Result]
 
 ### Tournament Serialization
 Both tournament types are serializable directly via the `instance.games` array available on both types. Suppose the games have been stored elsewhere, to continue scoring hte tournament reload up the tournament instance via either:
 #### T.FFA.fromGames(games) :: ffaTournament
 #### T.Duel.fromGames(games) :: duelTournament
+#### T.GroupStage.fromGames(games) :: groupStage
 
 ### Tracking Players
 TODO:
