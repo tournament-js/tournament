@@ -8,8 +8,7 @@ test("duel WB general", function (t) {
     , gs = duel.matches
     , p = duel.p;
 
-  // size == sizeof wb (powers of two consecutively)
-  t.equal(gs.length, Math.pow(2, p) - 1, "size of big t");
+  t.equal(gs.length, Math.pow(2, p), "size of big t"); // incl bronzefinal
 
   var lastM = gs[gs.length-1];
   t.ok(!lastM.m, "no map scores recorded for last match yet");
