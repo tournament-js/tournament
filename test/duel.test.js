@@ -124,6 +124,40 @@ test("duel simple WB", function (t) {
   t.end();
 });
 
+test("duel simple but big LB", function (t) {
+  // try scoring everything in order
+  var duel = new T.Duel(128, T.LB)
+    , gs = duel.matches
+    , p = duel.p;
+
+  t.equal(gs.length, Math.pow(2, p) - 1 + 2*Math.pow(2, p - 1), "size of big t");
+
+  var lastM = gs[gs.length-2]; // wont be a double final
+  t.ok(!lastM.m, "no map scores recorded for last match yet");
+
+  gs.forEach(function (g) {
+    // will produce some warnings when there are WO markers present
+    duel.score(g.id, (g.p[0] < g.p[1]) ? [2, 0] : [0, 2]); // score highest winner
+  });
+
+  t.ok(lastM.m, "map scores recorded for last match");
+  var lastPls = lastM.p.filter(function (n) {
+    return (n !== 0 && n !== T.WO);
+  });
+  // note this only true because this case gets a double final
+  t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
+
+  var res = duel.results(); // TODO: fails here ATM
+  t.ok(res, "results produced");
+
+  var sorted = $.pluck('seed', res.slice(0, 4));
+  t.deepEqual(sorted, $.range(4), "results sorted after position");
+
+  t.end();
+});
+
+
+
 test("duel detailed LB", function (t) {
   // try scoring everything in order
   var duel = new T.Duel(5, T.LB)
