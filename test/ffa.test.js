@@ -64,6 +64,7 @@ test("ffa 16 4 3", function (t) {
   t.end();
 });
 
+
 // full test of a 16 4 2 ffa tournament
 test("ffa 16 4 2", function (t) {
   var ffa = new T.FFA(16, 4, 2)
@@ -94,7 +95,7 @@ test("ffa 16 4 2", function (t) {
 
   // now score the first round
   $.range(4).forEach(function (m) {
-    ffa.score({s: T.WB, r: 1, m: m}, [4, 3, 2, 1]); // in the order of their seeds
+    ffa.score({s: 1, r: 1, m: m}, [4, 3, 2, 1]); // in the order of their seeds
   });
 
   // verify snd round filled in
@@ -129,7 +130,7 @@ test("ffa 16 4 2", function (t) {
   });
 
   $.range(2).forEach(function (m) {
-    ffa.score({s: T.WB, r: 2, m: m}, [4, 3, 2, 1]);
+    ffa.score({s: 1, r: 2, m: m}, [4, 3, 2, 1]);
   });
 
     // verify snd round filled in
@@ -174,7 +175,7 @@ test("ffa 16 4 2", function (t) {
   });
 
   // score final
-  ffa.score({s: T.WB, r: 3, m: 1}, [4, 3, 2, 1]);
+  ffa.score({s: 1, r: 3, m: 1}, [4, 3, 2, 1]);
   var res4 = ffa.results();
   t.ok(res4, "got results 4");
 
