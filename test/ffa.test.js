@@ -3,26 +3,48 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
+var getMaxLen = function (rnd) {
+  return $.maximum($.pluck('length', $.pluck('p', rnd)));
+};
+var getRnd = function (gs, r) {
+  return gs.filter(function (g) {
+    return g.id.r === r;
+  });
+};
+
+// awful layout: 28 7 3, messes up 2nd round...
+test("ffa 28 7 3", function (t) {
+  var ffa = new T.FFA(28, 7, 3)
+    , gs = ffa.matches;
+
+  var r1 = getRnd(gs, 1)
+    , r2 = getRnd(gs, 2)
+    , r3 = getRnd(gs, 3)
+    , r4 = getRnd(gs, 4)
+    , r5 = getRnd(gs, 5);
+
+  t.equal(r1.length, 4, "4 full rounds gets all 28 players in r1");
+  t.equal(getMaxLen(r1), 7, "4x7 in r1");
+
+  t.equal(r2.length, 2, "4*3=12, proceeding => 2 groups of 6 in r2");
+  t.equal(getMaxLen(r2), 6, "2x6 in r2");
+
+  t.equal(r3.length, 1, "2*3=6 proceeding => 1 group of 6 in r3");
+  t.equal(getMaxLen(r3), 6, "1x6 in r3");
+
+  t.end();
+});
 
 // difficult layout, uses sensible metric?
 test("ffa 16 4 3", function (t) {
   var ffa = new T.FFA(16, 4, 3)
     , gs = ffa.matches;
 
-  var getRnd = function (r) {
-    return gs.filter(function (g) {
-      return g.id.r === r;
-    });
-  };
-  var getMaxLen = function (rnd) {
-    return $.maximum($.pluck('length', $.pluck('p', rnd)));
-  };
-
-  var r1 = getRnd(1)
-    , r2 = getRnd(2)
-    , r3 = getRnd(3)
-    , r4 = getRnd(4)
-    , r5 = getRnd(5);
+  var r1 = getRnd(gs, 1)
+    , r2 = getRnd(gs, 2)
+    , r3 = getRnd(gs, 3)
+    , r4 = getRnd(gs, 4)
+    , r5 = getRnd(gs, 5);
 
   t.equal(r1.length, 4, "4 rounds gets all 16 players in r1");
   t.equal(getMaxLen(r1), 4, "4x4 in r1");
