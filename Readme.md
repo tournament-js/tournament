@@ -6,8 +6,8 @@ Tournament is a library for creating and managing data structures related to com
 Create a new tournament object, then interact with helper functions to score and calculate results.
 
 ````javascript
-var tournament = require('tournament');
-var duel = new tournament.Duel(4, tournament.WB);
+var t = require('tournament');
+var duel = new tournament.Duel(4, t.WB);
 
 duel.matches; // in playable order
 [ { id: { s: 1, r: 1, m: 1 },
@@ -15,6 +15,8 @@ duel.matches; // in playable order
   { id: { s: 1, r: 1, m: 2 },
     p: [ 3, 2 ] },
   { id: { s: 1, r: 2, m: 1 },
+    p: [ 0, 0 ] },
+  { id: { s: 2, r: 1, m: 1 },
     p: [ 0, 0 ] } ]
 
 duel.matches.forEach(function (m) {
@@ -31,6 +33,9 @@ duel.matches;
     m: [ 1, 0 ] },
   { id: { s: 1, r: 2, m: 1 },
     p: [ 1, 3 ],
+    m: [ 1, 0 ] },
+  { id: { s: 2, r: 1, m: 1 },
+    p: [ 2, 2 ],
     m: [ 1, 0 ] } ]
 
 // can view results at every stage of the tournament, here are the final ones
@@ -44,31 +49,44 @@ duel.results();
     wins: 1,
     pos: 2 },
   { seed: 2,
-    maps: 0,
-    wins: 0,
+    maps: 1,
+    wins: 1,
     pos: 3 },
   { seed: 4,
     maps: 0,
     wins: 0,
-    pos: 3 } ]
+    pos: 4 } ]
 ````
 
 ## Creation
+All matches for a tournament is created up front. In cases of elimination tournaments, not all players is known for the next round and is until that point filled in as the const placeholder `t.NA`.
+
 ### GroupStage
+Group stage part of a tournament splits `n` players into `g` groups. If `n` is a multiple of the resulting group length and this length is even, then this splitting is done in such a way so that the sum of seeds is constant. Otherwise it will differ by up to the group length.
+
 ````javascript
-var gs = new tournament.GroupStage(16, 4); // 16 players in groups of 4
+var gs = new t.GroupStage(16, 4); // 16 players in groups of 4
 ````
 
+At the end of a group stage, the results will be sorted in order of points, then map wins.
+
 ### Duel Elimination
+Duel elimination tournaments consist of two players (or clans) per match. after each match the winner is advanced to the right in the bracket, and if loser brackt is in use, the loser is put in the loser bracket.
+
+Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers that do not affect the scores in any way.
+A walkover marker is indicated by the const `t.WO` in the `.p` player array.
+
 ````
 javascript
-var duel1 = new tournament.Duel(16, tournament.WB); // 16 players in single elimination
-var duel2 = new tournament.Duel(16, tournament.LB); // 16 players in double elimination
+var duel1 = new t.Duel(16, t.WB); // 16 players in single elimination
+var duel2 = new t.Duel(16, t.LB); // 16 players in double elimination
 ````
+
+A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins) then the the top X in the results are also the top X seeded players. Player 1 will never meet player 2 in a single elimination quarter final for instance.
 
 ### FFA Elimination
 ````javascript
-var ffa = new tournament.FFA(16, 4, 2); // 16 players in matches of 4, top 2 advancing
+var ffa = new t.FFA(16, 4, 2); // 16 players in matches of 4, top 2 advancing
 ````
 
 ## Inspecting Matches
@@ -79,7 +97,7 @@ Each element in the match array contain the following:
 
 javascript
 ````
-ffa.matches[0]; // example first ffa match
+ffa.matches[0]; // example first ffa match from the one above when scored
 { id: { s: 1, r: 1, m: 1 },
   p: [ 1, 5, 12, 16 ]
 , m: [ 4, 3, 2, 1 ] }
@@ -111,7 +129,38 @@ ffa.matches.forEach(function (m) {
 });
 ````
 
-Note that in all but the GroupStage tournament type, the map score array can not contain all identical numbers, as ties are not allowed in elimination tournaments.
+### NB: Group Stages
+Matches in a group stage allow individual match draws. If this is unsuited to your game/application, check for it.
+
+### NB: FFA Tournaments
+Matches in FFA tournaments only ensures it can discriminate between the last advancer and the first non-advancers. If these two scores are identical, the ambiguity is disallowed and `.score()` will prevent such a score being registered.
+
+### NB: Duel Tournaments
+If `.score()` is called with an `id` that's been scored ages ago, it's possible that the wrong winner appears two rounds later. To fix this, the next game must also be rescored so that the right winner is propagated again.
+
+## Ensuring Consistency
+The basic `.score()` API is a very basic interface. It modifies the current match and propagates the winners and losers where applicable, but only to the next round. By allowing re-scoring older games, it is possible to get tournaments in an inconsistent state:
+
+For instance, in all elimination tournaments, if `.score()` is called with an `id` that's been scored ages ago, it's possible that the wrong winner appears two rounds later because it was propagated earlier. Two fix this, the next game must also be rescored so that the right winner is propagated again.
+
+This is clearly not ideal, and it is useful to know when such a problem may arise so that rewriting (relied upon) history is only available to expert users. All tournament types therefore have built in an optional `.scorable()` method that takes a match `id` only and returns boolean of whether calling `.score()` on this `id` is safe.
+
+````javascript
+var id = {s: 1, r: 2, m: 1}
+if (duel.scorable(id)) {
+  duel.score(id, score);
+}
+else {
+  // will rewrite history unsafely - proceed at own risk
+}
+````
+
+Additionally, `.scorable(id)` also verifies that `id` exists in the match array so that `.score(id)` does not return false.
+
+### NB: Group Stages
+All matches are by default scorable for all group stages (if they exist in `.matches`.
+
+However, if you want to ensure that matches are played in round order, you can pass in an optional second parameter to indicate that true round order should be obeyed. When using this security, `.scorable(id, true)` will return false when there exists games in earlier rounds in this group, that has not yet been played.
 
 ## Viewing Results
 At any stage in a tournament, up to date results/statistics can be generated on demand. Every tournament type has a `.results()` method that will inspect its match array and calculate results for all players, and sort it based on (currently reached) placement
@@ -133,13 +182,13 @@ duel.results().slice(0, 4); // get top 4
     wins: 2,
     pos: 2 },
   { seed: 5,
-    maps: 3,
-    wins: 1,
-    pos: 3 }, // 5 tied with 7 as both knocked out in semi TODO: bronze final
+    maps: 5,
+    wins: 2,
+    pos: 3 }, // player 5 won bronze final
   { seed: 7,
-    maps: 3,
+    maps: 4,
     wins: 1,
-    pos: 3 } ]
+    pos: 4 } ]
 ````
 
 ## Serializing Tournaments
@@ -148,7 +197,7 @@ Every tournament type is completely serializable via the `.matches` member, stor
 ````javascript
 var ms = duel.matches; // suppose we stored this in mongodb
 
-var duel2 = tournament.Duel.fromJSON(ms);
+var duel2 = t.Duel.fromJSON(ms);
 // can now score duel2 like it was the original object
 ````
 
@@ -159,7 +208,7 @@ A variety of helper methods are built in so that you have to use tournament's da
 Every tournament type has a `.representation()` method that takes an `id` of any match in the tournament. This will create a unique string representation for that match differing slightly depending on tournament type.
 
 ````javascript
-duel.representation({s: tournament.LB, r: 2, m: 3});
+duel.representation({s: t.LB, r: 2, m: 3});
 "LB R2 M3"
 
 ffa.representation({s: 1, r: 3, m: 2});
@@ -173,7 +222,7 @@ gs.representation({s: 5, r: 2, m: 1});
 Every tournament allow getting the next match `id` for any player id (seed number) via the `.upcoming()` method. It will search the match array for the next unscored match with the given player id in it.
 
 ````javascript
-var duel = new tournament.Duel(4, tournament.WB);
+var duel = new t.Duel(4, t.WB);
 duel.score({ s: 1, r: 1, m: 1}, [1, 0]); // this match is player 1 vs. player 4
 
 duel.upcoming(1);
@@ -183,72 +232,26 @@ duel.upcoming(4);
 null
 ````
 
-
-## NOTES
-Ignore these. Docs will improve below.
-### API
-
-### Constants
-#### T.WB :: Winner Bracket
-#### T.LB :: Loser Bracket
-#### T.WO :: Walk Over
-#### T.NA :: Player Not Ready
-
-### Duel Elimination
-#### new T.Duel(numPlayers, lastBracket) :: duelTournament
-#### duel.score(id, mapScore) :: Boolean
-Updates the `duel.games` array and propagates the winner to the next game, and (if applicable) the loser to the lower bracket.
-
-Note: if called with an `id` that's been scored ages ago, it's possible that the wrong winner appears two rounds later, so that the next game must also be rescored so that the right winner is propagated again.
-
-#### duel.scorable(id) :: Boolean
-Provides an extra safety check that `duel.score` will not leave the tournament in an inconsistent state described above.
-
-#### duel.results() :: [Result]
-Computes the results array for the current state of the tournament. Contains useful statistics like the final or currently obtained: placement, map wins and game wins.
-
-### FFA Elimination
-#### new T.FFA(numPlayers, groupSize, advancers) :: ffaTournament
-#### ffa.score(id, mapScore) :: Boolean
-Updates the `ffa.games` array and, if it's the last game of the round, the winners will be propagated to the next round.
-
-TODO: maybe see if possible to propagate always
-
-#### ffa.scorable(id [, trueRoundOrder]) :: Boolean
-Will by default only validate if the given `id` exists in the instance's games list.
-If `trueRoundOrder` is enabled, it will additionally verify that no games in this group have unscored games with strictly lower round numbers.
-
-#### ffa.results() :: [Result]
-Computes the results array for the current state of the tournament. Contains useful statistics like the final or currently obtained: placement, score sum and game wins.
+#### NB: FFA Tournaments
+If the round has not been fully completed yet, then this may return a partial id, like `{s: WB, r: 4}` missing a game number, as each round creates new seeds for a fair new round based on previous performance, and thus all the game results from this round are needed to determine a player's next game number. Note that such an id can still be represented via the `.representation()` method.
 
 
-### Group Stages
-The basic algorithms for how group stages work. Generally, not necessary to use directly, but useful for intuition or if more control is required.
-#### T.groups(numPlayers, groupSize) :: [Group]
-#### T.robin(numPlayers [, playerArray]) :: [Round]
+### Group Stage Algorithms
+The meat of the group stage algorithms are exported separately as helper functions. These may perhaps mostly help the developer's intuition, but they could also be used to for visualizing how different parameters affect group stage generation.
 
-#### new T.GroupStage(numPlayers, groupSize) :: groupStage
-#### group.score(id, mapScore) :: Boolean
-#### group.scorable(id) :: Boolean
-#### group.results() :: [Result]
+The following examples show how they work:
 
-### Tournament Serialization
-Both tournament types are serializable directly via the `instance.games` array available on both types. Suppose the games have been stored elsewhere, to continue scoring hte tournament reload up the tournament instance via either:
-#### T.FFA.fromGames(games) :: ffaTournament
-#### T.Duel.fromGames(games) :: duelTournament
-#### T.GroupStage.fromGames(games) :: groupStage
+````javascript
+t.groups(15, 5); // 15 players in groups of 5
+[ [ 1, 4, 7, 12, 15 ],
+  [ 2, 5, 8, 11, 14 ],
+  [ 3, 6, 9, 10, 13 ] ]
 
-### Tracking Players
-TODO:
-#### tInst.upcoming(playerId) :: Maybe Id
-Players can be tracked through the tournaments via this function. By allowing/forcing each player to score all ids returned by this function, the tournament will eventually finish by itself without the need for any more elaborate user interface.
-
-Note that the if the round has not been fully completed yet in FFA tournaments, then this may return a partial id, like `{b: WB, r: 4}` missing a game number, as each round is reseeded to new fair rounds based on the current round results, and thus need all the game results from this round to determine a player's game number. Such an id can still be represented via `tInst.representation`.
-
-#### tInst.representation(id) :: String
-If the games array is used for printing to a UI, then the following
-can be used to convert each game's `id` object to a unique string representation (differing slightly depending on tournament type).
-
+t.robin(4); // 4 player round robin pairups
+[ [ [ 1, 4 ], [ 2, 3 ] ],   // round 1
+  [ [ 1, 3 ], [ 4, 2 ] ],   // round 2
+  [ [ 1, 2 ], [ 3, 4 ] ] ]  // round 3
+````
 
 ## Installation
 
