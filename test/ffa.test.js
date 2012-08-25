@@ -12,7 +12,64 @@ var getRnd = function (gs, r) {
   });
 };
 
-// awful layout: 28 7 3, messes up 2nd round...
+
+test("ffa 28 7 3", function (t) {
+  var ffa = new T.FFA(28, 7, 3)
+    , gs = ffa.matches;
+
+  var r1 = getRnd(gs, 1)
+    , r2 = getRnd(gs, 2)
+    , r3 = getRnd(gs, 3)
+    , r4 = getRnd(gs, 4)
+    , r5 = getRnd(gs, 5);
+
+  t.equal(r1.length, 4, "4 full rounds gets all 28 players in r1");
+  t.equal(getMaxLen(r1), 7, "4x7 in r1");
+
+  t.equal(r2.length, 2, "4*3=12, proceeding => 2 groups of 6 in r2");
+  t.equal(getMaxLen(r2), 6, "2x6 in r2");
+
+  t.equal(r3.length, 1, "2*3=6 proceeding => 1 group of 6 in r3");
+  t.equal(getMaxLen(r3), 6, "1x6 in r3");
+
+  t.end();
+});
+
+// nice layout, 32 8 2 ensure it's right
+test("ffa 32 8 2", function (t) {
+  var ffa = new T.FFA(32, 8, 2)
+    , gs = ffa.matches;
+
+  var r1 = getRnd(gs, 1)
+    , r2 = getRnd(gs, 2);
+
+  t.equal(r1.length, 4, "4 full rounds gets all 32 players in r1");
+  t.equal(getMaxLen(r1), 8, "4x8 in r1");
+
+  t.equal(r2.length, 1, "4*2=8, proceeding => 1 groups of 8 in r2");
+  t.equal(getMaxLen(r2), 8, "1x8 in r2");
+
+  t.end();
+});
+
+// nice layout, 25 5 1 ensure it's right
+test("ffa 25 5 1", function (t) {
+  var ffa = new T.FFA(25, 5, 1)
+    , gs = ffa.matches;
+
+  var r1 = getRnd(gs, 1)
+    , r2 = getRnd(gs, 2);
+
+  t.equal(r1.length, 5, "5 full rounds gets all 25 players in r1");
+  t.equal(getMaxLen(r1), 5, "5x5 in r1");
+
+  t.equal(r2.length, 1, "5*1=5, proceeding => 1 groups of 5 in r2");
+  t.equal(getMaxLen(r2), 5, "1x5 in r2");
+
+  t.end();
+});
+
+// awful layout: 28 7 3
 test("ffa 28 7 3", function (t) {
   var ffa = new T.FFA(28, 7, 3)
     , gs = ffa.matches;
