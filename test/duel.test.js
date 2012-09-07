@@ -3,6 +3,69 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
+
+test("duel 16 WB fromJSON", function (t) {
+  var duel = new T.Duel(16, T.WB)
+    , gs = duel.matches;
+
+  var duel2 = T.Duel.fromJSON(gs);
+
+  t.deepEqual(duel.matches, duel2.matches, "matches same");
+  t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
+  t.equal(duel.hasBf, duel2.hasBf, "bf flag the same");
+  t.equal(duel.last, duel2.last, "last bracket the same");
+  t.equal(duel.p, duel2.p, "same power");
+
+  duel2.matches.forEach(function (g) {
+    t.ok(duel2.score(g.id, [4,1]), "should be able to score all these matches");
+  });
+
+  t.end();
+});
+
+// same test wo bronze final
+test("duel 16 WB noBf fromJSON", function (t) {
+  var duel = new T.Duel(16, T.WB, true)
+    , gs = duel.matches;
+
+  var duel2 = T.Duel.fromJSON(gs);
+
+  t.deepEqual(duel.matches, duel2.matches, "matches same");
+  t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
+  t.equal(duel.hasBf, duel2.hasBf, "bf flag the same");
+  t.equal(duel.last, duel2.last, "last bracket the same");
+  t.equal(duel.p, duel2.p, "same power");
+
+  duel2.matches.forEach(function (g) {
+    t.ok(duel2.score(g.id, [4,1]), "should be able to score all these matches");
+  });
+
+  t.end();
+});
+
+// same test with LB
+test("duel 16 LB fromJSON", function (t) {
+  var duel = new T.Duel(16, T.LB)
+    , gs = duel.matches;
+
+  var duel2 = T.Duel.fromJSON(gs);
+
+  t.deepEqual(duel.matches, duel2.matches, "matches same");
+  t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
+  t.equal(duel.hasBf, duel2.hasBf, "bf flag the same");
+  t.equal(duel.last, duel2.last, "last bracket the same");
+  t.equal(duel.p, duel2.p, "same power");
+
+  duel2.matches.forEach(function (g) {
+    // scorability only because this way there's a double final
+    t.ok(duel2.score(g.id, [0,1]), "should be able to score all these matches");
+  });
+
+  t.end();
+});
+
+
+
 test("duel WB general", function (t) {
   var duel = new T.Duel(32, T.WB)
     , gs = duel.matches

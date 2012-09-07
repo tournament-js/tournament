@@ -1,8 +1,12 @@
 NEXT / 2012-XX-XX
 ==================
-  * improve tests to ensure complete consistency of FFA tournament advancement algorithm
-  * add tests for fromJSON to ensure serialization code is working correctly
-  * consts for tournament type
+  * verify complete `upcoming()` behaviour for all types
+  * add opitonal gf2 flag to duel double elimination
+
+0.2.1 / 2012-09-07
+==================
+  * fromJSON deserialization now working for all tournament types
+  * results for group stage is now working correctly
 
 0.2.0 / 2012-07-24
 ==================

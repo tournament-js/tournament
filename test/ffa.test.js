@@ -3,6 +3,24 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
+
+test("ffa 16 4 2 fromJSON", function (t) {
+  var ffa = new T.FFA(16, 4, 2)
+    , gs = ffa.matches;
+
+  var ffa2 = T.FFA.fromJSON(gs);
+
+  t.deepEqual(ffa.matches, ffa2.matches, "matches same");
+  t.deepEqual(ffa.adv, ffa2.adv, "advancers recalculated correctly");
+  t.equal(ffa.numPlayers, ffa2.numPlayers, "numPlayers kept correctly");
+
+  ffa2.matches.forEach(function (g) {
+    t.ok(ffa2.score(g.id, [4,3,2,1]), "should be able to score all these matches");
+  });
+
+  t.end();
+});
+
 var getMaxLen = function (rnd) {
   return $.maximum($.pluck('length', $.pluck('p', rnd)));
 };
@@ -76,9 +94,7 @@ test("ffa 28 7 3", function (t) {
 
   var r1 = getRnd(gs, 1)
     , r2 = getRnd(gs, 2)
-    , r3 = getRnd(gs, 3)
-    , r4 = getRnd(gs, 4)
-    , r5 = getRnd(gs, 5);
+    , r3 = getRnd(gs, 3);
 
   t.equal(r1.length, 4, "4 full rounds gets all 28 players in r1");
   t.equal(getMaxLen(r1), 7, "4x7 in r1");
@@ -87,6 +103,50 @@ test("ffa 28 7 3", function (t) {
   t.equal(getMaxLen(r2), 6, "2x6 in r2");
 
   t.equal(r3.length, 1, "2*3=6 proceeding => 1 group of 6 in r3");
+  t.equal(getMaxLen(r3), 6, "1x6 in r3");
+
+  t.end();
+});
+
+// difficult layout: 36 6 3
+// SHOULD reduce adv to 2 for round 3
+test("ffa 28 7 3", function (t) {
+  var ffa = new T.FFA(36, 6, 3)
+    , gs = ffa.matches;
+
+  var r1 = getRnd(gs, 1)
+    , r2 = getRnd(gs, 2)
+    , r3 = getRnd(gs, 3);
+
+  t.equal(r1.length, 6, "6 full rounds gets all 36 players in r1");
+  t.equal(getMaxLen(r1), 6, "6x6 in r1");
+
+  t.equal(r2.length, 3, "3*6=18, proceeding => 3 groups of 6 in r2");
+  t.equal(getMaxLen(r2), 6, "3x6 in r2");
+
+  t.equal(r3.length, 1, "3*2=6 proceeding => 1 group of 6 in r3");
+  t.equal(getMaxLen(r3), 6, "1x6 in r3");
+
+  t.end();
+});
+
+// difficult layout: 47 7 3
+// SHOULD reduce adv to 2 for round 3
+test("ffa 28 7 3", function (t) {
+  var ffa = new T.FFA(47, 7, 3)
+    , gs = ffa.matches;
+
+  var r1 = getRnd(gs, 1)
+    , r2 = getRnd(gs, 2)
+    , r3 = getRnd(gs, 3);
+
+  t.equal(r1.length, 7, "7 full rounds gets all 49 players in r1");
+  t.equal(getMaxLen(r1), 7, "6x6 in r1");
+
+  t.equal(r2.length, 3, "3*7=21, proceeding => 3 groups of 7 in r2");
+  t.equal(getMaxLen(r2), 7, "3x7 in r2");
+
+  t.equal(r3.length, 1, "3*2=6 proceeding => 1 group of 6 in r3");
   t.equal(getMaxLen(r3), 6, "1x6 in r3");
 
   t.end();
