@@ -2,8 +2,9 @@ NEXT / 2012-XX-XX
 ==================
   * verify complete `upcoming()` behaviour for all types
   * add opitonal gf2 flag to duel double elimination
+  * verify scorability, particularly important to have good tests for an optional gf2
 
-0.2.1 / 2012-09-07
+0.2.1 / 2012-09-10
 ==================
   * fromJSON deserialization now working for all tournament types
   * results for group stage is now working correctly
