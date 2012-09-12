@@ -139,11 +139,11 @@ Matches in FFA tournaments only ensures it can discriminate between the last adv
 If `.score()` is called with an `id` that's been scored ages ago, it's possible that the wrong winner appears two rounds later. To fix this, the next game must also be rescored so that the right winner is propagated again.
 
 ## Ensuring Consistency
-The basic `.score()` API is a very basic interface. It modifies the current match and propagates the winners and losers where applicable, but only to the next round. By allowing re-scoring older games, it is possible to get tournaments in an inconsistent state:
+The `.score()` method is a very raw interface. It modifies the matches array when possible, but will also *rewrite history* if asked, possibly causing an *inconsistent tournament state* when used with match ids that are too far back in the past.
 
-For instance, in all elimination tournaments, if `.score()` is called with an `id` that's been scored ages ago, it's possible that the wrong winner appears two rounds later because it was propagated earlier. Two fix this, the next game must also be rescored so that the right winner is propagated again.
+For instance, in all elimination tournaments, if `.score()` is called with an `id` that's been scored 2 rounds before the current one, it's possible that the wrong winner appears in the current round because it was propagated earlier. Two fix this, the next game must also be rescored so that the right winner is propagated again.
 
-This is clearly not ideal, and it is useful to know when such a problem may arise so that rewriting (relied upon) history is only available to expert users. All tournament types therefore have built in an optional `.scorable()` method that takes a match `id` only and returns boolean of whether calling `.score()` on this `id` is safe.
+To ensure that `.score()` is never called stupidly on invalid or archaic match ids, all tournaments have a built in an optional `.scorable()` method that takes a match `id` only and returns boolean of whether calling `.score()` on this `id` results in a safe update.
 
 ````javascript
 var id = {s: 1, r: 2, m: 1}
@@ -151,14 +151,14 @@ if (duel.scorable(id)) {
   duel.score(id, score);
 }
 else {
-  // will rewrite history unsafely - proceed at own risk
+  // will rewrite history - expose to administrators only
 }
 ````
 
-Additionally, `.scorable(id)` also verifies that `id` exists in the match array so that `.score(id)` does not return false.
+Note that `.scorable(id)` also verifies that `id` exists in the match array and the players are all ready to play this match (i.e. not from an elimination round that's too far in the future to have any players yet).
 
 ### NB: Group Stages
-All matches are by default scorable for all group stages (if they exist in `.matches`.
+All matches are by default scorable for all group stages (that is, if they exist in `.matches` and has not already been scored).
 
 However, if you want to ensure that matches are played in round order, you can pass in an optional second parameter to indicate that true round order should be obeyed. When using this security, `.scorable(id, true)` will return false when there exists games in earlier rounds in this group, that has not yet been played.
 
@@ -222,14 +222,14 @@ gs.representation({s: 5, r: 2, m: 1});
 Every tournament allow getting the next match `id` for any player id (seed number) via the `.upcoming()` method. It will search the match array for the next unscored match with the given player id in it.
 
 ````javascript
-var duel = new t.Duel(4, t.WB);
+var duel = new t.Duel(4, t.WB, true); // 4 player single elim without bronze final
 duel.score({ s: 1, r: 1, m: 1}, [1, 0]); // this match is player 1 vs. player 4
 
-duel.upcoming(1);
+duel.upcoming(1); // 1 advanced to semi
 { s: 1, r: 2, m: 1}
 
-duel.upcoming(4);
-null
+duel.upcoming(4); // 4 was knocked out
+undefined
 ````
 
 #### NB: FFA Tournaments

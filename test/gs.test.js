@@ -140,3 +140,65 @@ test("upcoming 6 3", function (t) {
 
   t.end();
 });
+
+
+test("upcoming/scorable 16 8", function (t) {
+  var g = new T.GroupStage(16, 4)
+    , ms = g.matches;
+  // grps == 4 of 4
+
+  $.range(3).forEach(function (r) {
+    $.range(16).forEach(function (n) {
+      var up = g.upcoming(n);
+
+      t.ok(up, "found upcoming match for " + n);
+      t.ok(g.scorable(up), "given id is scorable");
+
+      // rounds increment as we score as everyone plays in each round when even group sizes
+      t.equal(up.r, r, "previous round scored all now wait for round" + r);
+
+      // now verify that n exists in the match and that it's unscored
+      var m = $.firstBy(byId.bind(null, up), ms);
+      t.ok(m.p.indexOf(n) >= 0, "player " + n + " exists in .p");
+      t.ok(!m.m, "given match was not scored");
+    });
+
+    // now ensure that scorable works on all ids correctly
+    ms.forEach(function (m) {
+      if (m.id.r == r) {
+        t.ok(g.scorable(m.id), "everything in current round is scorable");
+        t.ok(g.scorable(m.id, true), "even with trueRoundOrder");
+      }
+      else if (m.id.r > r) {
+        t.ok(g.scorable(m.id), "everything scorable by default in group stage");
+        t.ok(!g.scorable(m.id, true), "except i trueRoundOrder round not ready");
+      }
+      else if (m.id.r < r) {
+        t.ok(!g.scorable(m.id), "nothing is scorable in the past");
+        t.ok(!g.scorable(m.id, true), "especially if trueRoundOrder");
+      }
+    });
+
+    $.range(4).forEach(function (s) { // all 4 groups
+      $.range(2).forEach(function (m) { // all 2 matches per group (in this round) [4p / 2 prmatch]
+        t.ok(g.scorable({s: s, r: r, m: m}), "this match is scorable now");
+        t.ok(g.scorable({s: s, r: r, m: m}, true), "even with trueRoundOrder");
+        t.ok(g.score({s: s, r: r, m: m}, [1, 0]), "scoring round" + r);
+      });
+    });
+
+  });
+
+  $.range(16).forEach(function (n) {
+    var up = g.upcoming(n);
+    t.ok(!up, "no more upcoming matches after 3 rounds played");
+  });
+
+  // ensure that nothing is now scorable
+  ms.forEach(function (m) {
+    t.ok(!g.scorable(m.id), "no matches are now scorable" + JSON.stringify(m.id));
+    t.ok(!g.scorable(m.id, true), "esp. with trueRoundOrder" + JSON.stringify(m.id));
+  })
+
+  t.end();
+});

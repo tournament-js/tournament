@@ -281,3 +281,69 @@ test("duel detailed LB", function (t) {
 
   t.end();
 });
+
+
+test("upcoming/scorable 8 LB", function (t) {
+  var d = new T.Duel(8, T.LB) // NO WO markers in this (easy case)
+    , ms = d.matches;
+
+  // WB check
+  $.range(3).forEach(function (r) {
+
+    // upcoming
+    $.range(Math.pow(2, 3-r)).forEach(function (n) {
+      var up = d.upcoming(n);
+      t.ok(up, "upcoming match exists for round " + r + " advancer");
+      t.equal(up.r, r, "upcoming match for this round is in round " + r);
+      t.equal(up.s, T.WB, "upcoming match for round " + r + " is in WB");
+    });
+
+    // score
+    ms.filter(function (g) {
+      return (g.id.r === r && g.id.s === T.WB);
+    }).forEach(function (g) {
+      t.ok(d.scorable(g.id), "WB matches in round " + r + " are scorable");
+      t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "can score a game in round " + r);
+    });
+
+    if (r === 3) {
+      var up = d.upcoming(1);
+      t.equal(up.s, T.LB, "upcoming match for WB final winner is in LB");
+    }
+  });
+
+  // LB check
+  var maxr = $.maximum($.pluck('r', $.pluck('id', ms)));
+  $.range(maxr - 1).forEach(function (r) { // all rounds but gf2 round
+
+    var roundPls = $.nub($.flatten($.pluck('p', ms.filter(function (g) {
+      return (g.id.r === r && g.id.s === T.LB);
+    }))));
+
+    // upcoming
+    roundPls.forEach(function (n) {
+      t.ok(n >= T.NA, "player found was filled in and not a WO marker");
+
+      var up = d.upcoming(n);
+      t.ok(up, "upcoming match exists for round " + r + " advancer");
+      t.equal(up.r, r, "upcoming match for this round is in round " + r);
+      t.equal(up.s, T.LB, "upcoming match for round " + r + " is in LB");
+    });
+
+    // check all matches in this round
+    ms.filter(function (g) {
+      return (g.id.r === r && g.id.s === T.LB);
+    }).forEach(function (g) {
+      t.ok(d.scorable(g.id), "LB matches in round " + r + " are scorable");
+      t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "can score a game in round " + r);
+    });
+
+    if (r === 2*d.p - 1) {
+      var up = d.upcoming(1);
+      t.ok(!up, "no double final, favourite won");
+    }
+  });
+
+
+  t.end();
+});
