@@ -209,6 +209,13 @@ test("ffa 16 4 2", function (t) {
   t.equal(seedss.length, 16, "all different seeds represented");
   t.deepEqual(seedss.sort($.compare()), $.range(16), "should be all 16");
 
+  // check that all players have an upcoming match in round 1
+  $.range(16).forEach(function (n) {
+    var up = ffa.upcoming(n);
+    t.ok(up, "upcoming match for " + n + " exists");
+    t.equal(up.r, 1, "upcoming match for " + n + " exists in r1");
+    t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
+  });
 
   // now score the first round
   $.range(4).forEach(function (m) {
@@ -246,6 +253,20 @@ test("ffa 16 4 2", function (t) {
     }
   });
 
+  // check that top 8 have an upcoming match in round 2, and rest are out
+  $.range(16).forEach(function (n) {
+    var up = ffa.upcoming(n);
+    if (n <= 8) {
+      t.ok(up, "upcoming match for " + n + " exists");
+      t.equal(up.r, 2, "upcoming match for " + n + " exists in r2");
+      t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
+    }
+    else {
+      t.ok(!up, "no upcoming match in r2 for " + n + " (knocked out)" + JSON.stringify(up));
+    }
+  });
+
+  // score r2
   $.range(2).forEach(function (m) {
     ffa.score({s: 1, r: 2, m: m}, [4, 3, 2, 1]);
   });

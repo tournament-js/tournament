@@ -210,7 +210,7 @@ test("duel simple but big LB", function (t) {
   // note this only true because this case gets a double final
   t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
 
-  var res = duel.results(); // TODO: fails here ATM
+  var res = duel.results();
   t.ok(res, "results produced");
 
   var sorted = $.pluck('seed', res.slice(0, 4));
