@@ -7,16 +7,16 @@ Create a new tournament object, then interact with helper functions to score and
 
 ````javascript
 var t = require('tournament');
-var duel = new tournament.Duel(4, t.WB);
+var duel = new t.Duel(4, t.WB);
 
 duel.matches; // in playable order
-[ { id: { s: 1, r: 1, m: 1 },
+[ { id: { s: 1, r: 1, m: 1 }, // semi 1
     p: [ 1, 4 ] },
-  { id: { s: 1, r: 1, m: 2 },
+  { id: { s: 1, r: 1, m: 2 }, // semi 2
     p: [ 3, 2 ] },
-  { id: { s: 1, r: 2, m: 1 },
+  { id: { s: 1, r: 2, m: 1 }, // grand final
     p: [ 0, 0 ] },
-  { id: { s: 2, r: 1, m: 1 },
+  { id: { s: 2, r: 1, m: 1 }, // bronze final
     p: [ 0, 0 ] } ]
 
 duel.matches.forEach(function (m) {
@@ -31,11 +31,11 @@ duel.matches;
   { id: { s: 1, r: 1, m: 2 },
     p: [ 3, 2 ],
     m: [ 1, 0 ] },
-  { id: { s: 1, r: 2, m: 1 },
+  { id: { s: 1, r: 2, m: 1 }, // 1 and 3 won their matches and play the final
     p: [ 1, 3 ],
     m: [ 1, 0 ] },
-  { id: { s: 2, r: 1, m: 1 },
-    p: [ 2, 2 ],
+  { id: { s: 2, r: 1, m: 1 }, // 2 and 4 lost and play the bronze final
+    p: [ 4, 2 ],
     m: [ 1, 0 ] } ]
 
 // can view results at every stage of the tournament, here are the final ones

@@ -219,6 +219,7 @@ test("ffa 16 4 2", function (t) {
 
   // now score the first round
   $.range(4).forEach(function (m) {
+    t.ok(ffa.scorable({s: 1, r: 1, m: m}), "quarter scorable");
     ffa.score({s: 1, r: 1, m: m}, [4, 3, 2, 1]); // in the order of their seeds
   });
 
@@ -268,6 +269,7 @@ test("ffa 16 4 2", function (t) {
 
   // score r2
   $.range(2).forEach(function (m) {
+    t.ok(ffa.scorable({s: 1, r: 2, m: m}), "semi scorable");
     ffa.score({s: 1, r: 2, m: m}, [4, 3, 2, 1]);
   });
 
@@ -312,7 +314,21 @@ test("ffa 16 4 2", function (t) {
     }
   });
 
+  // check that top 4 have an upcoming match in round 3, and rest are out
+  $.range(16).forEach(function (n) {
+    var up = ffa.upcoming(n);
+    if (n <= 4) {
+      t.ok(up, "upcoming match for " + n + " exists");
+      t.equal(up.r, 3, "upcoming match for " + n + " exists in r3");
+      t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
+    }
+    else {
+      t.ok(!up, "no upcoming match in r3 for " + n + " (knocked out)" + JSON.stringify(up));
+    }
+  });
+
   // score final
+  t.ok(ffa.scorable({s: 1, r: 3, m: 1}), "final scorable");
   ffa.score({s: 1, r: 3, m: 1}, [4, 3, 2, 1]);
   var res4 = ffa.results();
   t.ok(res4, "got results 4");
@@ -338,6 +354,16 @@ test("ffa 16 4 2", function (t) {
       t.equal(p.pos, 4, "4 placed 4th");
       t.equal(p.sum, 8, "sum scores for 2: 4 + 3 + 1");
     }
+  });
+
+  // check that no upcoming matches now that final is scored
+  $.range(16).forEach(function (n) {
+    var up = ffa.upcoming(n);
+    t.ok(!up, "no upcoming match after final for player " + n);
+  });
+
+  gs.forEach(function (m) {
+    t.ok(!ffa.scorable(m.id), "cant score anything after final is done");
   });
 
   t.end();

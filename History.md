@@ -1,12 +1,12 @@
-NEXT / 2012-XX-XX
+PLANNED FOR 0.3.0
 ==================
-  * verify complete `upcoming()` behaviour for all types
-  * add opitonal gf2 flag to duel double elimination
-  * verify scorability, particularly important to have good tests for an optional gf2
+  * add opitonal gf2 flag to duel double elimination (by default on, like bronze final in single)
+  * crossover bracket for ffa elimination [will be difficult]
 
-0.2.2 / 2012-09-XX
+0.2.2 / 2012-09-17
 ==================
   * scorable/upcoming methods now takes care of corner cases for good consistency (readme updated)
+  * fixed 4 player Duel bug with bronze final loser getting moved to bronze final again
 
 0.2.1 / 2012-09-10
 ==================
