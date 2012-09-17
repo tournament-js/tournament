@@ -32,7 +32,7 @@ test("groups", function (t) {
         // group size model was reduced as all groups non-full, so:
         // calling T.groups with the gs reduced to maxsize should produce same output
         var grpsClone = T.groups(np, maxsize);
-        var errModel = np + " players, groupsize " + s + " reduced to " +  maxsize
+        var errModel = np + " players, groupsize " + s + " reduced to " +  maxsize;
         t.deepEqual(grps, grpsClone, "reduced model in deterministic way: " + errModel);
       }
     });
@@ -46,9 +46,9 @@ test("robin", function (t) {
     var expected = ($.odd(n)) ? n : n-1;
     t.equal(expected, rs.length, "correct number of rounds");
 
-    var pMaps = []
+    var pMaps = [];
     $.range(n).forEach(function (p) {
-      pMaps[p] = []
+      pMaps[p] = [];
     });
 
     rs.forEach(function (rnd) {

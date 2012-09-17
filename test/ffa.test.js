@@ -37,9 +37,7 @@ test("ffa 28 7 3", function (t) {
 
   var r1 = getRnd(gs, 1)
     , r2 = getRnd(gs, 2)
-    , r3 = getRnd(gs, 3)
-    , r4 = getRnd(gs, 4)
-    , r5 = getRnd(gs, 5);
+    , r3 = getRnd(gs, 3);
 
   t.equal(r1.length, 4, "4 full rounds gets all 28 players in r1");
   t.equal(getMaxLen(r1), 7, "4x7 in r1");

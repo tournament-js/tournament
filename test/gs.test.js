@@ -165,7 +165,7 @@ test("upcoming/scorable 16 8", function (t) {
 
     // now ensure that scorable works on all ids correctly
     ms.forEach(function (m) {
-      if (m.id.r == r) {
+      if (m.id.r === r) {
         t.ok(g.scorable(m.id), "everything in current round is scorable");
         t.ok(g.scorable(m.id, true), "even with trueRoundOrder");
       }
@@ -198,7 +198,7 @@ test("upcoming/scorable 16 8", function (t) {
   ms.forEach(function (m) {
     t.ok(!g.scorable(m.id), "no matches are now scorable" + JSON.stringify(m.id));
     t.ok(!g.scorable(m.id, true), "esp. with trueRoundOrder" + JSON.stringify(m.id));
-  })
+  });
 
   t.end();
 });

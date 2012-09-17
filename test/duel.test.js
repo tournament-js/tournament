@@ -129,8 +129,7 @@ test("duel LB general", function (t) {
 test("duel simple WB", function (t) {
   // try scoring everything in order
   var duel = new T.Duel(5, T.WB)
-    , gs = duel.matches
-    , p = 3;
+    , gs = duel.matches;
 
   var lastM = gs[gs.length-1];
   t.ok(!lastM.m, "no map scores recorded for last match yet");
@@ -224,8 +223,7 @@ test("duel simple but big LB", function (t) {
 test("duel detailed LB", function (t) {
   // try scoring everything in order
   var duel = new T.Duel(5, T.LB)
-    , gs = duel.matches
-    , p = 3;
+    , gs = duel.matches;
 
   var lastM = gs[gs.length-1];
   t.ok(!lastM.m, "no map scores recorded for last match yet");
