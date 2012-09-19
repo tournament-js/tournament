@@ -10,9 +10,11 @@ test("duel 16 WB fromJSON", function (t) {
 
   var duel2 = T.Duel.fromJSON(gs);
 
+  t.equal(gs.length, Math.pow(2, duel.p), "length same as num players with bronze final");
+
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
-  t.equal(duel.hasBf, duel2.hasBf, "bf flag the same");
+  t.equal(duel.isLong, duel2.isLong, "isLong flag the same");
   t.equal(duel.last, duel2.last, "last bracket the same");
   t.equal(duel.p, duel2.p, "same power");
 
@@ -24,15 +26,17 @@ test("duel 16 WB fromJSON", function (t) {
 });
 
 // same test wo bronze final
-test("duel 16 WB noBf fromJSON", function (t) {
+test("duel 16 WB short fromJSON", function (t) {
   var duel = new T.Duel(16, T.WB, true)
     , gs = duel.matches;
+
+  t.equal(gs.length, Math.pow(2, duel.p) - 1, "length same as num players - 1 without bronze final");
 
   var duel2 = T.Duel.fromJSON(gs);
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
-  t.equal(duel.hasBf, duel2.hasBf, "bf flag the same");
+  t.equal(duel.isLong, duel2.isLong, "isLong flag the same");
   t.equal(duel.last, duel2.last, "last bracket the same");
   t.equal(duel.p, duel2.p, "same power");
 
@@ -43,16 +47,20 @@ test("duel 16 WB noBf fromJSON", function (t) {
   t.end();
 });
 
-// same test with LB
+// same tests with LB
 test("duel 16 LB fromJSON", function (t) {
   var duel = new T.Duel(16, T.LB)
     , gs = duel.matches;
+
+  // sizeof WB === 2^p - 1
+  // sizeof LB === 2*(sizeof one p smaller WB) + 2
+  t.equal(gs.length, (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 2, "long DE length");
 
   var duel2 = T.Duel.fromJSON(gs);
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
-  t.equal(duel.hasBf, duel2.hasBf, "bf flag the same");
+  t.equal(duel.isLong, duel2.isLong, "isLong flag the same");
   t.equal(duel.last, duel2.last, "last bracket the same");
   t.equal(duel.p, duel2.p, "same power");
 
@@ -64,6 +72,30 @@ test("duel 16 LB fromJSON", function (t) {
   t.end();
 });
 
+/*test("duel 16 LB short fromJSON", function (t) {
+  var duel = new T.Duel(16, T.LB, true)
+    , gs = duel.matches;
+
+  var duel2 = T.Duel.fromJSON(gs);
+
+  // sizeof WB === 2^p - 1
+  // sizeof LB === 2*(sizeof one p smaller WB) + 1 (as no gf2 this time)
+  t.equal(gs.length, (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 1, "long DE length");
+
+  t.deepEqual(duel.matches, duel2.matches, "matches same");
+  t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
+  t.equal(duel.isLong, duel2.isLong, "bf flag the same");
+  t.equal(duel.last, duel2.last, "last bracket the same");
+  t.equal(duel.p, duel2.p, "same power");
+
+  duel2.matches.forEach(function (g) {
+    // scorability only because this way there's a double final
+    t.ok(duel2.score(g.id, [0,1]), "should be able to score all these matches");
+  });
+
+  t.end();
+});
+*/
 
 
 test("duel WB general", function (t) {
