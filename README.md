@@ -84,6 +84,19 @@ var duel2 = new t.Duel(16, t.LB); // 16 players in double elimination
 
 A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins) then the the top X in the results are also the top X seeded players. Player 1 will never meet player 2 in a single elimination quarter final for instance.
 
+#### Short Variants
+The default implementation of an elimination tournament includes one arguably controversial match in each case:
+
+ * bronze final included in single elimination (last = t.WB)
+ * double grand final in double elimination (last = t.LB)
+
+By passing a truthy third value to the `Duel` constructor in their respective cases, this default behaviour can be overriden and the shorter versions (lacking the respective match) is used.
+
+````javascript
+var duel1 = new t.Duel(16, t.WB, true); // no bronze final in this
+var duel2 = new t.Duel(16, t.LB, true); // winner of LB can win the grand final in one match
+````
+
 ### FFA Elimination
 ````javascript
 var ffa = new t.FFA(16, 4, 2); // 16 players in matches of 4, top 2 advancing

@@ -1,7 +1,11 @@
 PLANNED FOR 0.3.0
 ==================
-  * add opitonal gf2 flag to duel double elimination (by default on, like bronze final in single)
   * crossover bracket for ffa elimination [will be difficult]
+
+
+0.2.3 / 2012-09-20
+==================
+  * gf2 is now optional for double elimination in the same way as bronze winal is optional in single
 
 0.2.2 / 2012-09-17
 ==================

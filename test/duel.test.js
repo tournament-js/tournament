@@ -3,7 +3,6 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
-
 test("duel 16 WB fromJSON", function (t) {
   var duel = new T.Duel(16, T.WB)
     , gs = duel.matches;
@@ -21,6 +20,10 @@ test("duel 16 WB fromJSON", function (t) {
   duel2.matches.forEach(function (g) {
     t.ok(duel2.score(g.id, [4,1]), "should be able to score all these matches");
   });
+
+  var res = duel2.results();
+  t.ok(res, "can get results");
+  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1-4");
 
   t.end();
 });
@@ -43,6 +46,11 @@ test("duel 16 WB short fromJSON", function (t) {
   duel2.matches.forEach(function (g) {
     t.ok(duel2.score(g.id, [4,1]), "should be able to score all these matches");
   });
+
+  var res = duel2.results();
+  t.ok(res, "can get results");
+  // cant determine 3-vs-4th in this case!
+  t.ok($.isSubsetOf([1,2,3,3], $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1,2,3,3");
 
   t.end();
 });
@@ -69,10 +77,14 @@ test("duel 16 LB fromJSON", function (t) {
     t.ok(duel2.score(g.id, [0,1]), "should be able to score all these matches");
   });
 
+  var res = duel2.results();
+  t.ok(res, "can get results");
+  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1-4");
+
   t.end();
 });
 
-/*test("duel 16 LB short fromJSON", function (t) {
+test("duel 16 LB short fromJSON", function (t) {
   var duel = new T.Duel(16, T.LB, true)
     , gs = duel.matches;
 
@@ -93,9 +105,12 @@ test("duel 16 LB fromJSON", function (t) {
     t.ok(duel2.score(g.id, [0,1]), "should be able to score all these matches");
   });
 
+  var res = duel2.results();
+  t.ok(res, "can get results");
+  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1-4");
+
   t.end();
 });
-*/
 
 
 test("duel WB general", function (t) {
