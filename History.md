@@ -3,6 +3,10 @@ PLANNED FOR 0.3.0
   * crossover bracket for ffa elimination [will be difficult]
 
 
+0.2.4 / 2012-09-29
+==================
+  * logging now done via logule to allow people to turn off / filter / style tournament's few warnings
+
 0.2.3 / 2012-09-20
 ==================
   * gf2 is now optional for double elimination in the same way as bronze winal is optional in single
