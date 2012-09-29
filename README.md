@@ -108,8 +108,7 @@ App-specific match information can be appended to this struct, but due to future
 
 Each element in the match array contain the following:
 
-javascript
-```
+```js
 ffa.matches[0]; // example first ffa match from the one above when scored
 { id: { s: 1, r: 1, m: 1 },
   p: [ 1, 5, 12, 16 ]
