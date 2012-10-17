@@ -2,6 +2,10 @@ PLANNED FOR 0.3.0
 ==================
   * crossover bracket for ffa elimination [will be difficult]
 
+0.2.5 / 2012-10-17
+==================
+  * logule init fix
+  * `isDone` method on all tournament types
 
 0.2.4 / 2012-09-29
 ==================

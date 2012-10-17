@@ -98,6 +98,8 @@ var duel2 = new t.Duel(16, t.LB, true); // winner of LB can win the grand final 
 ```
 
 ### FFA Elimination
+FFA elimination tournaments consist of FFA matches that are bracketed like a duel elimination tournament. The only other main difference is that the number of players advancing can be greater than one.
+
 ```js
 var ffa = new t.FFA(16, 4, 2); // 16 players in matches of 4, top 2 advancing
 ```
