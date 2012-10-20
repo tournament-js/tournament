@@ -27,8 +27,7 @@
   "dependencies": {
     "interlude": "~1.0.0",
     "logule": "~1.1.0",
-    "deep-equal": "~0.0.0",
-    "typr": "~0.2.0"
+    "deep-equal": "~0.0.0"
   },
   "devDependencies": {
     "tap": "~0.3.1"
