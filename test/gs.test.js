@@ -49,8 +49,8 @@ test("group stage 16 4", function (t) {
     , ms = gs.matches;
   // should be 4 rounds, with 3 matches for each player, i.e. 3! matches
 
-  var numGroups = $.maximum(ms.map($.getDeep('id.s')));
-  var numRounds = $.maximum(ms.map($.getDeep('id.r')));
+  var numGroups = $.maximum(ms.map($.get('id', 's')));
+  var numRounds = $.maximum(ms.map($.get('id', 'r')));
 
   t.equal(numGroups, 4, "should be 4 groups (of 4)");
   t.equal(numRounds, 3, "should be 3 rounds");
@@ -64,8 +64,8 @@ test("group stage 32 8", function (t) {
   var gs = new T.GroupStage(32, 8)
     , ms = gs.matches;
 
-  var numGroups = $.maximum(ms.map($.getDeep('id.s')));
-  var numRounds = $.maximum(ms.map($.getDeep('id.r')));
+  var numGroups = $.maximum(ms.map($.get('id', 's')));
+  var numRounds = $.maximum(ms.map($.get('id', 'r')));
 
   t.equal(numGroups, 4, "should be 4 groups (of 8)");
   t.equal(numRounds, 7, "should be 7 rounds");
@@ -109,8 +109,8 @@ test("group stage 50 10", function (t) {
   var gs = new T.GroupStage(50, 10)
     , ms = gs.matches;
 
-  var numGroups = $.maximum(ms.map($.getDeep('id.s')));
-  var numRounds = $.maximum(ms.map($.getDeep('id.r')));
+  var numGroups = $.maximum(ms.map($.get('id', 's')));
+  var numRounds = $.maximum(ms.map($.get('id', 'r')));
 
   t.equal(numGroups, 5, "should be 5 groups (of 10)");
   t.equal(numRounds, 9, "should be 9 rounds");
