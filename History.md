@@ -2,6 +2,13 @@ PLANNED FOR 0.3.0
 ==================
   * crossover bracket for ffa elimination [will be difficult]
 
+0.2.6 / 2012-10-20
+==================
+  * use interlude@1.0.0 instead, a few improvements as a consequence
+  * remove typr, use Number.isFinite
+  * REMOVE NODE 0.6 SUPPORT because ^^
+  * use logule@1.1.0
+
 0.2.5 / 2012-10-17
 ==================
   * logule init fix
