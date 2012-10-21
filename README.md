@@ -76,8 +76,7 @@ Duel elimination tournaments consist of two players (or clans) per match. after 
 Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers that do not affect the scores in any way.
 A walkover marker is indicated by the const `t.WO` in the `.p` player array.
 
-```
-javascript
+```js
 var duel1 = new t.Duel(16, t.WB); // 16 players in single elimination
 var duel2 = new t.Duel(16, t.LB); // 16 players in double elimination
 ```
@@ -116,7 +115,7 @@ ffa.matches[0]; // example first ffa match from the one above when scored
   p: [ 1, 5, 12, 16 ]
 , m: [ 4, 3, 2, 1 ] }
 ```
-The `m` property is the map scores (or match result in ffa) which exists only if the match is `.score()`d.
+The `m` property is the map scores (or match result in ffa) which exists only if the match is `.score()`'d.
 
 The `id` fully determines the position in the tournament.
 The keys stand for `section` (bracket or group number), `round` number, `match` number.
