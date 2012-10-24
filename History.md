@@ -1,6 +1,14 @@
-PLANNED FOR 0.3.0
+PLANNED FOR 0.4.0
 ==================
   * crossover bracket for ffa elimination [will be difficult]
+
+0.3.0 / 2012-10-24
+==================
+  * rewrite `FFA.prototype.results` to count each players `pos` more intelligently:
+    - pos always ties at start of round, but will increase at end
+    - pos never decreases as a round is played like before
+    - pos is calculated across the entire round for the non-advancers (no more ties)
+  * code quality improvements
 
 0.2.6 / 2012-10-20
 ==================
