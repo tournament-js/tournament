@@ -599,9 +599,6 @@ test("ffa 81 3 1", function (t) {
   var res5 = ffa.results();
   t.ok(res5, "got results 5");
 
-
-  // TODO: wins seem badly calculated in final
-  // TODO: as does pos
   res5.forEach(function (p) {
     if (p.seed === 1) {
       t.equal(p.wins, 8, "seed 1 won all their matches (beat 4x2)");
@@ -655,5 +652,23 @@ test("ffa 81 3 1", function (t) {
   });
 
   t.end();
+});
 
+// short prop
+test("ffa 81 3 1", function (t) {
+  var ffa = new T.FFA(81, 3, 1)
+    , gs = ffa.matches;
+
+  gs.forEach(function (m) {
+    ffa.score(m.id, [3,2,1]); // score highest seed highest
+  });
+
+  // since advancement sorts by Pts then old Seed (and same for results)
+  // these two numbers should coincide perfectly
+  var matching = ffa.results().filter(function (m) {
+    return m.seed === m.pos;
+  }).length;
+  t.equal(matching, 81, "all players should match pos and seed in simple case");
+
+  t.end();
 });

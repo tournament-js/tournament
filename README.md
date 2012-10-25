@@ -1,6 +1,6 @@
 # Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
 
-Tournament is a library for creating and managing data structures related to competitions. In particular it creates fair, round robin scheduled group stages, single & double elimination tournaments and FFA tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics as well as provding the matches in a simple JSON format that completely serializes the tournament as far as this module is concerned.
+Tournament is a library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments and FFA elimination tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics as well as provding the matches in a simple JSON format that can be used to completely serialize the tournament and deserialize it back.
 
 ## Usage
 Create a new tournament object, then interact with helper functions to score and calculate results.
@@ -59,10 +59,10 @@ duel.results();
 ```
 
 ## Creation
-All matches for a tournament is created up front. In cases of elimination tournaments, not all players is known for the next round and is until that point filled in as the const placeholder `t.NA`.
+All matches for a tournament is created up front. In cases of elimination tournaments, not all players is known for the next round and is until that point filled in as the `const`placeholder `t.NA`.
 
 ### GroupStage
-Group stage part of a tournament splits `n` players into `g` groups. If `n` is a multiple of the resulting group length and this length is even, then this splitting is done in such a way so that the sum of seeds is constant. Otherwise it will differ by up to the group length.
+A group stage tournament splits `n` players into `g` groups. If `n` is a multiple of the resulting group length and this length is even, then this splitting is done in such a way so that the sum of seeds is constant across all groups. Otherwise it will differ by up to the group length. See [Group Stage Algorithms](#group-stage-algorithms).
 
 ```js
 var gs = new t.GroupStage(16, 4); // 16 players in groups of 4
@@ -71,25 +71,26 @@ var gs = new t.GroupStage(16, 4); // 16 players in groups of 4
 At the end of a group stage, the results will be sorted in order of points, then map wins.
 
 ### Duel Elimination
-Duel elimination tournaments consist of two players (or clans) per match. after each match the winner is advanced to the right in the bracket, and if loser brackt is in use, the loser is put in the loser bracket.
+Duel elimination tournaments consist of two players / groups per match. after each match the winner is advanced to the right in the bracket, and if loser brackt is in use, the loser is put in the loser bracket.
 
 Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers that do not affect the scores in any way.
-A walkover marker is indicated by the const `t.WO` in the `.p` player array.
+A walkover marker is the `const` placeholder `t.WO` in the `.p` player array.
 
 ```js
 var duel1 = new t.Duel(16, t.WB); // 16 players in single elimination
 var duel2 = new t.Duel(16, t.LB); // 16 players in double elimination
+var duel3 = new t.Duel(5, t.WB); // 5 player single elimination in an 8 player model
 ```
 
-A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins) then the the top X in the results are also the top X seeded players. Player 1 will never meet player 2 in a single elimination quarter final for instance.
+A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins over player b) then the the top X in the results are also the top X seeded players. As an example, seed 1 can only meet seed 2 in the final in single elimination.
 
 #### Short Variants
-The default implementation of an elimination tournament includes one arguably controversial match in each case:
+The _default_ implementation of an elimination tournament includes the usual (but sometimes controversial) extra match in each case:
 
- * bronze final included in single elimination (last = t.WB)
- * double grand final in double elimination (last = t.LB)
+ * bronze final in single elimination
+ * double grand final in double elimination
 
-By passing a truthy third value to the `Duel` constructor in their respective cases, this default behaviour can be overriden and the shorter versions (lacking the respective match) is used.
+By passing a truthy third value to the `Duel` constructor in their respective cases, this default behaviour can be overriden and the shorter versions (lacking their respective match) is used.
 
 ```js
 var duel1 = new t.Duel(16, t.WB, true); // no bronze final in this
@@ -97,11 +98,13 @@ var duel2 = new t.Duel(16, t.LB, true); // winner of LB can win the grand final 
 ```
 
 ### FFA Elimination
-FFA elimination tournaments consist of FFA matches that are bracketed like a duel elimination tournament. The only other main difference is that the number of players advancing can be greater than one.
+FFA elimination tournaments consist of FFA matches that are bracketed like a duel elimination tournament. The only other main difference is that the number of players per match is greater than two and the number advancing per match advancing can be greater than one.
 
 ```js
 var ffa = new t.FFA(16, 4, 2); // 16 players in matches of 4, top 2 advancing
 ```
+
+When using unusual divisions of players into odd numbered groups (that perhaps do not divide cleanly into the remainders), tournament will sometimes reduce the number of advancers for one particular round depending on what's the cleanest approach. Try not to be put off though, the algorithm is surprisingly robust and intelligent!
 
 ## Inspecting Matches
 All tournament types have a `.matches` member that can be inspected and used for UI creation.
