@@ -37,12 +37,6 @@ test("group stage 16 4 fromJSON", function (t) {
   t.end();
 });
 
-var getGroup = function (ms, g) {
-  return ms.filter(function (m) {
-    return m.id.s === g;
-  });
-};
-
 // couple of tests to ensure correct lengths
 test("group stage 16 4", function (t) {
   var gs = new T.GroupStage(16, 4)

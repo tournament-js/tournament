@@ -594,7 +594,7 @@ test("ffa 81 3 1", function (t) {
   var r5 = gs.some(function (m) {
     return m.id.r === 5;
   });
-  t.ok(!r5, "r5 sohuld not exist")
+  t.ok(!r5, "r5 sohuld not exist");
 
   var res5 = ffa.results();
   t.ok(res5, "got results 5");
