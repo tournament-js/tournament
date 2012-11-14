@@ -1,6 +1,11 @@
-PLANNED FOR 0.4.0
+PLANNED FOR 0.5.0
 ==================
   * crossover bracket for ffa elimination [will be difficult]
+
+0.4.0 / 2012-11-14
+==================
+  * logule version 2 now a peerDependency - install it to use/redirect logs to where you want them (NB: only logs warnings and errors by default)
+  * KnockOut tournaments added
 
 0.3.0 / 2012-10-24
 ==================
