@@ -25,9 +25,11 @@
     "test": "tap ./test"
   },
   "dependencies": {
-    "interlude": "~1.0.0",
-    "logule": "~1.1.0",
+    "interlude": "~1.0.2",
     "deep-equal": "~0.0.0"
+  },
+  "peerDependencies": {
+    "logule": "~2"
   },
   "devDependencies": {
     "tap": "~0.3.1"
