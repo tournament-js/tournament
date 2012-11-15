@@ -17,14 +17,19 @@ test("ko 10 [2,4,2]", function (t) {
 
   var leftover = 10;
   kos.forEach(function (k, i) {
-    var round = i+1;
+    var r = i+1;
     // remaining matches unscored
-    ms.slice(round).forEach(function (m) {
+    ms.slice(r).forEach(function (m) {
       t.equal($.nub(m.p).length, 1, "all T.NA in round " + m.id.r);
     });
 
-    // score current round round (so that highest seed wins)
-    t.ok(ko.score(ms[i].id, $.range(leftover).reverse()), "can score r" + round);
+    // is ONLY current match scorable?
+    ms.forEach(function (m) {
+      t.equal(ko.scorable(m.id), (m.id.r === r), "can score iff r==" + r);
+    });
+
+    // score current round r (so that highest seed wins)
+    t.ok(ko.score(ms[i].id, $.range(leftover).reverse()), "could score r" + r);
 
     // check progression
     t.deepEqual(ms[i+1].p, $.range(leftover - k), k + " knocked out of " + leftover);
