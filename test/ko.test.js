@@ -65,14 +65,24 @@ test("ko 10 [2,4,2] results", function (t) {
     t.equal(p.wins, 0, p.seed + " has not won anything yet");
     t.equal(p.sum, 0, p.seed + " score sums to zero");
     t.equal(p.pos, 10, p.seed + " ties at match 1 length");
-  })
+  });
+  $.range(10).forEach(function (n) {
+    var up = ko.upcoming(n);
+    t.ok(up, n + " has an upcoming match");
+    t.deepEqual(up, {s:1, r:1, m:1}, "it's match in r" + 1);
+  });
+
+
+
 
   // round 1
-  //var failScores = [10,9,8,7,6,5,4,3,3,1];
-  //t.ok(!ko.score({s:1, r:2, m:1}, failScores), "must cleanup losers in r" + 1)
+  var failScores = [10,9,8,7,6,5,4,3,3,1]; // ties at border
+  t.ok(ko.scorable({s:1, r:1, m:1}), "can score r" + 1);
+  t.ok(!ko.score({s:1, r:1, m:1}, failScores), "must cleanup losers in r" + 1);
 
   // score so last 2 tie
   t.ok(ko.score({s:1,r:1,m:1}, [10,9,8,7,6,5,4,3,2,2]), "scored r" + 1);
+  t.ok(!ko.scorable({s:1, r:1, m:1}), "should no longer score r" + 1);
   res = ko.results();
   t.ok(res, "we got results for r" + 1);
   t.equal(res.length, 10, "all players in result after round " + 1);
@@ -87,10 +97,21 @@ test("ko 10 [2,4,2] results", function (t) {
     t.equal(p.sum, 2, p.seed + " got 2 pts");
     t.equal(p.pos, 9, p.seed + " tied at 9th");
   });
+  $.range(10).forEach(function (n) {
+    var up = ko.upcoming(n);
+    if (n <= 8) {
+      t.ok(up, n + " has an upcoming match");
+      t.deepEqual(up, {s:1, r:2, m:1}, "it's match in r" + 2);
+    }
+    else {
+      t.ok(!up, "no upcoming match for " + n);
+    }
+  });
+
 
   // round 2
   failScores = [8,7,6,5,5,3,2,1]; // wont work cant distinguish losers/winners
-  t.ok(!ko.score({s:1, r:2, m:1}, failScores), "must cleanup losers in r" + 2)
+  t.ok(!ko.score({s:1, r:2, m:1}, failScores), "must cleanup losers in r" + 2);
 
   // score so 6th 7th tie
   t.ok(ko.score({s:1,r:2,m:1}, [8,7,7,5,4,3,3,2]), "scored r" + 2);
@@ -100,7 +121,7 @@ test("ko 10 [2,4,2] results", function (t) {
   t.equal(res.length, 10, "all players in result after round " + 2);
 
   // winners of both matches:
-  res.slice(0, -(kos[0] + kos[1])).forEach(function (p, i) {
+  res.slice(0, -(kos[0] + kos[1])).forEach(function (p) {
     // the ones that won both matches!
     t.ok(p.seed <= 4, p.seed + " is in first 4 as scored that way");
     t.equal(p.wins, 2, p.seed + " won 2 matches");
@@ -128,6 +149,16 @@ test("ko 10 [2,4,2] results", function (t) {
     t.equal(p.sum, 2, p.seed + " got 2 pts");
     t.equal(p.pos, 9, p.seed + " tied at 9th");
   });
+  $.range(10).forEach(function (n) {
+    var up = ko.upcoming(n);
+    if (n <= 4) {
+      t.ok(up, n + " has an upcoming match");
+      t.deepEqual(up, {s:1, r:3, m:1}, "it's match in r" + 3);
+    }
+    else {
+      t.ok(!up, "no upcoming match for " + n);
+    }
+  });
 
 
   // round 3
@@ -137,6 +168,24 @@ test("ko 10 [2,4,2] results", function (t) {
   t.ok(!ko.scorable({s:1,r:3,m:1}), "should not re-scored r" + 3);
   res = ko.results();
   t.ok(res, "we got results for r" + 3);
+
+  res.slice(0, -(kos[2] + kos[1] + kos[0])).forEach(function (p, i) {
+    t.ok(i < 2, "should only be 2 players left in here");
+
+    t.ok(p.seed <= 2, p.seed + " is 1 or 2");
+    t.equal(p.wins, 3, p.seed + " won 3 matches");
+  });
+
+  $.range(10).forEach(function (n) {
+    var up = ko.upcoming(n);
+    if (n <= 2) {
+      t.ok(up, n + " has an upcoming match");
+      t.deepEqual(up, {s:1, r:4, m:1}, "it's match in r" + 4);
+    }
+    else {
+      t.ok(!up, "no upcoming match for " + n);
+    }
+  });
 
 
   // round 4
@@ -154,6 +203,11 @@ test("ko 10 [2,4,2] results", function (t) {
 
   ko.matches.forEach(function (m, i) {
     t.ok(m.m, "match " + i + " scored");
+  });
+
+  $.range(10).forEach(function (n) {
+    var up = ko.upcoming(n);
+    t.ok(!up, "no upcoming match for " + n);
   });
 
   t.end();
