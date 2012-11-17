@@ -28,6 +28,9 @@
     "interlude": "~1.0.2",
     "deep-equal": "~0.0.0"
   },
+  "optionalDependencies": {
+    "logule": "~2"
+  },
   "peerDependencies": {
     "logule": "~2"
   },
