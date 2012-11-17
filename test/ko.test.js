@@ -3,6 +3,23 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
+test("ko 10 [2,4,2] fromJSON", function (t) {
+  var kos = [2,4,2];
+  var ko = new T.KnockOut(10, kos);
+
+  for (var i = 0; i < 4; i += 1) {
+    var konew = T.KnockOut.fromJSON(ko.matches);
+    t.deepEqual(ko.matches, konew.matches, "matches the same");
+    t.deepEqual(ko.kos, konew.kos, "kos the same");
+
+    var m = ko.matches[i];
+    t.ok(ko.score(m.id, $.range(m.p.length).reverse()), "score of round " + (i + 1));
+    t.ok(m.m, "score worked");
+  }
+  t.end();
+});
+
+
 // detailed simple knockout
 test("ko 10 [2,4,2]", function (t) {
   var kos = [2,4,2];
