@@ -1,7 +1,12 @@
-PLANNED FOR 0.5.0
+PLANNED
 ==================
   * crossover bracket for ffa elimination [will be difficult]
   * FFA results should handle ties better for scoring (currently badly done)
+  * group stages should have tiebreaker handling - or perhaps only needed for pipe
+
+0.4.1 / 2012-11-18
+==================
+  * Added KnockOut::upcoming and KnockOut.fromJSON to conform
 
 0.4.0 / 2012-11-17
 ==================

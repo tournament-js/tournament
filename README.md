@@ -1,6 +1,6 @@
 # Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
 
-Tournament is a library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments and FFA elimination tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics as well as provding the matches in a simple JSON format that can be used to completely serialize the tournament and deserialize it back.
+Tournament is a library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics as well as provding the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
 
 ## Usage
 Create a new tournament object, then interact with helper functions to score and calculate results.
@@ -59,7 +59,7 @@ duel.results();
 ```
 
 ## Creation
-All matches for a tournament is created up front. In cases of elimination tournaments, not all players is known for the next round and is until that point filled in as the `const`placeholder `t.NA`.
+All matches for a tournament is created up front. For most tournament types, not all players is known for the next round and is until that point filled in as the `const` placeholder `t.NA`.
 
 ### GroupStage
 A group stage tournament splits `n` players into `g` groups. If `n` is a multiple of the resulting group length and this length is even, then this splitting is done in such a way so that the sum of seeds is constant across all groups. Otherwise it will differ by up to the group length. See [Group Stage Algorithms](#group-stage-algorithms).
@@ -71,7 +71,7 @@ var gs = new t.GroupStage(16, 4); // 16 players in groups of 4
 At the end of a group stage, the results will be sorted in order of points, then map wins.
 
 ### Duel Elimination
-Duel elimination tournaments consist of two players / groups per match. after each match the winner is advanced to the right in the bracket, and if loser brackt is in use, the loser is put in the loser bracket.
+Duel elimination tournaments consist of two players / groups per match. after each match the winner is advanced to the right in the bracket, and if loser bracket is in use, the loser is put in the loser bracket.
 
 Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers that do not affect the scores in any way.
 A walkover marker is the `const` placeholder `t.WO` in the `.p` player array.
@@ -106,9 +106,18 @@ var ffa = new t.FFA(16, 4, 2); // 16 players in matches of 4, top 2 advancing
 
 When using unusual divisions of players into odd numbered groups (that perhaps do not divide cleanly into the remainders), tournament will sometimes reduce the number of advancers for one particular round depending on what's the cleanest approach. Try not to be put off though, the algorithm is surprisingly robust and intelligent!
 
+### Knockouts
+Knockout tournaments consist of a pool of players, repeatedly fighting against each other and gradually reducing the number of players each round. We specify the number of players to knock out each round as an array of integers.
+
+```js
+var ko = new t.KnockOut(10, [3, 2, 2]);
+```
+
+This example will create a 10 player match in round 1, a 7 player match in round 2, a 5 player match in round 3, and a 3 player final.
+
 ## Inspecting Matches
 All tournament types have a `.matches` member that can be inspected and used for UI creation.
-App-specific match information can be appended to this struct, but due to future version compatibility, it's recommended to put external information outside this structure.
+App-specific match information can be appended to this struct, but for future version compatibility, ownership and modularity considerations, it's recommended to put external information outside this structure.
 
 Each element in the match array contain the following:
 
@@ -118,7 +127,9 @@ ffa.matches[0]; // example first ffa match from the one above when scored
   p: [ 1, 5, 12, 16 ]
 , m: [ 4, 3, 2, 1 ] }
 ```
-The `m` property is the map scores (or match result in ffa) which exists only if the match is `.score()`'d.
+The `m` property is the map scores which exists only if the match is `.score()`'d.
+
+The `p` property represents the seeds of the players in this match. Typically, you should store a map from external player ids to tournament seeds somewhere local to the tournament. Seeding is important as the most tournament types contain strong algorithms to balance matches early on, ensuring the most interesting ones come later on. Seeds are 1-indexed.
 
 The `id` fully determines the position in the tournament.
 The keys stand for `section` (bracket or group number), `round` number, `match` number.
@@ -126,7 +137,7 @@ The keys stand for `section` (bracket or group number), `round` number, `match` 
 The `.matches` array is sorted in by comparing first `s` then `r` then `m`. This means a Double elimination duel tournament would have WB matches listed first in order of rounds. Thus, they are listed like you would look at a typical printed bracket representation, down each round, one round right, repeat down then right, finally do next bracket similarly.
 
 ## Scoring
-All tournament types, when instantiated have a `.score()` method. This always takes the `id` of the match and the array of map scores.
+All tournament types, when instantiated have a `.score()` method. This always takes the `id` of the match and the array of scores. The match scores must have the same number of elements as the number of players in the match and they must (in general) be able to distinguish advancers from non-advancers (score returns false in the error cases)
 
 Say a match has 2 players, and the match score [2, 1] is given:
 
@@ -135,13 +146,13 @@ var m = duel.matches[0]; // first match
 duel.score(m.id, [2, 1]); // m.p[0] won 2 - 1 over m.p[1]
 ```
 
-In this case, `m.p[0]` is propagated to the next match and `m.p[1]` is knocked out, or carried to the loser bracket if in use
+In this case, `m.p[0]` is propagated to the next match and `m.p[1]` is knocked out, or carried to the loser bracket if in use.
 
 Because matches are sorted, you could even score them in a forEach loop without ever attempting to score a match that does not have all players assigned to it yet!
 
 ```js
 ffa.matches.forEach(function (m) {
-  ffa.score(m.id, [4, 3, 2, 1]); // score every match [4, 3, 2, 1] (here assumes 4 players per match)
+  ffa.score(m.id, [4, 3, 2, 1]); // score every match [4, 3, 2, 1] (requires 4 players per match)
 });
 ```
 
@@ -149,10 +160,13 @@ ffa.matches.forEach(function (m) {
 Matches in a group stage allow individual match draws. If this is unsuited to your game/application, check for it.
 
 ### NB: FFA Tournaments
-Matches in FFA tournaments only ensures it can discriminate between the last advancer and the first non-advancers. If these two scores are identical, the ambiguity is disallowed and `.score()` will prevent such a score being registered.
+Matches in FFA tournaments only ensures it can discriminate between the last advancer and the first non-advancers. If these two scores are identical, the ambiguity is disallowed and `.score()` will return false.
 
 ### NB: Duel Tournaments
-If `.score()` is called with an `id` that's been scored ages ago, it's possible that the wrong winner appears two rounds later. To fix this, the next game must also be rescored so that the right winner is propagated again.
+Duel tournaments does not allow ties at any stage. It's meant to eliminate all but one, so do a best of 3 or overtime etc in the case of draws.
+
+### NB: Knockouts
+KnockOuts allow for ties everywhere except between the first knocked out player and the last advancing player. In the final, ties are fully allowed.
 
 ## Ensuring Consistency
 The `.score()` method is a very raw interface. It modifies the matches array when possible, but will also *rewrite history* if asked, possibly causing an *inconsistent tournament state* when used with match ids that are too far back in the past.
@@ -207,15 +221,20 @@ duel.results().slice(0, 4); // get top 4
     pos: 4 } ]
 ```
 
+Results can be computed at any stage in a tournament. If called before it's done, the position, or `pos`, will represent the current guaranteed to attain position in the tournament.
+
 ## Serializing Tournaments
-Every tournament type is completely serializable via the `.matches` member, store that and you can recreate it via the static `.fromJSON()` function on each tournament constructor. Note that you need to remember what type of tournament it is still.
+Every tournament type is completely serializable via the `.matches` member, store that and you can recreate it via the static `.fromJSON()` function on each tournament constructor. You only need to remember what type of tournament it is.
 
 ```js
-var ms = duel.matches; // suppose we stored this in mongodb
+var ms = duel.matches; // suppose we stored this in a database
 
 var duel2 = t.Duel.fromJSON(ms);
 // can now score duel2 like it was the original object
 ```
+
+NB: `fromJSON` does not accept stringified JSON.
+Only what comes out of `.matches` goes back into `fromJSON()`.
 
 ## UI Helpers
 A variety of helper methods are built in so that you have to use tournament's datastructures as little as possible.
@@ -232,10 +251,13 @@ ffa.representation({s: 1, r: 3, m: 2});
 
 gs.representation({s: 5, r: 2, m: 1});
 "G5 R5 M1"
+
+ko.representation({s: 1, r:2, m: 1});
+"R2"
 ```
 
 ### Upcoming Player Match
-Every tournament allow getting the next match `id` for any player id (seed number) via the `.upcoming()` method. It will search the match array for the next unscored match with the given player id in it.
+Every tournament allow getting the next match `id` for any player id (seed number) via the `.upcoming()` method. It will search the match array for the next unscored match with the given player seed number in it.
 
 ```js
 var duel = new t.Duel(4, t.WB, true); // 4 player single elim without bronze final
@@ -253,7 +275,7 @@ If the round has not been fully completed yet, then this may return a partial id
 
 
 ### Group Stage Algorithms
-The meat of the group stage algorithms are exported separately as helper functions. These may perhaps mostly help the developer's intuition, but they could also be used to for visualizing how different parameters affect group stage generation.
+The meat of the group stage algorithms are exported separately as helper functions. These may perhaps only help the developer's intuition, but they could also be used to for visualizing how different parameters affect group stage generation. Clever UI challenge accepted?
 
 The following examples show how they work:
 
