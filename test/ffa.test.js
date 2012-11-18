@@ -440,11 +440,11 @@ test("ffa 81 3 1", function (t) {
     }
     if ($.range(28, 54).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 1, "28-54th seed got 2nd in their matches (all beat 1)");
-      t.ok(27 < p.pos && p.pos <= 54, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 28, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(55, 81).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 0, "55-81th seed got 3rd in their matches (all beat 0)");
-      t.ok(54 < p.pos && p.pos <= 81, p.pos + " pos sensible for loser " + p.seed);
+      t.equal(p.pos, 55, p.pos + " pos tied for loser " + p.seed);
     }
   });
 
@@ -487,22 +487,22 @@ test("ffa 81 3 1", function (t) {
     if ($.range(10, 18).indexOf(p.seed) >= 0) {
       // these got 1st then 2nd (out)
       t.equal(p.wins, 3, "10h-18th seed got 1st then 2nd");
-      t.ok(9 < p.pos && p.pos <= 18, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 10, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(19, 27).indexOf(p.seed) >= 0) {
       // these got 1st then 3rd (out)
       t.equal(p.wins, 2, "10h-18th seed got 1st then 3rd");
-      t.ok(18 < p.pos && p.pos <= 27, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 19, p.pos + " pos tied for mid player " + p.seed);
     }
 
     // these should stay the same
     if ($.range(28, 54).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 1, "28-54th seed got 2nd in their matches (all beat 1)");
-      t.ok(27 < p.pos && p.pos <= 54, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 28, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(55, 81).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 0, "55-81th seed got 3rd in their matches (all beat 0)");
-      t.ok(54 < p.pos && p.pos <= 81, p.pos + " pos sensible for loser " + p.seed);
+      t.equal(p.pos, 55, p.pos + " pos tied for loser " + p.seed);
     }
   });
 
@@ -543,33 +543,33 @@ test("ffa 81 3 1", function (t) {
     if ($.range(4, 6).indexOf(p.seed) >= 0) {
       // these got 1st, 1st then 2nd (out)
       t.equal(p.wins, 5, "4-6th seed got 1st then 2nd");
-      t.ok(3 < p.pos && p.pos <= 6, p.pos + " pos sensible for mid player " + p.seedP);
+      t.equal(p.pos, 4, p.pos + " pos tied for mid player " + p.seedP);
     }
     if ($.range(7, 9).indexOf(p.seed) >= 0) {
       // these got 1st, 1st then 3rd (out)
       t.equal(p.wins, 4, "7-9th seed got 1st,1st,3rd");
-      t.ok(6 < p.pos && p.pos <= 9, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 7, p.pos + " pos tied for mid player " + p.seed);
     }
 
     // these should stay the same
     if ($.range(10, 18).indexOf(p.seed) >= 0) {
       // these got 1st then 2nd (out)
       t.equal(p.wins, 3, "10h-18th seed got 1st then 2nd");
-      t.ok(9 < p.pos && p.pos <= 18, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 10, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(19, 27).indexOf(p.seed) >= 0) {
       // these got 1st then 3rd (out)
       t.equal(p.wins, 2, "10h-18th seed got 1st then 3rd");
-      t.ok(18 < p.pos && p.pos <= 27, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 19, p.pos + " pos tied for mid player " + p.seed);
     }
 
     if ($.range(28, 54).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 1, "28-54th seed got 2nd in their matches (all beat 1)");
-      t.ok(27 < p.pos && p.pos <= 54, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 28, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(55, 81).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 0, "55-81th seed got 3rd in their matches (all beat 0)");
-      t.ok(54 < p.pos && p.pos <= 81, p.pos + " pos sensible for loser " + p.seed);
+      t.equal(p.pos, 55, p.pos + " pos tied for loser " + p.seed);
     }
   });
 
@@ -617,32 +617,32 @@ test("ffa 81 3 1", function (t) {
     if ($.range(4, 6).indexOf(p.seed) >= 0) {
       // these got 1st, 1st then 2nd (out)
       t.equal(p.wins, 5, "4-6th seed got 1st then 2nd");
-      t.ok(3 < p.pos && p.pos <= 6, p.pos + " pos sensible for mid player " + p.seedP);
+      t.equal(p.pos, 4, p.pos + " pos tied for mid player " + p.seedP);
     }
     if ($.range(7, 9).indexOf(p.seed) >= 0) {
       // these got 1st, 1st then 3rd (out)
       t.equal(p.wins, 4, "7-9th seed got 1st,1st,3rd");
-      t.ok(6 < p.pos && p.pos <= 9, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 7, p.pos + " pos tied for mid player " + p.seed);
     }
 
     if ($.range(10, 18).indexOf(p.seed) >= 0) {
       // these got 1st then 2nd (out)
       t.equal(p.wins, 3, "10h-18th seed got 1st then 2nd");
-      t.ok(9 < p.pos && p.pos <= 18, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 10, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(19, 27).indexOf(p.seed) >= 0) {
       // these got 1st then 3rd (out)
       t.equal(p.wins, 2, "10h-18th seed got 1st then 3rd");
-      t.ok(18 < p.pos && p.pos <= 27, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 19, p.pos + " pos tied for mid player " + p.seed);
     }
 
     if ($.range(28, 54).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 1, "28-54th seed got 2nd in their matches (all beat 1)");
-      t.ok(27 < p.pos && p.pos <= 54, p.pos + " pos sensible for mid player " + p.seed);
+      t.equal(p.pos, 28, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(55, 81).indexOf(p.seed) >= 0) {
       t.equal(p.wins, 0, "55-81th seed got 3rd in their matches (all beat 0)");
-      t.ok(54 < p.pos && p.pos <= 81, p.pos + " pos sensible for loser " + p.seed);
+      t.equal(p.pos, 55, p.pos + " pos tied for loser " + p.seed);
     }
   });
 
@@ -650,25 +650,6 @@ test("ffa 81 3 1", function (t) {
     var up = ffa.upcoming(n);
     t.ok(!up, "no upcoming match for " + n + " (tournament over)" + JSON.stringify(up));
   });
-
-  t.end();
-});
-
-// short prop
-test("ffa 81 3 1", function (t) {
-  var ffa = new T.FFA(81, 3, 1)
-    , gs = ffa.matches;
-
-  gs.forEach(function (m) {
-    ffa.score(m.id, [3,2,1]); // score highest seed highest
-  });
-
-  // since advancement sorts by Pts then old Seed (and same for results)
-  // these two numbers should coincide perfectly
-  var matching = ffa.results().filter(function (m) {
-    return m.seed === m.pos;
-  }).length;
-  t.equal(matching, 81, "all players should match pos and seed in simple case");
 
   t.end();
 });
