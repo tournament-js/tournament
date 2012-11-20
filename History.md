@@ -1,8 +1,16 @@
 PLANNED
 ==================
-  * crossover bracket for ffa elimination [will be difficult]
-  * FFA results should handle ties better for scoring (currently badly done)
-  * group stages should have tiebreaker handling - or perhaps only needed for pipe
+  * `FFA` elimination crossovers? perhaps using tierbreakers in multi-stage FFA -> FFA
+  * `FFA` manual mode by passing in adv array similar to what `KnockOut` does
+  * `KnockOut` automatic mode by passing in a constant ko factor
+  * group stages should have tiebreaker handling
+  * `FFA` best could now be top player score and could also do average.
+
+0.4.2 / 2012-11-20
+==================
+  * `FFA` results now properly accounts for ties
+  * `FFA` results now score a win as having progressed to the next match rather than the amount of people below in comparing points then seed (which was bad anyway, did not account for ties) to let wins be consistent with other tournament types.
+  * Last 0.4 release. 0.5 Will break constructors.
 
 0.4.1 / 2012-11-18
 ==================
