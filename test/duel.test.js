@@ -30,7 +30,7 @@ test("duel 16 WB fromJSON", function (t) {
 
 // same test wo bronze final
 test("duel 16 WB short fromJSON", function (t) {
-  var duel = new T.Duel(16, T.WB, true)
+  var duel = new T.Duel(16, T.WB, {short: true})
     , gs = duel.matches;
 
   t.equal(gs.length, Math.pow(2, duel.p) - 1, "length same as num players - 1 without bronze final");
@@ -85,7 +85,7 @@ test("duel 16 LB fromJSON", function (t) {
 });
 
 test("duel 16 LB short fromJSON", function (t) {
-  var duel = new T.Duel(16, T.LB, true)
+  var duel = new T.Duel(16, T.LB, {short: true})
     , gs = duel.matches;
 
   var duel2 = T.Duel.fromJSON(gs);
@@ -111,7 +111,6 @@ test("duel 16 LB short fromJSON", function (t) {
 
   t.end();
 });
-
 
 test("duel WB general", function (t) {
   var duel = new T.Duel(32, T.WB)
@@ -389,6 +388,6 @@ test("upcoming/scorable 8 LB", function (t) {
     }
   });
 
-
   t.end();
 });
+

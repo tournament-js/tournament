@@ -90,11 +90,11 @@ The _default_ implementation of an elimination tournament includes the usual (bu
  * bronze final in single elimination
  * double grand final in double elimination
 
-By passing a truthy third value to the `Duel` constructor in their respective cases, this default behaviour can be overriden and the shorter versions (lacking their respective match) is used.
+Passing a `short:true` flag in the third options object to the `Duel` constructor will override the default behaviour and use the short variants.
 
 ```js
-var duel1 = new t.Duel(16, t.WB, true); // no bronze final in this
-var duel2 = new t.Duel(16, t.LB, true); // winner of LB can win the grand final in one match
+var ses = new t.Duel(16, t.WB, {short: true}); // no bronze final in this
+var des = new t.Duel(16, t.LB, {short: true}); // winner of LB can win the grand final in one match
 ```
 
 ### FFA Elimination
