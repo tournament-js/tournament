@@ -5,13 +5,16 @@ PLANNED
   * `KnockOut` automatic mode by passing in a constant ko factor
   * group stages should have tiebreaker handling
   * `FFA` best could now be top player score and could also do average.
-  * `FFA` results should? tie 4th placers across matches when not proceeding etc
+  * `FFA` results should? tie 4th placers across matches when not proceeding etch
+  * All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
+  * `representation` functions should be static
+  * textual representations should be done PROPERLY per instance via roundName
 
-0.5.0 / 2012-XX-XX
+0.5.0 / 2012-11-22
 ==================
-  * TODO: All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
-  * `Duel` constructor heaps optional flags in the third options object. This used to be a bool only.
-  * `Duel` double elimination positions are now accurate mid tournament.
+  * `Duel` constructor heaps optional flags in the third options object. This used to be a bool only for the current only option [only minor bump reason]
+  * `Duel` double elimination positions are now accurate mid tournament
+  * `Duel` scoring now only affects the winner (other players are scored as if they're about to lose everything to give a guaranteed score at any point)
 
 0.4.2 / 2012-11-20
 ==================
