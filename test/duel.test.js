@@ -3,6 +3,51 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
+test("duel LB underdog + scorable", function (t) {
+  // long LB underdog lost
+  var duel = new T.Duel(16, T.LB, {short:false});
+  duel.matches.slice(0, -2).map(function (m, i) {
+    t.ok(duel.scorable(m.id), "can score long m" + i);
+    t.ok(duel.score(m.id, m.p[0] < m.p[1] ? [2,1] : [1,2]), "can score long m" + i);
+  });
+  t.ok(duel.score(duel.matches[duel.matches.length-2].id, [1,0]), "could score gf1");
+  t.deepEqual($.last(duel.matches).p, [0, 0], "no players forwarded when underdog lost");
+  t.ok(duel.isDone(), "duel tournament should be done now");
+  t.ok(!duel.scorable($.last(duel.matches).id), "cannot score GF2");
+  t.ok(!duel.score($.last(duel.matches).id, [2, 1]), "could NOT score GF2");
+
+  // long LB underdog won
+  duel = new T.Duel(16, T.LB, {short:false});
+  duel.matches.slice(0, -2).map(function (m, i) {
+    t.ok(duel.scorable(m.id), "can score long m" + i);
+    t.ok(duel.score(m.id, m.p[0] < m.p[1] ? [2,1] : [1,2]), "can score long m" + i);
+  });
+  t.ok(duel.score(duel.matches[duel.matches.length-2].id, [0,1]), "could score GF1");
+  t.deepEqual($.last(duel.matches).p, [2, 1], "underdog win => forwarding");
+  t.ok(!duel.isDone(), "there should be one more match to play");
+  t.ok(duel.scorable($.last(duel.matches).id), "can score GF2");
+  t.ok(duel.score($.last(duel.matches).id, [2, 1]), "could score GF2");
+  t.ok(duel.isDone(), "long GF2 played so we are done");
+
+  // short LB underdog lost
+  var duel = new T.Duel(16, T.LB, {short:true});
+  duel.matches.map(function (m, i) {
+    t.ok(duel.scorable(m.id), "can score short m" + i);
+    t.ok(duel.score(m.id, [1,2]), "can score short m" + i);
+  });
+  t.ok(duel.isDone(), "duel tournament should be done now");
+
+  // short LB underdog won
+  var duel = new T.Duel(16, T.LB, {short:true});
+  duel.matches.map(function (m, i) {
+    t.ok(duel.scorable(m.id), "can score short m" + i);
+    t.ok(duel.score(m.id, [2,1]), "can score short m" + i);
+  });
+  t.ok(duel.isDone(), "duel tournament should be done now");
+
+  t.end();
+});
+
 test("duel 16 WB fromJSON", function (t) {
   var duel = new T.Duel(16, T.WB)
     , gs = duel.matches;
@@ -50,7 +95,7 @@ test("duel 16 WB short fromJSON", function (t) {
   var res = duel2.results();
   t.ok(res, "can get results");
   // cant determine 3-vs-4th in this case!
-  t.ok($.isSubsetOf([1,2,3,3], $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1,2,3,3");
+  t.ok($.isSubsetOf([1,2,3,3], $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1,2,3,4");
 
   t.end();
 });
@@ -107,8 +152,7 @@ test("duel 16 LB short fromJSON", function (t) {
 
   var res = duel2.results();
   t.ok(res, "can get results");
-  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1-4");
-
+  t.deepEqual($.pluck('pos', res.slice(0, 4)), $.range(4), "top 4 should have pos 1-4");
   t.end();
 });
 
@@ -390,4 +434,3 @@ test("upcoming/scorable 8 LB", function (t) {
 
   t.end();
 });
-
