@@ -101,10 +101,11 @@ var des = new t.Duel(16, t.LB, {short: true}); // winner of LB can win the grand
 FFA elimination tournaments consist of FFA matches that are bracketed like a duel elimination tournament. The only other main difference is that the number of players per match is greater than two and the number advancing per match advancing can be greater than one.
 
 ```js
-var ffa = new t.FFA(16, 4, 2); // 16 players in matches of 4, top 2 advancing
+var ffa = new t.FFA(16, [4, 4, 4], [2, 2]); // 16 players in matches of 4 each round, top 2 advances between each
 ```
 
-When using unusual divisions of players into odd numbered groups (that perhaps do not divide cleanly into the remainders), tournament will sometimes reduce the number of advancers for one particular round depending on what's the cleanest approach. Try not to be put off though, the algorithm is surprisingly robust and intelligent!
+You must specify precisely the required group size for each round and how many to advance.
+This is really the hardest part of an FFA elimination. There are essentially endless possibilities, but we limit the most outragous ones so that it must at least be playable and non-trivial. The plan is to expose helpers to make this selection easiers on the UI side of things, but for now, be prepared to think about your parameters and check the tests for usage.
 
 ### Knockouts
 Knockout tournaments consist of a pool of players, repeatedly fighting against each other and gradually reducing the number of players each round. We specify the number of players to knock out each round as an array of integers.
@@ -240,19 +241,19 @@ Only what comes out of `.matches` goes back into `fromJSON()`.
 A variety of helper methods are built in so that you have to use tournament's datastructures as little as possible.
 
 ### Match Representation
-Every tournament type has a `.representation()` method that takes an `id` of any match in the tournament. This will create a unique string representation for that match differing slightly depending on tournament type.
+Every tournament type has a static `.idString()` method that takes an `id` of any match in a tournament. This will create a unique string representation for that match differing slightly depending on tournament type.
 
 ```js
-duel.representation({s: t.LB, r: 2, m: 3});
+t.Duel.idString({s: t.LB, r: 2, m: 3});
 "LB R2 M3"
 
-ffa.representation({s: 1, r: 3, m: 2});
+t.FFA.idString({s: 1, r: 3, m: 2});
 "R3 M2"
 
-gs.representation({s: 5, r: 2, m: 1});
+t.GroupStage.idString({s: 5, r: 2, m: 1});
 "G5 R5 M1"
 
-ko.representation({s: 1, r:2, m: 1});
+t.KnockOut.idString({s: 1, r:2, m: 1});
 "R2"
 ```
 

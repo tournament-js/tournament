@@ -2,13 +2,20 @@ PLANNED
 ==================
   * `FFA` elimination crossovers? perhaps using tierbreakers in multi-stage FFA -> FFA
   * `FFA` manual mode by passing in adv array similar to what `KnockOut` does
-  * `KnockOut` automatic mode by passing in a constant ko factor
   * group stages should have tiebreaker handling
   * `FFA` best could now be top player score and could also do average.
-  * `FFA` results should? tie 4th placers across matches when not proceeding etch
+  * `FFA` results should? tie 4th placers across matches when not proceeding etc
   * All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
-  * `representation` functions should be static
-  * textual representations should be done PROPERLY per instance via roundName
+  * Factor GroupStage algorithms into own mini-library (used by FFA as well as client) - needed all over the place
+  * Factor ADV algorithm into own mini-library (useful for client and optional server) - done, but not exposed anywhere
+  * `Duel::roundName` should work with all `Duel` types and options atm a little iffy because no good name for bronze final round (should be bronze final, but it does not have a unique round number - perhaps change id of bronze final)
+
+0.6.0 / 2012-11-29
+==================
+  * `FFA` tournaments now require full control of input parameters - no more guessing of what the user wants, let the users control it all - and let the guess work be handled externally.
+  * `FFA` tournaments take array of group sizes and array of advancers to be input at construction.
+  * All tournament types had an instance method `::representation` which is now a static `.idString` function instead - this is exportable as always independent of tournament settings
+  * `Duel::roundName` somewhat improved, but still a bit lackluster - ideas welcome
 
 0.5.0 / 2012-11-22
 ==================
