@@ -1,7 +1,8 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../');
+  , T = require('../')
+  , rep = T.Duel.idString;
 
 
 test("seeding assumption", function (t) {
@@ -22,7 +23,7 @@ test("seeding assumption", function (t) {
     // score the matches, check that it works given it's such a huge tournament
     // this massively inflates test counts, the roundly ones are the important ones
     round.forEach(function (m) {
-      var id = d.representation(m.id);
+      var id = rep(m.id);
       t.ok(d.scorable(m.id), id + " scorable");
       t.ok(d.score(m.id, m.p[0] < m.p[1] ? [1, 0] : [0, 1]), id + " scored");
     });

@@ -1,7 +1,8 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../');
+  , T = require('../')
+  , rep = T.Duel.idString;
 
 test("score affects only winner", function (t) {
   var n = 16
@@ -30,12 +31,12 @@ test("score affects only winner", function (t) {
   };
 
   var res = d.results();
-  t.equal(res.length, n, "res has same number of players as input")
+  t.equal(res.length, n, "res has same number of players as input");
 
   gs.forEach(function (m) {
     // NB: scoring it underdog way to ensure even long GF can be scored
-    t.ok(d.score(m.id, [0, 1]), 'could score ' + d.representation(m.id));
-    var newRes = d.results()
+    t.ok(d.score(m.id, [0, 1]), 'could score ' + rep(m.id));
+    var newRes = d.results();
     verifyResDiff(res, newRes, m.p[1], 1);
     res = newRes;
   });
@@ -60,9 +61,9 @@ test("duel results detailed WB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 1 && g.id.s === T.WB) {
         // let top seed through
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -79,9 +80,9 @@ test("duel results detailed WB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 2 && g.id.s === T.WB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -106,9 +107,9 @@ test("duel results detailed WB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 3 && g.id.s === T.WB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + str);
       }
     });
     res = duel.results();
@@ -138,9 +139,9 @@ test("duel results detailed WB 8", function (t) {
     gs.forEach(function (g) {
       if (!g.m) {
         // score last 1/2 matches, final + bf?
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + str);
       }
     });
     var res3 = duel.results();
@@ -185,9 +186,9 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 1 && g.id.s === T.WB) {
         // let top seed through
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -204,9 +205,9 @@ test("duel results detailed LB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 2 && g.id.s === T.WB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -226,9 +227,9 @@ test("duel results detailed LB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 1 && g.id.s === T.LB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -251,9 +252,9 @@ test("duel results detailed LB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 2 && g.id.s === T.LB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -276,9 +277,9 @@ test("duel results detailed LB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 3 && g.id.s === T.LB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -304,9 +305,9 @@ test("duel results detailed LB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 3 && g.id.s === T.WB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -335,9 +336,9 @@ test("duel results detailed LB 8", function (t) {
 
     gs.forEach(function (g) {
       if (g.id.r === 4 && g.id.s === T.LB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -366,9 +367,9 @@ test("duel results detailed LB 8", function (t) {
     // score gf1 (all code below consider whether or not we are in short mode)
     gs.forEach(function (g) {
       if (g.id.r === 5 && g.id.s === T.LB) {
-        var rep = duel.representation(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + rep);
-        t.ok(duel.score(g.id, [2, 0]), 'scored' + rep);
+        var str = rep(g.id);
+        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.ok(duel.score(g.id, [2, 0]), 'scored' + str);
       }
     });
     res = duel.results();
@@ -393,9 +394,9 @@ test("duel results detailed LB 8", function (t) {
     // overwrite g5
     gs.forEach(function (g) {
       if (g.id.r === 5 && g.id.s === T.LB) {
-        var rep = duel.representation(g.id);
+        var str = rep(g.id);
         t.ok(!duel.scorable(g.id), "should not really be able to score " + rep);
-        t.ok(duel.score(g.id, [0, 2]), 'scored' + rep);
+        t.ok(duel.score(g.id, [0, 2]), 'scored' + str);
       }
     });
     res = duel.results();
