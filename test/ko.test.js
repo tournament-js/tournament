@@ -1,7 +1,8 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../');
+  , T = require('../')
+  , rep = T.KnockOut.idString;
 
 test("ko 10 [2,4,2] fromJSON", function (t) {
   var kos = [2,4,2];
@@ -13,7 +14,7 @@ test("ko 10 [2,4,2] fromJSON", function (t) {
     t.deepEqual(ko.kos, konew.kos, "kos the same");
 
     var m = ko.matches[i];
-    t.ok(ko.score(m.id, $.range(m.p.length).reverse()), "score of round " + (i + 1));
+    t.ok(ko.score(m.id, $.range(m.p.length).reverse()), "score " + rep(m.id));
     t.ok(m.m, "score worked");
   }
   t.end();
@@ -37,7 +38,7 @@ test("ko 10 [2,4,2]", function (t) {
     var r = i+1;
     // remaining matches unscored
     ms.slice(r).forEach(function (m) {
-      t.equal($.nub(m.p).length, 1, "all T.NA in round " + m.id.r);
+      t.equal($.nub(m.p).length, 1, "all T.NA in " + rep(m.id));
     });
 
     // ensure results match the current round
@@ -51,7 +52,8 @@ test("ko 10 [2,4,2]", function (t) {
     });
 
     // score current round r (so that highest seed wins)
-    t.ok(ko.score(ms[i].id, $.range(leftover).reverse()), "could score r" + r);
+    var couldScore = ko.score(ms[i].id, $.range(leftover).reverse());
+    t.ok(couldScore, "could score " + rep(ms[i].id));
 
     // check progression
     t.deepEqual(ms[i+1].p, $.range(leftover - k), k + " knocked out of " + leftover);
@@ -62,7 +64,7 @@ test("ko 10 [2,4,2]", function (t) {
   // now all matches should have players
   leftover = 10;
   ms.forEach(function (m, i) {
-    t.deepEqual(m.p, $.range(leftover), leftover + " players in r" + m.id.r);
+    t.deepEqual(m.p, $.range(leftover), leftover + " players in" + rep(m.id));
     leftover -= kos[i];
   });
 
