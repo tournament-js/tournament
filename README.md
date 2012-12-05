@@ -272,7 +272,7 @@ undefined
 ```
 
 #### NB: FFA Tournaments
-If the round has not been fully completed yet, then this may return a partial id, like `{s: WB, r: 4}` missing a game number, as each round creates new seeds for a fair new round based on previous performance, and thus all the game results from this round are needed to determine a player's next game number. Note that such an id can still be represented via the `.representation()` method.
+If the round has not been fully completed yet, then this may return a partial id, like `{s: WB, r: 4}` missing a game number, as each round creates new seeds for a fair new round based on previous performance, and thus all the game results from this round are needed to determine a player's next game number. Note that such an id can still be represented via the `.idString()` function.
 
 
 ### Group Stage Algorithms
