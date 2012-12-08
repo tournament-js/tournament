@@ -11,7 +11,10 @@ test("ffa 16 4 2 unfinished no limits", function (t) {
 });
 
 test("ffa 16 4 2 unfinished res limits", function (t) {
-  var ffa = new T.FFA(16, [4,4], [2], {limit: 4})
+  var ffaB = new T.FFA(16, [4,4], [2], {limit: 4});
+
+  // quick serialization test as only case atm
+  var ffa = T.FFA.fromJSON(ffaB.matches, {limit: 4})
     , gs = ffa.matches;
 
   t.ok(gs.length > 0, "could create ffa with limits");

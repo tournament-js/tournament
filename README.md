@@ -237,6 +237,13 @@ var duel2 = t.Duel.fromJSON(ms);
 NB: `fromJSON` does not accept stringified JSON.
 Only what comes out of `.matches` goes back into `fromJSON()`.
 
+NB: If the options object were passed to the respective tournament constructor then these must be passed verbatim to `fromJSON` as the second parameter.
+
+```js
+var ffaDb = new T.FFA(16, [4,4], [2], {limit: 4});
+var ffa = T.FFA.fromJSON(ffaDb.matches, {limit: 4}); // now the same as ffaDb
+```
+
 ## Ensuring Constructibility
 Certain parameter configurations can be logically impossible. Whether or not they are should be able to be tested for. This is a recent addition and at the moment only available for the most difficult to configure tournament; `FFA`.
 
