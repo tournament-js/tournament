@@ -1,14 +1,18 @@
 PLANNED
 ==================
+  * MULTISTAGE: All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
   * `FFA` elimination crossovers? perhaps using tierbreakers in multi-stage FFA -> FFA
-  * `FFA` manual mode by passing in adv array similar to what `KnockOut` does
   * group stages should have tiebreaker handling
-  * `FFA` best could now be top player score and could also do average.
-  * `FFA` results should? tie 4th placers across matches when not proceeding etc
-  * All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
   * Factor GroupStage algorithms into own mini-library (used by FFA as well as client) - needed all over the place
   * Factor ADV algorithm into own mini-library (useful for client and optional server) - done, but not exposed anywhere
   * `Duel::roundName` should work with all `Duel` types and options atm a little iffy because no good name for bronze final round (should be bronze final, but it does not have a unique round number - perhaps change id of bronze final)
+
+0.7.0 / 2012-12-08
+==================
+  * `FFA` tournaments now a better set of restrictions imposed to ensure things are valid.
+  * Internal `FFA` restriction function exported to `t.FFA.invalidReason` and returns a reason (for client) or `null` if valid configuration.
+  * `FFA` tournaments does not position (the `.pos` attribute in each `results()` element) between groups anymore - all x-placers are tied (but we still sort the list by pos then sum of scores)
+  * `FFA` tournaments allow an experimental `limit` parameter to the last options parameter (first tournament type that implements this) so that you can guarantee you can pick the top `limit` at the end of a tournament (via `results()`) and send those to another tournament (multi-stage tournaments)
 
 0.6.0 / 2012-11-29
 ==================

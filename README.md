@@ -237,6 +237,19 @@ var duel2 = t.Duel.fromJSON(ms);
 NB: `fromJSON` does not accept stringified JSON.
 Only what comes out of `.matches` goes back into `fromJSON()`.
 
+## Ensuring Constructibility
+Certain parameter configurations can be logically impossible. Whether or not they are should be able to be tested for. This is a recent addition and at the moment only available for the most difficult to configure tournament; `FFA`.
+
+```js
+var str = t.FFA.invalidReason(numPlayers, grsAry, advAry, limit || 0);
+if (str === null) {
+  // tournament valid - and can be constructed with the parameters just passed in
+}
+else {
+  console.log(str); // will tell you what went wrong
+}
+```
+
 ## UI Helpers
 A variety of helper methods are built in so that you have to use tournament's datastructures as little as possible.
 
@@ -291,6 +304,9 @@ t.robin(4); // 4 player round robin pairups
   [ [ 1, 3 ], [ 4, 2 ] ],   // round 2
   [ [ 1, 2 ], [ 3, 4 ] ] ]  // round 3
 ```
+
+## Multi-Stage Tournaments
+In development. Follow the [multi-stage issue](https://github.com/clux/tournament/issues/1)
 
 ## Installation
 
