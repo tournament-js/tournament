@@ -61,10 +61,6 @@ test("ffa 16 4 2 unfinished res limits", function (t) {
   var res2 = ffa.results();
   t.ok(res2, "could get post-final semi results");
 
-  // does this need changing?
-  // at the moment it does distinguish between the winners in semi1 from semi2
-  // by comparing their points as they are considered as they didnt advance
-  // is this completely fair?
   verifyLosers(res2); // bottom 8 should at least remain the same
 
   res2.slice(0, 8).forEach(function (o) {
@@ -89,7 +85,7 @@ test("ffa 16 4 2 unfinished res limits", function (t) {
   });
 
 
-  // what if we scored semi 1 differently, will it sort really badly between the groups?
+  //if we scored semi 1 differently, it used to sort really badly between the groups
   ffa.score({s:1, r:2, m:1}, [8,7,6,5]); // score semi 1 weirdly
   // NB: that was the semi with 1, 3, 6, 8 in it
   // so score list is:
@@ -103,6 +99,7 @@ test("ffa 16 4 2 unfinished res limits", function (t) {
   //  7: 1, 4
   //  8: 5  POS 4 (tight)
   //}
+  // note it should tie Xth-placers at the moment between groups
 
   var res2b = ffa.results();
   t.ok(res2b, "could get post-final semi results");
@@ -130,13 +127,13 @@ test("ffa 16 4 2 unfinished res limits", function (t) {
       t.equal(o.pos, 5, "6 3rd'd the 'tighter' semi with 6");
     }
     if (o.seed === 5) {
-      t.equal(o.pos, 6, "5 3rd'd the 'easier' semi with 2");
+      t.equal(o.pos, 5, "5 3rd'd the 'easier' semi with 2");
     }
     if (o.seed === 8) {
       t.equal(o.pos, 7, "8 4th'd the 'tighter' semi with 5");
     }
     if (o.seed === 7) {
-      t.equal(o.pos, 8, "8 4th'd the 'easier' semi with 1");
+      t.equal(o.pos, 7, "8 4th'd the 'easier' semi with 1");
     }
   });
 
