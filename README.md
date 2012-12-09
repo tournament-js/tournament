@@ -245,15 +245,20 @@ var ffa = T.FFA.fromJSON(ffaDb.matches, {limit: 4}); // now the same as ffaDb
 ```
 
 ## Ensuring Constructibility
-Certain parameter configurations can be logically impossible. Whether or not they are should be able to be tested for. This is a recent addition and at the moment only available for the most difficult to configure tournament; `FFA`.
+Certain parameter configurations to tournament constructors are logically impossible. Like group size > number of players etc. Whether or not a set of parameters will fail contruction can be tested for with a method taking the same parameters as the respective constructor.
+
+This is particularly valuable for the `FFA` elimination type where the possibilities are basically endless.
 
 ```js
-var str = t.FFA.invalidReason(numPlayers, grsAry, advAry, limit || 0);
+// construct if valid:
+var str = t.FFA.invalidReason(numPlayers, grsAry, advAry, opts);
 if (str === null) {
   // tournament valid - and can be constructed with the parameters just passed in
+  return new t.FFA(numPlayers, grsAry, advAry, opts);
 }
 else {
   console.log(str); // will tell you what went wrong
+  return false;
 }
 ```
 

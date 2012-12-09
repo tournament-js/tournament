@@ -1,11 +1,19 @@
 PLANNED
 ==================
   * MULTISTAGE: All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
+    - only KnockOut/Duel/GroupStage left - and KnockOut should be easy!
   * `FFA` elimination crossovers? perhaps using tierbreakers in multi-stage FFA -> FFA
   * group stages should have tiebreaker handling
   * Factor GroupStage algorithms into own mini-library (used by FFA as well as client) - needed all over the place
   * Factor ADV algorithm into own mini-library (useful for client and optional server) - done, but not exposed anywhere
-  * `Duel::roundName` should work with all `Duel` types and options atm a little iffy because no good name for bronze final round (should be bronze final, but it does not have a unique round number - perhaps change id of bronze final)
+
+0.8.0 / 2012-12-09
+==================
+  * `FFA.invalidReason` now takes the same parameters as `FFA` constructor
+  * All other tournament types have a static `.invalidReason` function that takes the same parameter as their respective constructors
+  * `Duel::roundName` now takes a partial or complete id from a round in a tournament instead of both round and bracket - also works with Double elimination
+  * `duel_names.js` contains this code and is's a basic english shell that can be copied into an own module and used similarly as a replacement mixin for full localization
+  * Fixed a bug where `Duel::isDone()` returned true prematurely.
 
 0.7.0 / 2012-12-08
 ==================
