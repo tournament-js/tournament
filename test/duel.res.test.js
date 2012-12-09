@@ -395,7 +395,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 5 && g.id.s === T.LB) {
         var str = rep(g.id);
-        t.ok(!duel.scorable(g.id), "should not really be able to score " + rep);
+        t.ok(!duel.scorable(g.id), "should not really be able to score " + str);
         t.ok(duel.score(g.id, [0, 2]), 'scored' + str);
       }
     });
