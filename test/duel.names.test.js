@@ -17,7 +17,7 @@ test("names 32 WB", function (t) {
     var r = m.id.r;
     var name = d.roundName(m.id);
     if (m.id.s === T.LB) {
-      t.equal(name, "Bronze Final", "Round 1 LB name");
+      t.equal(name, "Bronze final", "Round 1 LB name");
     }
     else {
       if (r === 1) {
@@ -27,13 +27,13 @@ test("names 32 WB", function (t) {
         t.equal(name, "Round of 16", "Round 2 WB name");
       }
       if (r === 3) {
-        t.equal(name, "Quarter Finals", "Round 3 WB name");
+        t.equal(name, "Quarter-finals", "Round 3 WB name");
       }
       if (r === 4) {
-        t.equal(name, "Semi Finals", "Round 4 WB name");
+        t.equal(name, "Semi-finals", "Round 4 WB name");
       }
       if (r === 5) {
-        t.equal(name, "Grand Final", "Round 5 WB name");
+        t.equal(name, "Grand final", "Round 5 WB name");
       }
     }
   });
@@ -56,29 +56,29 @@ test("names 32 LB", function (t) {
         t.equal(name, "LB Round of 16", "Round 1 LB name");
       }
       else if (r === 2) {
-        t.equal(name, "LB Mixed Round of 16", "Round 2 LB name");
+        t.equal(name, "LB Strong round of 16", "Round 2 LB name");
       }
       else if (r === 3) {
         t.equal(name, "LB Round of 8", "Round 3 LB name");
       }
       else if (r === 4) {
-        t.equal(name, "LB Mixed Round of 8", "Round 4 LB name");
+        t.equal(name, "LB Strong round of 8", "Round 4 LB name");
       }
       else if (r === 5) {
         t.equal(name, "LB Round of 4", "Round 5 LB name");
       }
       else if (r === 6) {
-        t.equal(name, "LB Mixed Round of 4", "Round 6 LB name");
+        t.equal(name, "LB Strong round of 4", "Round 6 LB name");
       }
       // special rounds
       else if (r === 2*p - 3) { // 7
-        t.equal(name, "LB Mixed Final", "LB round 7 name (4th place ko match)");
+        t.equal(name, "LB Final", "LB round 7 name (4th place ko match)");
       }
       else if (r === 2*p - 2) { // 8
-        t.equal(name, "LB Final", "LB Final name (3rd place ko match)");
+        t.equal(name, "LB Strong final", "LB Final name (3rd place ko match)");
       }
       else if (r === 2*p || r === 2*p - 1) { // 9 and 10
-        t.equal(name, "Grand Final", "GF round 1 or 2");
+        t.equal(name, "Grand final", "GF round 1 or 2");
       }
       else {
         // to prove we covered all rounds in LB
@@ -93,10 +93,10 @@ test("names 32 LB", function (t) {
         t.equal(name, "WB Round of 16", "Round 2 WB name");
       }
       else if (r === 3) {
-        t.equal(name, "WB Quarter Finals", "Round 3 WB name");
+        t.equal(name, "WB Quarter-finals", "Round 3 WB name");
       }
       else if (r === 4) {
-        t.equal(name, "WB Semi Finals", "Round 4 WB name");
+        t.equal(name, "WB Semi-finals", "Round 4 WB name");
       }
       else if (r === 5) {
         t.equal(name, "WB Final", "Round 5 WB name");
