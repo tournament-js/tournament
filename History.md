@@ -6,6 +6,13 @@ PLANNED
   * group stages should have tiebreaker handling
   * Factor GroupStage algorithms into own mini-library (used by FFA as well as client) - needed all over the place
   * Factor ADV algorithm into own mini-library (useful for client and optional server) - done, but not exposed anywhere
+  * When overriding history, should undo the scores to make the error explicit!
+
+0.9.0 / 2012-12-10
+==================
+  * `.invalidReason` -> `.invalid`
+  * `.scorable` refactored into `.unscorable` which returns a reason string if !scorable
+  * Remove `trueRoundOrder` scorable feature
 
 0.8.0 / 2012-12-09
 ==================

@@ -169,29 +169,49 @@ Duel tournaments does not allow ties at any stage. It's meant to eliminate all b
 ### NB: Knockouts
 KnockOuts allow for ties everywhere except between the first knocked out player and the last advancing player. In the final, ties are fully allowed.
 
-## Ensuring Consistency
-The `.score()` method is a very raw interface. It modifies the matches array when possible, but will also *rewrite history* if asked, possibly causing an *inconsistent tournament state* when used with match ids that are too far back in the past.
+## Ensuring Scorability & Consistency
+The `.score(id, scores)` method, whilst simple, has a couple of problems when used with the default behaviour:
 
-For instance, in all elimination tournaments, if `.score()` is called with an `id` that's been scored 2 rounds before the current one, it's possible that the wrong winner appears in the current round because it was propagated earlier. Two fix this, the next game must also be rescored so that the right winner is propagated again.
+1. When invalid `.score()` parameters are given, tournament will by default just log the error and return `false`. This is not very helpful if the action was taken remotely through a UI who will not see the message.
 
-To ensure that `.score()` is never called stupidly on invalid or archaic match ids, all tournaments have a built in an optional `.scorable()` method that takes a match `id` only and returns boolean of whether calling `.score()` on this `id` results in a safe update.
+2. If the `.score()` parameter are valid, but it happened on an old match, it will rewrite history, and return `true`, possibly leaving the tournament in an inconsistent state.
+
+The `.unscorable()` method addresses both of these problems in kind:
+
+1. It reports the actual string logged by `.score()` if the scoring was unsuccessful, allowing you to guard on it and report it back to the client.
+
+2. It also by default returns a string when you are rewriting history, unless you pass in an optional last parameter to explicitly allow this.
+
 
 ```js
+// default user access
 var id = {s: 1, r: 2, m: 1}
-if (duel.scorable(id)) {
-  duel.score(id, score);
+var reason = duel.unscorable(id, score);
+if (reason === null) {
+  duel.score(id, score); // will work, and will not  rewrite history
 }
 else {
-  // will rewrite history - expose to administrators only
+  console.log(reason); // either invalid parameters or complaining about rewriting history
+}
+
+// administrator access - can rewrite history
+va reason = duel.unscorable(id, score, true);
+if (reason === null) {
+  duel.score(id, score); // will work, but may rewrite history.
+}
+else {
+  console.log(reason); // parameters invalid in some way
 }
 ```
 
-Note that `.scorable(id)` also verifies that `id` exists in the match array and the players are all ready to play this match (i.e. not from an elimination round that's too far in the future to have any players yet).
+ When guarding on `!unscorable` like this `tournament` will never log anything during a `.score()` call.
 
-### NB: Group Stages
-All matches are by default scorable for all group stages (that is, if they exist in `.matches` and has not already been scored).
+ The reasons are currently hardcoded inside each tournament types dedicated file, under their internal `unscorable` function. Typical faults include:
 
-However, if you want to ensure that matches are played in round order, you can pass in an optional second parameter to indicate that true round order should be obeyed. When using this security, `.scorable(id, true)` will return false when there exists games in earlier rounds in this group, that has not yet been played.
+ - parameters not integers, scores not an array of numbers
+ - scores not the same length as the player array
+ - scores cannot distinguish between the top X player that are advancing (if eliminating match)
+ - players are not ready in the match (dependent match not played)
 
 ## Viewing Results
 At any stage in a tournament, up to date results/statistics can be generated on demand. Every tournament type has a `.results()` method that will inspect its match array and calculate results for all players, and sort it based on (currently reached) placement
@@ -251,13 +271,13 @@ This is particularly valuable for the `FFA` elimination type where the possibili
 
 ```js
 // construct if valid:
-var str = t.FFA.invalidReason(numPlayers, grsAry, advAry, opts);
-if (str === null) {
+var reason = t.FFA.invalid(numPlayers, grsAry, advAry, opts);
+if (!reason) {
   // tournament valid - and can be constructed with the parameters just passed in
   return new t.FFA(numPlayers, grsAry, advAry, opts);
 }
 else {
-  console.log(str); // will tell you what went wrong
+  console.log(reason); // will tell you what went wrong
   return false;
 }
 ```
