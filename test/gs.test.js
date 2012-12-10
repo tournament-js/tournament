@@ -2,9 +2,11 @@ var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
   , T = require('../')
-  , byId = require('../lib/common').byId;
+  , byId = require('../lib/common').byId
+  , rep = T.GroupStage.idString;
 
 test("group stage 10 6 fromJSON", function (t) {
+  t.equal(T.GroupStage.invalid(10, 6), null, "can construct a 10 6 group stage");
   var gs = new T.GroupStage(10, 6);
   var gs2 = T.GroupStage.fromJSON(gs.matches);
 
@@ -39,6 +41,7 @@ test("group stage 16 4 fromJSON", function (t) {
 
 // couple of tests to ensure correct lengths
 test("group stage 16 4", function (t) {
+  t.equal(T.GroupStage.invalid(16, 4), null, "can construct a 16 4 group stage");
   var gs = new T.GroupStage(16, 4)
     , ms = gs.matches;
   // should be 4 rounds, with 3 matches for each player, i.e. 3! matches
@@ -55,6 +58,7 @@ test("group stage 16 4", function (t) {
 });
 
 test("group stage 32 8", function (t) {
+  t.equal(T.GroupStage.invalid(32, 8), null, "can construct a 32 8 group stage");
   var gs = new T.GroupStage(32, 8)
     , ms = gs.matches;
 
@@ -100,6 +104,7 @@ test("group stage 32 8", function (t) {
 
 
 test("group stage 50 10", function (t) {
+  t.equal(T.GroupStage.invalid(50, 10), null, "can construct a 50 10 group stage");
   var gs = new T.GroupStage(50, 10)
     , ms = gs.matches;
 
@@ -137,6 +142,7 @@ test("upcoming 6 3", function (t) {
 
 
 test("upcoming/scorable 16 8", function (t) {
+  t.equal(T.GroupStage.invalid(16, 4), null, "can construct a 16 4 group stage");
   var g = new T.GroupStage(16, 4)
     , ms = g.matches;
   // grps == 4 of 4
@@ -146,9 +152,9 @@ test("upcoming/scorable 16 8", function (t) {
       var up = g.upcoming(n);
 
       t.ok(up, "found upcoming match for " + n);
-      t.ok(g.scorable(up), "given id is scorable");
+      t.equal(g.unscorable(up, [1, 0]), null, "given id is scorable");
 
-      // rounds increment as we score as everyone plays in each round when even group sizes
+      // up.r follow loop as everyone plays in each round when group sizes even
       t.equal(up.r, r, "previous round scored all now wait for round" + r);
 
       // now verify that n exists in the match and that it's unscored
@@ -159,25 +165,21 @@ test("upcoming/scorable 16 8", function (t) {
 
     // now ensure that scorable works on all ids correctly
     ms.forEach(function (m) {
-      if (m.id.r === r) {
-        t.ok(g.scorable(m.id), "everything in current round is scorable");
-        t.ok(g.scorable(m.id, true), "even with trueRoundOrder");
-      }
-      else if (m.id.r > r) {
-        t.ok(g.scorable(m.id), "everything scorable by default in group stage");
-        t.ok(!g.scorable(m.id, true), "except i trueRoundOrder round not ready");
+      if (m.id.r >= r) {
+        t.equal(g.unscorable(m.id, [1,0]), null, "unplayed matches scorable");
+        t.equal(g.unscorable(m.id, [1,0], true), null, "also when rewriting..");
       }
       else if (m.id.r < r) {
-        t.ok(!g.scorable(m.id), "nothing is scorable in the past");
-        t.ok(!g.scorable(m.id, true), "especially if trueRoundOrder");
+        t.ok(g.unscorable(m.id, [1,0]), "nothing is scorable in the past");
+        t.equal(g.unscorable(m.id, [1,0], true), null, "except when rewriting");
       }
     });
 
     $.range(4).forEach(function (s) { // all 4 groups
-      $.range(2).forEach(function (m) { // all 2 matches per group (in this round) [4p / 2 prmatch]
-        t.ok(g.scorable({s: s, r: r, m: m}), "this match is scorable now");
-        t.ok(g.scorable({s: s, r: r, m: m}, true), "even with trueRoundOrder");
-        t.ok(g.score({s: s, r: r, m: m}, [1, 0]), "scoring round" + r);
+      $.range(2).forEach(function (m) { // all 2 matches per group (in this round)
+        var id = {s: s, r: r, m: m};
+        t.equal(g.unscorable(id, [1,0]), null, "can score " + rep(id));
+        t.ok(g.score(id, [1, 0]), "scoring round" + r);
       });
     });
 
@@ -190,8 +192,9 @@ test("upcoming/scorable 16 8", function (t) {
 
   // ensure that nothing is now scorable
   ms.forEach(function (m) {
-    t.ok(!g.scorable(m.id), "no matches are now scorable" + JSON.stringify(m.id));
-    t.ok(!g.scorable(m.id, true), "esp. with trueRoundOrder" + JSON.stringify(m.id));
+    var id = rep(m.id);
+    t.ok(g.unscorable(m.id, [1,0]), "no matches are now scorable" + id);
+    t.equal(g.unscorable(m.id, [1,0], true), null, "unless we rewrite history" + id);
   });
 
   t.end();
