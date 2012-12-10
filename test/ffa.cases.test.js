@@ -5,6 +5,7 @@ var tap = require('tap')
 
 
 test("ffa 16 4 2 fromJSON", function (t) {
+  t.equal(T.FFA.invalid(16, [4,4,4], [2,2]), null, "can construct 16 4 2 FFA");
   var ffa = new T.FFA(16, [4,4,4], [2,2])
     , gs = ffa.matches;
 
@@ -34,6 +35,7 @@ var getRnd = function (gs, r) {
 // currently will also work if you put [7, 7, 7]
 // because group reduction is automatic like before
 test("ffa 28 [7, 6, 6] [3, 3]", function (t) {
+  t.equal(T.FFA.invalid(28, [7,6,6], [3,3]), null, "can construct 28 7 3 FFA");
   var ffa = new T.FFA(28, [7, 6, 6], [3, 3])
     , gs = ffa.matches;
 
@@ -56,6 +58,7 @@ test("ffa 28 [7, 6, 6] [3, 3]", function (t) {
 
 // nice layout, 32 8 2 ensure it's right
 test("ffa 32 8 2", function (t) {
+  t.equal(T.FFA.invalid(32, [8, 8], [2]), null, "can construct 32 8 2 FFA");
   var ffa = new T.FFA(32, [8, 8], [2])
     , gs = ffa.matches;
 
@@ -73,6 +76,7 @@ test("ffa 32 8 2", function (t) {
 
 // nice layout, 25 5 1 ensure it's right
 test("ffa 25 5 1", function (t) {
+  t.equal(T.FFA.invalid(25, [5, 5], [1]), null, "can construct 25 5 1 FFA");
   var ffa = new T.FFA(25, [5, 5], [1])
     , gs = ffa.matches;
 
@@ -90,7 +94,9 @@ test("ffa 25 5 1", function (t) {
 
 // awful layout: 28 7 3
 test("ffa 28 7 3", function (t) {
+  t.equal(T.FFA.invalid(28, [7,6,6], [3,3]), null, "can construct 28 7,6,6 3,3 FFA");
   // would work for [7,7,7] also
+  t.equal(T.FFA.invalid(28, [7,7,7], [3,3]), null, "can construct 28 7,7,7 3,3 FFA");
   var ffa = new T.FFA(28, [7,6,6], [3,3])
     , gs = ffa.matches;
 
@@ -112,6 +118,7 @@ test("ffa 28 7 3", function (t) {
 
 // difficult layout: 36 6 3 - reduce advancers for final
 test("ffa 28 7 3", function (t) {
+  t.equal(T.FFA.invalid(36, [6,6,6], [3,2]), null, "can construct 32 6,6,6 3,2 FFA");
   var ffa = new T.FFA(36, [6,6,6], [3,2])
     , gs = ffa.matches;
 
@@ -133,6 +140,7 @@ test("ffa 28 7 3", function (t) {
 
 // difficult layout: 49 7 3 - reduces advancers for final
 test("ffa 49 7 3", function (t) {
+  t.equal(T.FFA.invalid(49, [7,7,6], [3,2]), null, "can construct 49 7,7,6 3,2 FFA");
   var ffa = new T.FFA(49, [7,7,6], [3,2])
     , gs = ffa.matches;
 
@@ -154,6 +162,7 @@ test("ffa 49 7 3", function (t) {
 
 // advance almost all the players!
 test("ffa 16 4 3", function (t) {
+  t.equal(T.FFA.invalid(16, [4,4,3,3,4], [3,3,2,2]), null, "can FFA 16 4 3");
   var ffa = new T.FFA(16, [4,4,3,3,4], [3,3,2,2])
     , gs = ffa.matches;
 

@@ -41,7 +41,7 @@ test("ffa 16 4 2", function (t) {
 
   // now score the first round
   $.range(4).forEach(function (m) {
-    t.ok(ffa.scorable({s: 1, r: 1, m: m}), "quarter scorable");
+    t.equal(ffa.unscorable({s: 1, r: 1, m: m}, [4,3,2,1]), null, "quarter scorable");
     ffa.score({s: 1, r: 1, m: m}, [4, 3, 2, 1]); // in the order of their seeds
   });
 
@@ -86,13 +86,13 @@ test("ffa 16 4 2", function (t) {
       t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
     }
     else {
-      t.ok(!up, "no upcoming match in r2 for " + n + " (knocked out)" + JSON.stringify(up));
+      t.equal(up, undefined, "no upcoming r2 match for knocked out p" + n);
     }
   });
 
   // score r2
   $.range(2).forEach(function (m) {
-    t.ok(ffa.scorable({s: 1, r: 2, m: m}), "semi scorable");
+    t.equal(ffa.unscorable({s: 1, r: 2, m: m}, [4,3,2,1]), null, "semi scorable");
     ffa.score({s: 1, r: 2, m: m}, [4, 3, 2, 1]);
   });
 
@@ -136,12 +136,12 @@ test("ffa 16 4 2", function (t) {
       t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
     }
     else {
-      t.ok(!up, "no upcoming match in r3 for " + n + " (knocked out)" + JSON.stringify(up));
+      t.equal(up, undefined, "no upcoming r3 match for knocked out p" + n);
     }
   });
 
   // score final
-  t.ok(ffa.scorable({s: 1, r: 3, m: 1}), "final scorable");
+  t.equal(ffa.unscorable({s: 1, r: 3, m: 1}, [4,3,2,1]), null, "final scorable");
   ffa.score({s: 1, r: 3, m: 1}, [4, 3, 2, 1]);
   var res4 = ffa.results();
   t.ok(res4, "got results 4");
@@ -191,7 +191,7 @@ test("ffa 16 4 2", function (t) {
   });
 
   gs.forEach(function (m) {
-    t.ok(!ffa.scorable(m.id), "cant score anything after final is done");
+    t.ok(ffa.unscorable(m.id, [4,3,2,1]), "cant score anything after final is done");
   });
 
   t.end();
@@ -234,7 +234,7 @@ test("ffa 81 3 1", function (t) {
 
   // now score the first round
   $.range(27).forEach(function (m) {
-    t.ok(ffa.scorable({s: 1, r: 1, m: m}), "r1 match " + m + " scorable");
+    t.equal(ffa.unscorable({s: 1, r: 1, m: m}, [3,2,1]), null, "scorable R1M" + m);
     ffa.score({s: 1, r: 1, m: m}, [3, 2, 1]); // in the order of their seeds
   });
 
@@ -274,13 +274,13 @@ test("ffa 81 3 1", function (t) {
       t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
     }
     else {
-      t.ok(!up, "no upcoming match in r2 for " + n + " (knocked out)" + JSON.stringify(up));
+      t.equal(up, undefined, "no upcoming r2 match for knocked out p" + n);
     }
   });
 
   // score r2
   $.range(9).forEach(function (m) {
-    t.ok(ffa.scorable({s: 1, r: 2, m: m}), "r2 match " + m + " scorable");
+    t.equal(ffa.unscorable({s: 1, r: 2, m: m}, [3,2,1]), null, "scorable R2M" + m);
     ffa.score({s: 1, r: 2, m: m}, [3, 2, 1]);
   });
 
@@ -331,13 +331,13 @@ test("ffa 81 3 1", function (t) {
       t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
     }
     else {
-      t.ok(!up, "no upcoming match in r3 for " + n + " (knocked out)" + JSON.stringify(up));
+      t.equal(up, undefined, "no upcoming r3 match for knocked out p" + n);
     }
   });
 
   // score r3
   $.range(3).forEach(function (m) {
-    t.ok(ffa.scorable({s: 1, r: 3, m: m}), "r3 match " + m + " scorable");
+    t.equal(ffa.unscorable({s: 1, r: 3, m: m}, [3,2,1]), null, "scorable R3M" + m);
     ffa.score({s: 1, r: 3, m: m}, [3, 2, 1]);
   });
 
@@ -400,13 +400,13 @@ test("ffa 81 3 1", function (t) {
       t.ok(up.m, "upcoming match for " + n + " is fully filled in!");
     }
     else {
-      t.ok(!up, "no upcoming match in r4 for " + n + " (knocked out)" + JSON.stringify(up));
+      t.equal(up, undefined, "no r4 match for knocked out p" + n);
     }
   });
 
 
   // score gf
-  t.ok(ffa.scorable({s: 1, r: 4, m: 1}), "gf scorable");
+  t.equal(ffa.unscorable({s: 1, r: 4, m: 1}, [3,2,1]), null, "gf scorable");
   ffa.score({s: 1, r: 4, m: 1}, [3, 2, 1]);
 
   var r5 = gs.some(function (m) {
@@ -435,7 +435,7 @@ test("ffa 81 3 1", function (t) {
     if ($.range(4, 6).indexOf(p.seed) >= 0) {
       // these got 1st, 1st then 2nd (out)
       t.equal(p.wins, 2, "4-6th seed got 1st,1st,2nd");
-      t.equal(p.pos, 4, p.pos + " pos tied for mid player " + p.seedP);
+      t.equal(p.pos, 4, p.pos + " pos tied for mid player " + p.seed);
     }
     if ($.range(7, 9).indexOf(p.seed) >= 0) {
       // these got 1st, 1st then 3rd (out)
@@ -466,7 +466,7 @@ test("ffa 81 3 1", function (t) {
 
   $.range(81).forEach(function (n) {
     var up = ffa.upcoming(n);
-    t.ok(!up, "no upcoming match for " + n + " (tournament over)" + JSON.stringify(up));
+    t.equal(up, undefined, "tournament over, no no upcoming match for p" + n);
   });
 
   t.end();
