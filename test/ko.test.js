@@ -158,11 +158,11 @@ test("ko 10 [2,4,2] results", function (t) {
     t.ok(p.pos <= 10-kos[0] && p.pos > kos[1], p.seed + " pos resides in between");
 
     // verify ties for 6 and 7 and verify slice size
-         if (p.seed === 8) t.equal(p.pos, 8, p.seed + " came 8th");
-    else if (p.seed === 7) t.equal(p.pos, 6, p.seed + " tied 6th");
-    else if (p.seed === 6) t.equal(p.pos, 6, p.seed + " tied 6th");
-    else if (p.seed === 5) t.equal(p.pos, 5, p.seed + " came 5th");
-    else t.ok(false, "should not have counted any other in here");
+         if (p.seed === 8) { t.equal(p.pos, 8, p.seed + " came 8th"); }
+    else if (p.seed === 7) { t.equal(p.pos, 6, p.seed + " tied 6th"); }
+    else if (p.seed === 6) { t.equal(p.pos, 6, p.seed + " tied 6th"); }
+    else if (p.seed === 5) { t.equal(p.pos, 5, p.seed + " came 5th"); }
+    else                   { t.ok(false, "didnt counted any other in here"); }
   });
 
   // losers of 1st match stay the same

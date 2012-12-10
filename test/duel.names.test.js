@@ -1,8 +1,7 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../')
-  , rep = T.Duel.idString;
+  , T = require('../');
 
 
 test("names 32 WB", function (t) {

@@ -38,21 +38,16 @@ test("ffa 16 4 2 unfinished res limits", function (t) {
       t.ok(o.seed > 8, "bottom 8 seeds are here");
       t.ok(o.pos > 8, "they have no chance of getting 8th anymore");
       if ([9, 10, 11, 12].indexOf(o.seed) >= 0) {
-        t.equal(o.pos, 9, "9-12 all got got equal score 3rds and thus tie at 9th")
+        t.equal(o.pos, 9, "9-12 all got got equal score 3rds and thus tie at 9th");
       }
       if ([13, 14, 15, 16].indexOf(o.seed) >= 0) {
-        t.equal(o.pos, 13, "13-16 all got got equal score 4thss and thus tie at 13th")
+        t.equal(o.pos, 13, "13-16 all got equal score 4ths and thus tie at 13th");
       }
     });
   };
   verifyLosers(res1); // bottom 8 should be ready now
 
-  // score semis (which is the last round)
-  $.range(2).forEach(function (n) {
-
-  });
-
-  // score semis
+  // score semis (last round)
   ffa.score({s:1, r:2, m:2}, [4,3,2,1]); // score semi 2
   // if we just scored last then this next test would fail
   t.ok(!ffa.isDone(), "ffa should NOT be done yet");

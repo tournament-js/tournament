@@ -11,7 +11,7 @@ test("duel LB underdog + scorable", function (t) {
     t.ok(duel.score(m.id, m.p[0] < m.p[1] ? [2,1] : [1,2]), "can score long m" + i);
   });
   t.ok(duel.score(duel.matches[duel.matches.length-2].id, [1,0]), "could score gf1");
-  t.deepEqual($.last(duel.matches).p, [0, 0], "no players forwarded when underdog lost");
+  t.deepEqual($.last(duel.matches).p, [0, 0], "no players in gf2 when quick gf");
   t.ok(duel.isDone(), "duel tournament should be done now");
   t.ok(duel.unscorable($.last(duel.matches).id, [1,0], true), "cannot score GF2");
   t.ok(!duel.score($.last(duel.matches).id, [2, 1]), "could NOT score GF2");
@@ -54,7 +54,7 @@ test("duel 16 WB fromJSON", function (t) {
 
   var duel2 = T.Duel.fromJSON(gs);
 
-  t.equal(gs.length, Math.pow(2, duel.p), "length same as num players with bronze final");
+  t.equal(gs.length, Math.pow(2, duel.p), "np == matches.length with bronze final");
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
@@ -68,7 +68,7 @@ test("duel 16 WB fromJSON", function (t) {
 
   var res = duel2.results();
   t.ok(res, "can get results");
-  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1-4");
+  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top4.pos in1..4");
 
   t.end();
 });
@@ -78,7 +78,7 @@ test("duel 16 WB short fromJSON", function (t) {
   var duel = new T.Duel(16, T.WB, {short: true})
     , gs = duel.matches;
 
-  t.equal(gs.length, Math.pow(2, duel.p) - 1, "length same as num players - 1 without bronze final");
+  t.equal(gs.length, Math.pow(2, duel.p) - 1, "np -1 == matches.length  w/o bronze");
 
   var duel2 = T.Duel.fromJSON(gs);
 
@@ -95,7 +95,7 @@ test("duel 16 WB short fromJSON", function (t) {
   var res = duel2.results();
   t.ok(res, "can get results");
   // cant determine 3-vs-4th in this case!
-  t.ok($.isSubsetOf([1,2,3,3], $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1,2,3,4");
+  t.ok($.isSubsetOf([1,2,3,3], $.pluck('pos', res.slice(0, 4))), "top4 pos=1,2,3,4");
 
   t.end();
 });
@@ -107,7 +107,8 @@ test("duel 16 LB fromJSON", function (t) {
 
   // sizeof WB === 2^p - 1
   // sizeof LB === 2*(sizeof one p smaller WB) + 2
-  t.equal(gs.length, (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 2, "long DE length");
+  var longDeLength = (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 2;
+  t.equal(gs.length, longDeLength, "long DE length");
 
   var duel2 = T.Duel.fromJSON(gs);
 
@@ -124,7 +125,7 @@ test("duel 16 LB fromJSON", function (t) {
 
   var res = duel2.results();
   t.ok(res, "can get results");
-  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top 4 should have pos 1-4");
+  t.ok($.isSubsetOf($.range(4), $.pluck('pos', res.slice(0, 4))), "top4 pos 1..4");
 
   t.end();
 });
@@ -137,7 +138,8 @@ test("duel 16 LB short fromJSON", function (t) {
 
   // sizeof WB === 2^p - 1
   // sizeof LB === 2*(sizeof one p smaller WB) + 1 (as no gf2 this time)
-  t.equal(gs.length, (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 1, "long DE length");
+  var longDeLength = (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 1;
+  t.equal(gs.length, longDeLength, "long DE length");
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
@@ -152,7 +154,7 @@ test("duel 16 LB short fromJSON", function (t) {
 
   var res = duel2.results();
   t.ok(res, "can get results");
-  t.deepEqual($.pluck('pos', res.slice(0, 4)), $.range(4), "top 4 should have pos 1-4");
+  t.deepEqual($.pluck('pos', res.slice(0, 4)), $.range(4), "top 4 pos in 1..4");
   t.end();
 });
 
