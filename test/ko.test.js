@@ -6,6 +6,7 @@ var tap = require('tap')
 
 test("ko 10 [2,4,2] fromJSON", function (t) {
   var kos = [2,4,2];
+  t.ok(!T.KnockOut.invalid(10, kos), "10 kos not invalid");
   var ko = new T.KnockOut(10, kos);
 
   for (var i = 0; i < 4; i += 1) {
@@ -48,7 +49,8 @@ test("ko 10 [2,4,2]", function (t) {
 
     // is ONLY current match scorable?
     ms.forEach(function (m) {
-      t.equal(ko.scorable(m.id), (m.id.r === r), "can score iff r==" + r);
+      var reason = ko.unscorable(m.id, $.range(m.p.length));
+      t.equal(reason === null, m.id.r === r, "can score iff r==" + r);
     });
 
     // score current round r (so that highest seed wins)
@@ -96,12 +98,13 @@ test("ko 10 [2,4,2] results", function (t) {
 
   // round 1
   var failScores = [10,9,8,7,6,5,4,3,3,1]; // ties at border
-  t.ok(ko.scorable({s:1, r:1, m:1}), "can score r" + 1);
+  t.equal(ko.unscorable({s:1, r:1, m:1}, $.range(10)), null, "can score r" + 1);
+  t.ok(ko.unscorable({s:1, r:1, m:1}, failScores), "must cleanup losers in r" + 1);
   t.ok(!ko.score({s:1, r:1, m:1}, failScores), "must cleanup losers in r" + 1);
 
   // score so last 2 tie
   t.ok(ko.score({s:1,r:1,m:1}, [10,9,8,7,6,5,4,3,2,2]), "scored r" + 1);
-  t.ok(!ko.scorable({s:1, r:1, m:1}), "should no longer score r" + 1);
+  t.ok(ko.unscorable({s:1, r:1, m:1}, failScores), "should no longer score r" + 1);
   res = ko.results();
   t.ok(res, "we got results for r" + 1);
   t.equal(res.length, 10, "all players in result after round " + 1);
@@ -182,9 +185,9 @@ test("ko 10 [2,4,2] results", function (t) {
 
   // round 3
   t.equal(kos[2], 2, "should only be 2 left after scoring r" + 3);
-  t.ok(ko.scorable({s:1,r:3,m:1}), "can score r" + 3);
+  t.equal(ko.unscorable({s:1,r:3,m:1}, [4,3,2,1]), null, "can score r" + 3);
   t.ok(ko.score({s:1,r:3,m:1}, [4,3,2,1]), "scored r" + 3);
-  t.ok(!ko.scorable({s:1,r:3,m:1}), "should not re-scored r" + 3);
+  t.ok(ko.unscorable({s:1,r:3,m:1}, [4,3,2,1]), "should not re-scored r" + 3);
   res = ko.results();
   t.ok(res, "we got results for r" + 3);
 
