@@ -22,7 +22,7 @@ test("score affects only winner", function (t) {
       var newEl = newEls[0];
       if (pX === el.seed) {
         // only a few things should have changed
-        t.equal(el.wins + plusWins, newEl.wins, pX + " should have  +" + plusWins + " wins now");
+        t.equal(el.wins + plusWins, newEl.wins, pX + " win's  === " + plusWins);
       }
       else {
         t.deepEqual(el, newEl, "res element should be identical");
@@ -46,7 +46,7 @@ test("score affects only winner", function (t) {
 
 
 test("duel results detailed WB 8", function (t) {
-  [false].forEach(function (shrt) {
+  [false, true].forEach(function (shrt) {
     // first runthrough with bronze final, second without
     var duel = new T.Duel(16, T.WB, {short: shrt})
       , gs = duel.matches;
@@ -62,7 +62,7 @@ test("duel results detailed WB 8", function (t) {
       if (g.id.r === 1 && g.id.s === T.WB) {
         // let top seed through
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -81,7 +81,7 @@ test("duel results detailed WB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 2 && g.id.s === T.WB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -108,7 +108,7 @@ test("duel results detailed WB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 3 && g.id.s === T.WB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + str);
       }
     });
@@ -140,7 +140,7 @@ test("duel results detailed WB 8", function (t) {
       if (!g.m) {
         // score last 1/2 matches, final + bf?
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + str);
       }
     });
@@ -187,7 +187,7 @@ test("duel results detailed LB 8", function (t) {
       if (g.id.r === 1 && g.id.s === T.WB) {
         // let top seed through
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -206,7 +206,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 2 && g.id.s === T.WB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -228,7 +228,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 1 && g.id.s === T.LB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -253,7 +253,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 2 && g.id.s === T.LB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -278,7 +278,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 3 && g.id.s === T.LB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -306,7 +306,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 3 && g.id.s === T.WB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -337,7 +337,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 4 && g.id.s === T.LB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
       }
     });
@@ -368,7 +368,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 5 && g.id.s === T.LB) {
         var str = rep(g.id);
-        t.ok(duel.scorable(g.id), "should be able to score " + str);
+        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
         t.ok(duel.score(g.id, [2, 0]), 'scored' + str);
       }
     });
@@ -395,7 +395,7 @@ test("duel results detailed LB 8", function (t) {
     gs.forEach(function (g) {
       if (g.id.r === 5 && g.id.s === T.LB) {
         var str = rep(g.id);
-        t.ok(!duel.scorable(g.id), "should not really be able to score " + str);
+        t.ok(duel.unscorable(g.id, [1,0]), "cannot score " + str);
         t.ok(duel.score(g.id, [0, 2]), 'scored' + str);
       }
     });
@@ -425,7 +425,7 @@ test("duel results detailed LB 8", function (t) {
       return; // nothing else to do in this mode
     }
     // score gf2
-    t.ok(duel.scorable(gf2.id), "can score gf2 now");
+    t.equal(duel.unscorable(gf2.id, [1,0]), null, "can score gf2 now");
     t.ok(duel.score(gf2.id, [1, 0]), "could score gf2");
     res = duel.results();
     t.ok(res, "results for LBR6 (gf2) produced");
@@ -440,7 +440,8 @@ test("duel results detailed LB 8", function (t) {
     t.ok(duel.isDone(), "duel tournament is now done");
 
     // overwrite gf2
-    t.ok(!duel.scorable(gf2.id), "should not rescore gf2");
+    t.ok(duel.unscorable(gf2.id, [1,0]), "cannot rescore gf2");
+    t.equal(duel.unscorable(gf2.id, [1,0], true), null, "unless allow rewrite");
     t.ok(duel.score(gf2.id, [0, 1]), "scored gf2");
     res = duel.results();
     t.ok(res, "results for rescoring LBR6 (gf2) produced");

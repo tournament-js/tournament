@@ -7,32 +7,32 @@ test("duel LB underdog + scorable", function (t) {
   // long LB underdog lost
   var duel = new T.Duel(16, T.LB, {short:false});
   duel.matches.slice(0, -2).map(function (m, i) {
-    t.ok(duel.scorable(m.id), "can score long m" + i);
+    t.equal(duel.unscorable(m.id, [1,0]), null, "can score long m" + i);
     t.ok(duel.score(m.id, m.p[0] < m.p[1] ? [2,1] : [1,2]), "can score long m" + i);
   });
   t.ok(duel.score(duel.matches[duel.matches.length-2].id, [1,0]), "could score gf1");
   t.deepEqual($.last(duel.matches).p, [0, 0], "no players forwarded when underdog lost");
   t.ok(duel.isDone(), "duel tournament should be done now");
-  t.ok(!duel.scorable($.last(duel.matches).id), "cannot score GF2");
+  t.ok(duel.unscorable($.last(duel.matches).id, [1,0], true), "cannot score GF2");
   t.ok(!duel.score($.last(duel.matches).id, [2, 1]), "could NOT score GF2");
 
   // long LB underdog won
   duel = new T.Duel(16, T.LB, {short:false});
   duel.matches.slice(0, -2).map(function (m, i) {
-    t.ok(duel.scorable(m.id), "can score long m" + i);
+    t.equal(duel.unscorable(m.id, [1,0]), null, "can score long m" + i);
     t.ok(duel.score(m.id, m.p[0] < m.p[1] ? [2,1] : [1,2]), "can score long m" + i);
   });
   t.ok(duel.score(duel.matches[duel.matches.length-2].id, [0,1]), "could score GF1");
   t.deepEqual($.last(duel.matches).p, [2, 1], "underdog win => forwarding");
   t.ok(!duel.isDone(), "there should be one more match to play");
-  t.ok(duel.scorable($.last(duel.matches).id), "can score GF2");
+  t.equal(duel.unscorable($.last(duel.matches).id, [1,0]), null, "can score GF2");
   t.ok(duel.score($.last(duel.matches).id, [2, 1]), "could score GF2");
   t.ok(duel.isDone(), "long GF2 played so we are done");
 
   // short LB underdog lost
   var duel = new T.Duel(16, T.LB, {short:true});
   duel.matches.map(function (m, i) {
-    t.ok(duel.scorable(m.id), "can score short m" + i);
+    t.equal(duel.unscorable(m.id, [1,0]), null, "can score short m" + i);
     t.ok(duel.score(m.id, [1,2]), "can score short m" + i);
   });
   t.ok(duel.isDone(), "duel tournament should be done now");
@@ -40,7 +40,7 @@ test("duel LB underdog + scorable", function (t) {
   // short LB underdog won
   var duel = new T.Duel(16, T.LB, {short:true});
   duel.matches.map(function (m, i) {
-    t.ok(duel.scorable(m.id), "can score short m" + i);
+    t.equal(duel.unscorable(m.id, [1,0]), null, "can score short m" + i);
     t.ok(duel.score(m.id, [2,1]), "can score short m" + i);
   });
   t.ok(duel.isDone(), "duel tournament should be done now");
@@ -390,8 +390,8 @@ test("upcoming/scorable 8 LB", function (t) {
     ms.filter(function (g) {
       return (g.id.r === r && g.id.s === T.WB);
     }).forEach(function (g) {
-      t.ok(d.scorable(g.id), "WB matches in round " + r + " are scorable");
-      t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "can score a game in round " + r);
+      t.equal(d.unscorable(g.id, [1,0]), null, "WB R" + r + " are scorable");
+      t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "scored m in R" + r);
     });
 
     if (r === 3) {
@@ -422,8 +422,8 @@ test("upcoming/scorable 8 LB", function (t) {
     ms.filter(function (g) {
       return (g.id.r === r && g.id.s === T.LB);
     }).forEach(function (g) {
-      t.ok(d.scorable(g.id), "LB matches in round " + r + " are scorable");
-      t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "can score a game in round " + r);
+      t.equal(d.unscorable(g.id, [1,0]), null, "LB R" + r + " is scorable");
+      t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "scored m in R" + r);
     });
 
     if (r === 2*d.p - 1) {

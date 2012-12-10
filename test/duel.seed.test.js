@@ -24,7 +24,7 @@ test("seeding assumption", function (t) {
     // this massively inflates test counts, the roundly ones are the important ones
     round.forEach(function (m) {
       var id = rep(m.id);
-      t.ok(d.scorable(m.id), id + " scorable");
+      t.equal(d.unscorable(m.id, [1,0]), null, id + " scorable");
       t.ok(d.score(m.id, m.p[0] < m.p[1] ? [1, 0] : [0, 1]), id + " scored");
     });
   };
