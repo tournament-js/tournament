@@ -45,30 +45,31 @@ test("score affects only winner", function (t) {
 });
 
 
-test("duel results detailed WB 8", function (t) {
+test("duel results detailed WB 16", function (t) {
   [false, true].forEach(function (shrt) {
     // first runthrough with bronze final, second without
     var duel = new T.Duel(16, T.WB, {short: shrt})
       , gs = duel.matches;
 
-    var res = duel.results();
-    t.ok(res, "results0 produced");
-    res.forEach(function (r) {
+    duel.results().forEach(function (r) {
       t.equal(r.pos, 9, "all players guaranteed 9th place (as losers all tie)");
     });
 
+    var scoreRound = function (br, r) {
+      gs.forEach(function (g) {
+        if (g.id.r === r && g.id.s === br) {
+          // let top seed through
+          var str = rep(g.id);
+          t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
+          t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
+        }
+      });
+      var res = duel.results();
+      t.ok(res, "results produced for BR" + br + "R" + r);
+      return res;
+    };
 
-    gs.forEach(function (g) {
-      if (g.id.r === 1 && g.id.s === T.WB) {
-        // let top seed through
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results1 produced");
-    res.forEach(function (r) {
+    scoreRound(T.WB, 1).forEach(function (r) {
       if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(r.seed) >= 0) {
         t.equal(r.pos, 5, 'winners tie at 5th');
       }
@@ -77,17 +78,7 @@ test("duel results detailed WB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (g.id.r === 2 && g.id.s === T.WB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results2 produced");
-    res.forEach(function (r) {
+    scoreRound(T.WB, 2).forEach(function (r) {
       if ([1, 2, 3, 4].indexOf(r.seed) >= 0) {
         if (shrt) {
           t.equal(r.pos, 3, r.seed + ' guaranteed 3rd place');
@@ -105,16 +96,7 @@ test("duel results detailed WB 8", function (t) {
     });
 
 
-    gs.forEach(function (g) {
-      if (g.id.r === 3 && g.id.s === T.WB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results3 produced");
-    res.forEach(function (r) {
+    scoreRound(T.WB, 3).forEach(function (r) {
       if ([1, 2].indexOf(r.seed) >= 0) {
         t.equal(r.pos, 2, "finalists guaranteed 2nd");
       }
@@ -135,18 +117,8 @@ test("duel results detailed WB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (!g.m) {
-        // score last 1/2 matches, final + bf?
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored ' + str);
-      }
-    });
-    var res3 = duel.results();
-    t.ok(res3, "results2 produced");
-    res3.forEach(function (r) {
+    scoreRound(T.WB, 4);
+    scoreRound(T.LB, 1).forEach(function (r) {
       if (r.seed <= 3) {
         t.equal(r.pos, r.seed, "everything should be sorted for top 4 now");
       }
@@ -176,24 +148,35 @@ test("duel results detailed LB 8", function (t) {
     var duel = new T.Duel(8, T.LB, {short: shrt})
       , gs = duel.matches;
 
-    var res = duel.results();
-    t.ok(res, "results0 produced");
-    res.forEach(function (r) {
+    duel.results().forEach(function (r) {
       t.equal(r.pos, 7, "all players guaranteed 7th place (as losers all tie)");
     });
 
+    var scoreRound = function (br, r, reverse) {
+      gs.forEach(function (g) {
+        if (g.id.r === r && g.id.s === br) {
+          // let top seed through
+          var str = rep(g.id);
 
-    gs.forEach(function (g) {
-      if (g.id.r === 1 && g.id.s === T.WB) {
-        // let top seed through
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for WBR1 produced");
-    res.forEach(function (r) {
+          // allow rescoring of gf1 and gf2 - checked for separately
+          if (!(br === T.LB && r >= 5)) {
+            var reason = duel.unscorable(g.id, [1,0]);
+            t.equal(reason, null, "can score " + str);
+          }
+
+          var scores = (g.p[0] < g.p[1]) ? [2, 1] : [1, 2];
+          if (reverse) {
+            scores = scores.reverse();
+          }
+          t.ok(duel.score(g.id, scores), 'scored' + str);
+        }
+      });
+      var res = duel.results();
+      t.ok(res, "results produced for BR" + br + "R" + r);
+      return res;
+    };
+
+    scoreRound(T.WB, 1).forEach(function (r) {
       if ([1, 2, 3, 4].indexOf(r.seed) >= 0) {
         t.equal(r.pos, 5, 'winners tie at 5th');
       }
@@ -202,17 +185,7 @@ test("duel results detailed LB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (g.id.r === 2 && g.id.s === T.WB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for WBR2 produced");
-    res.forEach(function (r) {
+    scoreRound(T.WB, 2).forEach(function (r) {
       if ([1, 2].indexOf(r.seed) >= 0) {
         t.equal(r.pos, 3, "wb finalists guaranteed 3rd");
       }
@@ -224,17 +197,7 @@ test("duel results detailed LB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (g.id.r === 1 && g.id.s === T.LB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for LBR1 produced");
-    res.forEach(function (r) {
+    scoreRound(T.LB, 1).forEach(function (r) {
       if ([1, 2].indexOf(r.seed) >= 0) {
         t.equal(r.pos, 3, "wb finalists guaranteed 3rd");
       }
@@ -249,17 +212,7 @@ test("duel results detailed LB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (g.id.r === 2 && g.id.s === T.LB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for LBR2 produced");
-    res.forEach(function (r) {
+    scoreRound(T.LB, 2).forEach(function (r) {
       if ([1, 2].indexOf(r.seed) >= 0) {
         t.equal(r.pos, 3, "wb finalists guaranteed 3rd");
       }
@@ -274,17 +227,7 @@ test("duel results detailed LB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (g.id.r === 3 && g.id.s === T.LB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for LBR3 produced");
-    res.forEach(function (r) {
+    scoreRound(T.LB, 3).forEach(function (r) {
       if ([1, 2].indexOf(r.seed) >= 0) {
         t.equal(r.pos, 3, "wb finalists guaranteed 3rd");
       }
@@ -302,17 +245,7 @@ test("duel results detailed LB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (g.id.r === 3 && g.id.s === T.WB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for WBR3 produced");
-    res.forEach(function (r) {
+    scoreRound(T.WB, 3).forEach(function (r) {
       if (r.seed === 1) {
         t.equal(r.pos, 2, "wb final winner guaranteed 2nd");
       }
@@ -333,17 +266,7 @@ test("duel results detailed LB 8", function (t) {
       }
     });
 
-
-    gs.forEach(function (g) {
-      if (g.id.r === 4 && g.id.s === T.LB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, g.p[0] < g.p[1] ? [2, 1] : [1, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for LBR4 produced");
-    res.forEach(function (r) {
+    scoreRound(T.LB, 4).forEach(function (r) {
       if (r.seed === 1) {
         t.equal(r.pos, 2, "wb final winner guaranteed 2nd");
       }
@@ -364,17 +287,10 @@ test("duel results detailed LB 8", function (t) {
       }
     });
 
-    // score gf1 (all code below consider whether or not we are in short mode)
-    gs.forEach(function (g) {
-      if (g.id.r === 5 && g.id.s === T.LB) {
-        var str = rep(g.id);
-        t.equal(duel.unscorable(g.id, [1,0]), null, "can score " + str);
-        t.ok(duel.score(g.id, [2, 0]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for LBR5 (gf1) produced");
-    res.forEach(function (r) {
+
+    // all code below consider whether or not we are in short mode
+    var gf2 = $.last(gs); // NB: only last if !shrt, so test for it further down!
+    scoreRound(T.LB, 5).forEach(function (r) {
       if (r.seed === 1) {
         t.equal(r.pos, 1, "gf1 winner (wb final winner) finalizes a 1st");
       }
@@ -382,26 +298,18 @@ test("duel results detailed LB 8", function (t) {
         t.equal(r.pos, 2, "gf1 underdog loser finalizes a 2nd");
       }
     });
-    var gf2; // this further down still
     if (!shrt) {
-      gf2 = $.last(gs); // last is only gf2 in long mode, as gf2 wont exist
+      // last is only gf2 in long mode, as gf2 wont exist
       t.deepEqual(gf2.p, [0, 0], "no players should have been advanced");
     }
     // if wb winner wins, we are done regardless of short mode
     t.ok(duel.isDone(), "duel tournament is done (short final)");
 
 
-    // overwrite g5
-    gs.forEach(function (g) {
-      if (g.id.r === 5 && g.id.s === T.LB) {
-        var str = rep(g.id);
-        t.ok(duel.unscorable(g.id, [1,0]), "cannot score " + str);
-        t.ok(duel.score(g.id, [0, 2]), 'scored' + str);
-      }
-    });
-    res = duel.results();
-    t.ok(res, "results for LBR5 (gf1) produced");
-    res.forEach(function (r) {
+    // rescore GF1
+    t.ok(duel.unscorable({s:T.LB, r:5, m:1}, [1,0]), "cannot rewrite GF1");
+    // do it anyway - score in reverse order of seeds!
+    scoreRound(T.LB, 5, true).forEach(function (r) {
       if (r.seed === 1) {
         t.equal(r.pos, 2, "gf1 losers (wb final winner) forces gf2");
       }
@@ -424,12 +332,13 @@ test("duel results detailed LB 8", function (t) {
     if (shrt) {
       return; // nothing else to do in this mode
     }
-    // score gf2
+
+    // score GF2
     t.equal(duel.unscorable(gf2.id, [1,0]), null, "can score gf2 now");
-    t.ok(duel.score(gf2.id, [1, 0]), "could score gf2");
-    res = duel.results();
-    t.ok(res, "results for LBR6 (gf2) produced");
-    res.forEach(function (r) {
+    t.deepEqual(gf2.p, [2, 1], "underdog moved to top");
+    t.equal(gf2.id.r, 6, "gf2 in r6");
+
+    scoreRound(T.LB, 6, true).forEach(function (r) {
       if (r.seed === 1) {
         t.equal(r.pos, 2, "double loss for 1 in gf");
       }
@@ -439,13 +348,11 @@ test("duel results detailed LB 8", function (t) {
     });
     t.ok(duel.isDone(), "duel tournament is now done");
 
-    // overwrite gf2
+    // rescore GF2
     t.ok(duel.unscorable(gf2.id, [1,0]), "cannot rescore gf2");
     t.equal(duel.unscorable(gf2.id, [1,0], true), null, "unless allow rewrite");
-    t.ok(duel.score(gf2.id, [0, 1]), "scored gf2");
-    res = duel.results();
-    t.ok(res, "results for rescoring LBR6 (gf2) produced");
-    res.forEach(function (r) {
+    // rewrite - score in normal seed order
+    scoreRound(T.LB, 6).forEach(function (r) {
       if (r.seed === 1) {
         t.equal(r.pos, 1, "double final, but wb winner won overall");
       }
@@ -454,7 +361,7 @@ test("duel results detailed LB 8", function (t) {
       }
     });
     t.ok(duel.isDone(), "duel tournament is now done");
+
   });
   t.end();
 });
-

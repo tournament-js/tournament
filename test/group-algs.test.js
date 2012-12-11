@@ -15,16 +15,19 @@ test("groups", function (t) {
 
       var pls = $.flatten(grps);
       t.equal(pls.length, np, "right number of players included");
-      t.deepEqual($.difference(pls, $.range(np)), [], "players included once per group");
+      t.deepEqual($.difference(pls, $.range(np)), []
+        , "players included once per group");
 
       if (np % s === 0) {
         var gsums = grps.map($.sum);
         // sum of seeds must differ by at most number of groups in full groups
-        t.ok($.minimum(gsums) <= $.maximum(gsums) + grps.length, "sum of seeds in full groups difference");
+        t.ok($.minimum(gsums) <= $.maximum(gsums) + grps.length
+          , "sum of seeds in full groups difference");
 
         if ($.even(s)) {
           // a group is perfect if groups are full and only filled with pairs!
-          t.equal($.minimum(gsums), $.maximum(gsums), "sum of seeds zero difference in perfect groups");
+          t.equal($.minimum(gsums), $.maximum(gsums)
+            , "sum of seeds zero difference in perfect groups");
         }
       }
 
@@ -33,7 +36,7 @@ test("groups", function (t) {
         // calling T.groups with the gs reduced to maxsize should produce same output
         var grpsClone = T.groups(np, maxsize);
         var errModel = np + " players, groupsize " + s + " reduced to " +  maxsize;
-        t.deepEqual(grps, grpsClone, "reduced model in deterministic way: " + errModel);
+        t.deepEqual(grps, grpsClone, "reduced model deterministically: " + errModel);
       }
     });
   });
@@ -51,8 +54,8 @@ test("robin", function (t) {
       pMaps[p] = [];
     });
 
-    rs.forEach(function (rnd) {
-      t.equal(rnd.length, Math.floor(n/2), "each round has correct number of matches");
+    rs.forEach(function (rnd, r) {
+      t.equal(rnd.length, Math.floor(n/2), "number of matches in round "+ (r+1));
 
       var plrs = $.flatten(rnd);
       t.deepEqual(plrs, $.nub(plrs), "players listed only once per round");

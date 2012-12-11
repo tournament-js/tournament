@@ -30,7 +30,7 @@ test("duel LB underdog + scorable", function (t) {
   t.ok(duel.isDone(), "long GF2 played so we are done");
 
   // short LB underdog lost
-  var duel = new T.Duel(16, T.LB, {short:true});
+  duel = new T.Duel(16, T.LB, {short:true});
   duel.matches.map(function (m, i) {
     t.equal(duel.unscorable(m.id, [1,0]), null, "can score short m" + i);
     t.ok(duel.score(m.id, [1,2]), "can score short m" + i);
@@ -38,7 +38,7 @@ test("duel LB underdog + scorable", function (t) {
   t.ok(duel.isDone(), "duel tournament should be done now");
 
   // short LB underdog won
-  var duel = new T.Duel(16, T.LB, {short:true});
+  duel = new T.Duel(16, T.LB, {short:true});
   duel.matches.map(function (m, i) {
     t.equal(duel.unscorable(m.id, [1,0]), null, "can score short m" + i);
     t.ok(duel.score(m.id, [2,1]), "can score short m" + i);
