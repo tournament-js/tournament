@@ -1,0 +1,74 @@
+{
+    "bitwise"       : false, // no bitwise ops
+    "camelcase"     : true,  // camelCase or UPPER_CASE var names only
+    "curly"         : true,  // force curly braces
+    "eqeqeq"        : true,  // force ===
+    "forin"         : false, // force hasOwnProp usage
+    "indent"        : 2,     // force tab-width
+    "latedef"       : true,  // prevent use of vars before their defs
+    "newcap"        : true,  // force capitalized constructors
+    "noarg"         : true,  // prevent arguments.callee and arguments.caller
+    "noempty"       : true,  // warn on empty code blocks
+    "nonew"         : false, // prevent use of new
+    "plusplus"      : true,  // prevent ++ usage
+    "regexp"        : true,  // prevent . in regexps
+    "undef"         : true,  // prevent accessing undeclared vars
+    "unused"        : true,  // prevent having unused vars
+    "strict"        : false, // require all fns to run in ES5 strict mode
+    "trailing"      : true,  // prevent trailing whitespace
+
+    // complexity
+    "maxparams"     : 5,     // max params per function
+    "maxdepth"      : 5,     // max levels of nesting
+    "maxstatements" : 50,    // max statements per fn
+    "maxcomplexity" : 11,    // max cyclomatic complexity
+    "maxlen"        : 85,    // max line length
+
+    // relaxing opts
+    "asi"           : false, // allow automatic semicolon insertion
+    "boss"          : false, // allow assignments inside a conditionals check
+    "debug"         : false, // allow debugger statements
+    "eqnull"        : true,  // allow == null (to check if null || undefined)
+    "es5"           : true,  // allow ES5 features
+    "esnext"        : true,  // allow harmony syntax like const
+    "evil"          : false, // allow eval
+    "expr"          : false, // allow expressions in assignments/calls (hard to optimize)
+    "funcscope"     : false, // allow using vars outside their let scope
+    "globalstrict"  : false, // allow global strict mode (not recommended)
+    "iterator"      : false, // allow unsupported __iterator__ prop usage
+    "lastsemic"     : false, // allow missing semicolons for one-line blocks
+    "laxbreak"      : true,  // allow unsafe linebreaks
+    "laxcomma"      : true,  // allow comma-first style
+    "loopfunc"      : false, // allow defining functions inside loops
+    "multistr"      : false, // allow multi-line strings
+    "onecase"       : false, // allow one case switches
+    "proto"         : false, // allow __proto__ usage (deprecated)
+    "regexdash"     : false, // allow unescaped - at end of regexes
+    "scripturl"     : false, // allow script targeted urls
+    "smarttabs"     : false, // allow mixing tabs and spaces
+    "shadow"        : false, // allow shadowing outer variables
+    "sub"           : false, // allow obj['prop'] when it could've been obj.prop
+    "supernew"      : false, // allow weird new keyword usage for singleton creation
+    "validthis"     : true,  // allow using this in non-constructor function
+
+    // environments
+    "browser"       : false,
+    "couch"         : false,
+    "devel"         : false,
+    "dojo"          : false,
+    "jquery"        : false,
+    "mootools"      : false,
+    "node"          : true,
+    "nonstandard"   : false,
+    "prototypejs"   : false,
+    "rhino"         : false,
+    "worker"        : false,
+    "wsh"           : false,
+    "yui"           : false,
+
+    // legacy
+    "nomen"         : false, // force no dangling _ in var names
+    "onevar"        : false, // force all var declarations at top of scope
+    "passfail"      : false, // force stop on first jshint warn/error
+    "white"         : false  // force doug crockford whitespace style
+}
