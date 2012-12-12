@@ -178,33 +178,33 @@ The `.score(id, scores)` method, whilst simple, has a couple of problems when us
 
 The `.unscorable()` method addresses both of these problems in kind:
 
-1. It reports the actual string logged by `.score()` if the scoring was unsuccessful, allowing you to guard on it and report it back to the client.
+1. It reports the actual string logged by `.score()` if the scoring would be unsuccessful, allowing you to guard on it and report it back to the client instead of blindly trying.
 
-2. It also by default returns a string when you are rewriting history, unless you pass in an optional last parameter to explicitly allow this.
+2. It also by default disallows rewriting history, unless you pass in an optional last parameter to explicitly allow this.
 
 
 ```js
 // default user access
 var id = {s: 1, r: 2, m: 1}
 var reason = duel.unscorable(id, score);
-if (reason === null) {
-  duel.score(id, score); // will work, and will not  rewrite history
+if (reason !== null) {
+  console.log(reason); // either invalid parameters or complaining about rewriting history
 }
 else {
-  console.log(reason); // either invalid parameters or complaining about rewriting history
+  duel.score(id, score); // will work, and will not  rewrite history
 }
 
 // administrator access - can rewrite history
 va reason = duel.unscorable(id, score, true);
-if (reason === null) {
-  duel.score(id, score); // will work, but may rewrite history.
+if (reason !== null) {
+  console.log(reason); // parameters invalid in some way
 }
 else {
-  console.log(reason); // parameters invalid in some way
+  duel.score(id, score); // will work, but may rewrite history.
 }
 ```
 
- When guarding on `!unscorable` like this `tournament` will never log anything during a `.score()` call.
+ When guarding on `!unscorable` like this `tournament` will never log anything during a `.score()` call as they will always work.
 
  The reasons are currently hardcoded inside each tournament types dedicated file, under their internal `unscorable` function. Typical faults include:
 
