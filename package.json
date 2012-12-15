@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git://github.com/clux/tournament.git"
   },
-  "main": "./lib/tournament.js",
+  "main": "lib/tournament.js",
   "engines": {
     "node": ">=0.8.0"
   },
@@ -22,7 +22,8 @@
     "robin"
   ],
   "scripts": {
-    "test": "tap ./test && jshint lib/ test/"
+    "lint": "jshint lib test",
+    "test": "tap test"
   },
   "dependencies": {
     "interlude": "~1.0.2",
