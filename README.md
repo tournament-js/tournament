@@ -3,13 +3,13 @@
 Tournament is a library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics, as well as providing the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
 
 ## Usage
-Create a new tournament object, then interact with helper functions to score and calculate results.
+Create a new tournament instance from the class at the respective tournament type entry point, then interact with helper functions to score and calculate results.
 
 ```js
-var t = require('tournament');
-var duel = new t.Duel(4, 1);
+var Duel = require('tournament/duel'); // Duel only entry point
+var d = new Duel(4, 1); // 4 players - single elimination
 
-duel.matches; // in playable order
+d.matches; // in playable order
 [ { id: { s: 1, r: 1, m: 1 }, // semi 1
     p: [ 1, 4 ] },
   { id: { s: 1, r: 1, m: 2 }, // semi 2
@@ -19,12 +19,12 @@ duel.matches; // in playable order
   { id: { s: 2, r: 1, m: 1 }, // bronze final
     p: [ 0, 0 ] } ]
 
-duel.matches.forEach(function (m) {
-  duel.score(m.id, [1, 0]);
+d.matches.forEach(function (m) {
+  d.score(m.id, [1, 0]);
 });
 
 // now winners are propagated and map scores are recorded
-duel.matches;
+d.matches;
 [ { id: { s: 1, r: 1, m: 1 },
     p: [ 1, 4 ],
     m: [ 1, 0 ] },
@@ -39,7 +39,7 @@ duel.matches;
     m: [ 1, 0 ] } ]
 
 // can view results at every stage of the tournament, here are the final ones
-duel.results();
+d.results();
 [ { seed: 1,
     maps: 2,
     wins: 2,
@@ -58,8 +58,10 @@ duel.results();
     pos: 4 } ]
 ```
 
+If you want all the tournament types and helpers you can `var t = require('tournament')` then access all the constructors on this object. In this document `t` is assumed to refer to the result of this full require.
+
 ## Creation
-All matches for a tournament is created up front. For most tournament types, not all players is known for the next round and is until that point filled in as the `const` placeholder `t.NA`.
+All matches for a tournament is created up front. For most tournament types, not all players is known for the next round and is until that point filled in with zeroes. Note that zero never clashes with the actual numbers because the player arrays only refer to them via their 1-indexed seeding number.
 
 ### GroupStage
 A group stage tournament splits `n` players into `g` groups. If `n` is a multiple of the resulting group length and this length is even, then this splitting is done in such a way so that the sum of seeds is constant across all groups. Otherwise it will differ by up to the group length. See [Group Stage Algorithms](#group-stage-algorithms).
@@ -68,21 +70,21 @@ A group stage tournament splits `n` players into `g` groups. If `n` is a multipl
 var gs = new t.GroupStage(16, 4); // 16 players in groups of 4
 ```
 
-At the end of a group stage, the results will be sorted in order of points, then map wins.
+At the end of a group stage, the `results()` will be sorted in order of points, then map wins.
+The positions therein will be tied based purely on points, however, so whether to act on map wins as a secondary ordering rather than manually tie-breaking is purely advisory.
 
 ### Duel Elimination
-Duel elimination tournaments consist of two players / groups per match. after each match the winner is advanced to the right in the bracket, and if loser bracket is in use, the loser is put in the loser bracket.
+Duel elimination tournaments consist of two players / teams per match. after each match the winner is advanced to the right in the bracket, and if loser bracket is in use, the loser is put in the loser bracket.
 
-Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers that do not affect the scores in any way.
-A walkover marker is the `const` placeholder `t.WO` in the `.p` player array.
+Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers that do not affect the scores in any way and will run an unbalanced tournament in the fairest possible way.
 
 ```js
 var duel1 = new t.Duel(16, 1); // 16 players in single elimination
 var duel2 = new t.Duel(16, 2); // 16 players in double elimination
-var duel3 = new t.Duel(5, 1); // 5 player single elimination in an 8 player model
+var duel3 = new t.Duel(5, 1); // 5 player single elimination (uses an 8 player model)
 ```
 
-A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins over player b) then the the top X in the results are also the top X seeded players. As an example, seed 1 can only meet seed 2 in the final in single elimination.
+A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins over player b) then the top X in the results are also the top X seeded players. As an example, seed 1 can only meet seed 2 in the final in single elimination.
 
 #### Short Variants
 The _default_ implementation of an elimination tournament includes the usual (but sometimes controversial) extra match in each case:
@@ -97,6 +99,8 @@ var ses = new t.Duel(16, 1, {short: true}); // no bronze final in this
 var des = new t.Duel(16, 2, {short: true}); // winner of LB can win the grand final in one match
 ```
 
+**NB:** Short double elimination tournaments are strongly discouraged because they breaks several fairness properties. As a worst case example, if player 1 and 4 met early in the tournament and 1 won, 4 could come back from the losers bracket and win the grand final in one game despite the two players being 1-1 in games overall in the tournament.
+
 ### FFA Elimination
 FFA elimination tournaments consist of FFA matches that are bracketed like a duel elimination tournament. The only other main difference is that the number of players per match is greater than two and the number advancing per match advancing can be greater than one.
 
@@ -105,7 +109,7 @@ var ffa = new t.FFA(16, [4, 4, 4], [2, 2]); // 16 players in matches of 4 each r
 ```
 
 You must specify precisely the required group size for each round and how many to advance.
-This is really the hardest part of an FFA elimination. There are essentially endless possibilities, but we limit the most outragous ones so that it must at least be playable and non-trivial. The plan is to expose helpers to make this selection easiers on the UI side of things, but for now, be prepared to think about your parameters and check the tests for usage.
+This is really the hardest part of an FFA elimination. There are essentially endless possibilities, and we will allow very exotic adventurous ones as long as they are at least playable and non-trivial. See the [Ensuring Constructibility](#ensuring-constructibility) section for how to check your parameters.
 
 ### Knockouts
 Knockout tournaments consist of a pool of players, repeatedly fighting against each other and gradually reducing the number of players each round. We specify the number of players to knock out each round as an array of integers.
@@ -143,17 +147,18 @@ All tournament types, when instantiated have a `.score()` method. This always ta
 Say a match has 2 players, and the match score [2, 1] is given:
 
 ```js
-var m = duel.matches[0]; // first match
+var m = duel.matches[0]; // first match of some duel tournament
 duel.score(m.id, [2, 1]); // m.p[0] won 2 - 1 over m.p[1]
 ```
 
 In this case, `m.p[0]` is propagated to the next match and `m.p[1]` is knocked out, or carried to the loser bracket if in use.
 
-Because matches are sorted, you could even score them in a forEach loop without ever attempting to score a match that does not have all players assigned to it yet!
+Because matches are sorted, you could even score them in a forEach loop without ever attempting to score a match that does not have all players assigned to it yet.
 
 ```js
+var ffa = new FFA(16, [4,4,4], [2,2])
 ffa.matches.forEach(function (m) {
-  ffa.score(m.id, [4, 3, 2, 1]); // score every match [4, 3, 2, 1] (requires 4 players per match)
+  ffa.score(m.id, [4, 3, 2, 1]); // score every match [4, 3, 2, 1]
 });
 ```
 
@@ -161,13 +166,13 @@ ffa.matches.forEach(function (m) {
 Matches in a group stage allow individual match draws. If this is unsuited to your game/application, check for it.
 
 ### NB: FFA Tournaments
-Matches in FFA tournaments only ensures it can discriminate between the last advancer and the first non-advancers. If these two scores are identical, the ambiguity is disallowed and `.score()` will return false.
+Matches in FFA tournaments only ensures it can discriminate between the last advancer and the first non-advancers. If these two scores are identical, the ambiguity is disallowed and `.score()` will return false (equivalently `unscorable()` will tell you this).
 
 ### NB: Duel Tournaments
-Duel tournaments does not allow ties at any stage. It's meant to eliminate all but one, so do a best of 3 or overtime etc in the case of draws.
+Duel tournaments does not allow ties at any stage. It's meant to eliminate all but one, so you have to do your own best of 3 / overtime methods etc to determine winners in case of draws.
 
 ### NB: Knockouts
-KnockOuts allow for ties everywhere except between the first knocked out player and the last advancing player. In the final, ties are fully allowed.
+KnockOuts allow for ties everywhere except between the first knocked out player and the last advancing player. In the final, ties are fully allowed, so multiple players can share the first place. Check for this if it's unsuited to your game/application.
 
 ## Ensuring Scorability & Consistency
 The `.score(id, scores)` method, whilst simple, has a couple of problems when used with the default behaviour:
@@ -195,9 +200,9 @@ else {
 }
 
 // administrator access - can rewrite history
-va reason = duel.unscorable(id, score, true);
+va reason = duel.unscorable(id, score, true); // 3rd param true for rewrite access
 if (reason !== null) {
-  console.log(reason); // parameters invalid in some way
+  console.log(reason); // parameters invalid in some normal way
 }
 else {
   duel.score(id, score); // will work, but may rewrite history.
@@ -213,15 +218,15 @@ else {
  - scores cannot distinguish between the top X player that are advancing (if eliminating match)
  - players are not ready in the match (dependent match not played)
 
-## Viewing Results
-At any stage in a tournament, up to date results/statistics can be generated on demand. Every tournament type has a `.results()` method that will inspect its match array and calculate results for all players, and sort it based on (currently reached) placement
+But they do not cover the the stricter reasons listed in the NBs above!
 
-The results array contains as many players as the tournament was created with and the original seeding number is available in each object.
+## Viewing Results
+At any stage in a tournament, up to date results/statistics can be generated on demand. Every tournament type has a `.results()` method that will inspect the match array and calculate results for all players, then sort it based on the placement.
 
 ```js
 var duel = new t.Duel(8, 1);
 duel.matches.forEach(function (m) {
-  duel.score(m.id, [2, 1]); // top player always proceeds
+  duel.score(m.id, [2, 1]); // upper player always proceeds
 });
 duel.results().slice(0, 4); // get top 4
 [ { seed: 1,  // player 1 starts out in R1 M1 wins everything as always on top
@@ -242,10 +247,10 @@ duel.results().slice(0, 4); // get top 4
     pos: 4 } ]
 ```
 
-Results can be computed at any stage in a tournament. If called before it's done, the position, or `pos`, will represent the current guaranteed to attain position in the tournament.
+Results can be computed at any stage in a tournament. If called before `isDone()`, the position (`.pos`) will represent the current guaranteed to attain position in the tournament (if everything other match was lost).
 
 ## Serializing Tournaments
-Every tournament type is completely serializable via the `.matches` member, store that and you can recreate it via the static `.fromJSON()` function on each tournament constructor. You only need to remember what type of tournament it is.
+Every tournament type is completely serializable via the `.matches` member, store that and you can recreate it via the static `.fromJSON()` function on each tournament constructor. You only need to remember what type of tournament it is and, if used, the options object.
 
 ```js
 var ms = duel.matches; // suppose we stored this in a database
@@ -254,10 +259,7 @@ var duel2 = t.Duel.fromJSON(ms);
 // can now score duel2 like it was the original object
 ```
 
-NB: `fromJSON` does not accept stringified JSON.
-Only what comes out of `.matches` goes back into `fromJSON()`.
-
-NB: If the options object were passed to the respective tournament constructor then these must be passed verbatim to `fromJSON` as the second parameter.
+When using an options object (here with `FFA` limits):
 
 ```js
 var ffaDb = new T.FFA(16, [4,4], [2], {limit: 4});
@@ -265,7 +267,7 @@ var ffa = T.FFA.fromJSON(ffaDb.matches, {limit: 4}); // now the same as ffaDb
 ```
 
 ## Ensuring Constructibility
-Certain parameter configurations to tournament constructors are logically impossible. Like group size > number of players etc. Whether or not a set of parameters will fail contruction can be tested for with a method taking the same parameters as the respective constructor.
+Certain parameter configurations to tournament constructors are logically impossible. Like group size > number of players etc. Whether or not a set of parameters will fail contruction can be tested for with a method taking the same parameters as its respective constructor.
 
 This is particularly valuable for the `FFA` elimination type where the possibilities are basically endless.
 
@@ -321,7 +323,7 @@ If the round has not been fully completed yet, then this may return a partial id
 
 
 ### Group Stage Algorithms
-The meat of the group stage algorithms are exported separately as helper functions. These may perhaps only help the developer's intuition, but they could also be used to for visualizing how different parameters affect group stage generation. Clever UI challenge accepted?
+The meat of the group stage / ffa algorithms are exported separately as helper functions. These may perhaps only help the developer's intuition, but they could also be used to for visualizing how different parameters affect group stage generation and aid a nice UI.
 
 The following examples show how they work:
 

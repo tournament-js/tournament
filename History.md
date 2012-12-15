@@ -1,12 +1,19 @@
 PLANNED
 ==================
+  * scuttlebutt style require('tournament/Duel') should work!
+   thus: move things out of lib (helps bundlers as well!)
   * MULTISTAGE: All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
     - only KnockOut/Duel/GroupStage left - and KnockOut should be easy!
-  * `FFA` elimination crossovers? perhaps using tierbreakers in multi-stage FFA -> FFA
   * group stages should have tiebreaker handling
-  * Factor GroupStage algorithms into own mini-library (used by FFA as well as client) - needed all over the place
-  * Factor ADV algorithm into own mini-library (useful for client and optional server) - done, but not exposed anywhere
-  * When overriding history, should undo the scores to make the error explicit!
+  * move `ffa_cost` and `balancer` to own libraries?
+  * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
+
+0.10.0 / 2012-12-15
+==================
+  * added alternate entry points for people who just want one tournament type
+    can be used with `require('tournament/duel')` or `/knockout` or `/ffa` or `/groupstage`
+  * `groups` and `robin` factored into own helper file
+  * fixed a bug in `KnockOut` restrictions in `KnockOut.invalid` which allowed a 1 player final
 
 0.9.0 / 2012-12-10
 ==================
