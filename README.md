@@ -1,13 +1,13 @@
 # Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
 
-Tournament is a library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics as well as provding the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
+Tournament is a library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics, as well as providing the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
 
 ## Usage
 Create a new tournament object, then interact with helper functions to score and calculate results.
 
 ```js
 var t = require('tournament');
-var duel = new t.Duel(4, t.WB);
+var duel = new t.Duel(4, 1);
 
 duel.matches; // in playable order
 [ { id: { s: 1, r: 1, m: 1 }, // semi 1
@@ -77,9 +77,9 @@ Duel tournaments can be of any size although perfect powers of 2 are the nicest.
 A walkover marker is the `const` placeholder `t.WO` in the `.p` player array.
 
 ```js
-var duel1 = new t.Duel(16, t.WB); // 16 players in single elimination
-var duel2 = new t.Duel(16, t.LB); // 16 players in double elimination
-var duel3 = new t.Duel(5, t.WB); // 5 player single elimination in an 8 player model
+var duel1 = new t.Duel(16, 1); // 16 players in single elimination
+var duel2 = new t.Duel(16, 2); // 16 players in double elimination
+var duel3 = new t.Duel(5, 1); // 5 player single elimination in an 8 player model
 ```
 
 A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins over player b) then the the top X in the results are also the top X seeded players. As an example, seed 1 can only meet seed 2 in the final in single elimination.
@@ -90,11 +90,11 @@ The _default_ implementation of an elimination tournament includes the usual (bu
  * bronze final in single elimination
  * double grand final in double elimination
 
-Passing a `short:true` flag in the third options object to the `Duel` constructor will override the default behaviour and use the short variants.
+Passing a `short:true` flag in the options object to the `Duel` constructor will override the default behaviour and use the short variants.
 
 ```js
-var ses = new t.Duel(16, t.WB, {short: true}); // no bronze final in this
-var des = new t.Duel(16, t.LB, {short: true}); // winner of LB can win the grand final in one match
+var ses = new t.Duel(16, 1, {short: true}); // no bronze final in this
+var des = new t.Duel(16, 2, {short: true}); // winner of LB can win the grand final in one match
 ```
 
 ### FFA Elimination
@@ -219,7 +219,7 @@ At any stage in a tournament, up to date results/statistics can be generated on 
 The results array contains as many players as the tournament was created with and the original seeding number is available in each object.
 
 ```js
-var duel = new tournament.Duel(8, tournament.WB);
+var duel = new t.Duel(8, 1);
 duel.matches.forEach(function (m) {
   duel.score(m.id, [2, 1]); // top player always proceeds
 });
@@ -306,7 +306,7 @@ t.KnockOut.idString({s: 1, r:2, m: 1});
 Every tournament allow getting the next match `id` for any player id (seed number) via the `.upcoming()` method. It will search the match array for the next unscored match with the given player seed number in it.
 
 ```js
-var duel = new t.Duel(4, t.WB, true); // 4 player single elim without bronze final
+var duel = new t.Duel(4, 1, {short: true}); // 4 player single elim without bronze final
 duel.score({ s: 1, r: 1, m: 1}, [1, 0]); // this match is player 1 vs. player 4
 
 duel.upcoming(1); // 1 advanced to semi
