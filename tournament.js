@@ -1,13 +1,13 @@
 require('logule').init(module, 'tournament');
 
-var consts = require('./common')
-  , algs = require('./balancer');
+var consts = require('./lib/common')
+  , algs = require('./lib/balancer');
 
 var tournament = {
-  FFA         : require('./ffa'),
-  Duel        : require('./duel'),
-  KnockOut    : require('./knockout'),
-  GroupStage  : require('./groupstage'),
+  FFA         : require('./lib/ffa'),
+  Duel        : require('./lib/duel'),
+  KnockOut    : require('./lib/knockout'),
+  GroupStage  : require('./lib/groupstage'),
   groups      : algs.groups,
   robin       : algs.robin
 };
