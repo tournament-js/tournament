@@ -12,17 +12,18 @@
     "node": ">=0.8.0"
   },
   "keywords": [
-    "elimination",
-    "double",
+  "elimination",
+    "duel",
+    "groupstage",
+    "knockout",
     "bracket",
     "groups",
-    "groupstage",
     "AI",
     "FFA",
     "robin"
   ],
   "scripts": {
-    "lint": "jshint lib test",
+    "lint": "jshint lib test *.js",
     "test": "tap test"
   },
   "dependencies": {
