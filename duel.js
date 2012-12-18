@@ -1,1 +1,1 @@
-module.exports = require('./lib/duel.js')
+module.exports = require('./lib/duel.js');

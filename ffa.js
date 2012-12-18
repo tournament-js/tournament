@@ -1,1 +1,1 @@
-module.exports = require('./lib/ffa.js')
+module.exports = require('./lib/ffa.js');

@@ -1,1 +1,1 @@
-module.exports = require('./lib/knockout.js')
+module.exports = require('./lib/knockout.js');

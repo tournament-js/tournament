@@ -1,1 +1,1 @@
-module.exports = require('./lib/groupstage.js')
+module.exports = require('./lib/groupstage.js');
