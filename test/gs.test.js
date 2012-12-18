@@ -199,3 +199,53 @@ test("upcoming/scorable 16 8", function (t) {
 
   t.end();
 });
+
+
+test("res test 9 3", function (t) {
+  var g = new T.GroupStage(9, 3)
+    , ms = g.matches;
+
+  var scoreRnd = function (r) {
+    ms.forEach(function (m) {
+      if (m.id.r === r) {
+        t.equal(g.unscorable(m.id, [1,0]), null, rep(m.id) + " !unscorable");
+        t.ok(g.score(m.id, m.p[0] < m.p[1] ? [1,0] : [0,1]), "score " + rep(m.id));
+      }
+    });
+  };
+
+  scoreRnd(1);
+  var res1 = g.results();
+  t.ok(res1, "got res1");
+  res1.forEach(function (r) {
+    if (r.wins === 1) {
+      t.equal(r.pos, 4, "winners of first match guaranteed 4th");
+    }
+    else if (r.wins === 0) {
+      t.equal(r.pos, 7, "group losers still tied at 7th");
+    }
+    else {
+      t.ok(false, "all players should have a wins property in {0,1} after r1");
+    }
+  });
+
+  scoreRnd(2);
+  var res2 = g.results();
+  t.ok(res2, "got res2");
+  res2.forEach(function (r) {
+    if (r.wins === 2) {
+      t.equal(r.pos, 1, "group winners are tied 1st");
+    }
+    else if (r.wins === 1) {
+      t.equal(r.pos, 4, "group mids are tied 4th");
+    }
+    else if (r.wins === 0) {
+      t.equal(r.pos, 7, "group losers tied at 7th");
+    }
+    else {
+      t.ok(false, "all players should have a wins property in {0,1,2} after r2");
+    }
+  });
+
+  t.end();
+});
