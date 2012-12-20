@@ -1,12 +1,19 @@
 PLANNED
 ==================
-  * scuttlebutt style require('tournament/Duel') should work!
-   thus: move things out of lib (helps bundlers as well!)
   * MULTISTAGE: All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
     - only KnockOut/Duel/GroupStage left - and KnockOut should be easy!
   * group stages should have tiebreaker handling
   * move `ffa_cost` and `balancer` to own libraries?
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
+  * `FFA` should also have a `mapsBreak` option
+  * test common interfaces better - idString was inconsistent!
+
+0.10.1 / 2012-12-20
+==================
+  * `GroupStage` results fixed up `pos` positioning was inconsistent and wrong, now robust
+  * `GroupStage` results now allow an options object to set the amount of points to be rewarded for winning/tieing and whether or not maps should break positions.
+  * `GroupStage` results expose `grp` as the group number the player was/is in
+  * Note: `GroupStage` can still not be used multistage with `limit` options yet, see issue #7
 
 0.10.0 / 2012-12-15
 ==================
