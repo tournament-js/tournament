@@ -82,7 +82,8 @@ test("group stage 32 8", function (t) {
     t.ok(r.pos >= 1 && r.pos <= 32, "places between 1 and 32");
     t.equal(r.maps, r.wins*2, "maps === wins*2 for each result summary here");
     t.equal(r.pts, r.wins*3, "points == 3 per mapwin");
-    t.ok(r.grp === undefined, "temporary group property unset");
+    t.equal(r.gpos, undefined, "temporary group property unset");
+    t.ok(1 <= r.grp && r.grp <= 4, "grp stored");
   });
 
   // x-placers sorterd across groups based on pts and maps
@@ -201,50 +202,90 @@ test("upcoming/scorable 16 8", function (t) {
 });
 
 
-test("res test 9 3", function (t) {
-  var g = new T.GroupStage(9, 3)
-    , ms = g.matches;
+test("res test 9 3 without allow map breaks for ties", function (t) {
+  var score = function (g, mapsTie, r) {
+      g.matches.forEach(function (m) {
+        // g.id.s is unique amongst x-placers and sufficient for never-tieing prop.
+        var a = mapsTie ? 1 : 4 - m.id.s; // first group have highest score
+        if (m.id.r === r) {
+          t.equal(g.unscorable(m.id, [a,0]), null, rep(m.id) + " !unscorable");
+          t.ok(g.score(m.id, m.p[0] < m.p[1] ? [a,0] : [0,a]), "score " + rep(m.id));
+        }
+      });
+    };
 
-  var scoreRnd = function (r) {
-    ms.forEach(function (m) {
-      if (m.id.r === r) {
-        t.equal(g.unscorable(m.id, [1,0]), null, rep(m.id) + " !unscorable");
-        t.ok(g.score(m.id, m.p[0] < m.p[1] ? [1,0] : [0,1]), "score " + rep(m.id));
-      }
+  [true, false].forEach(function (mapsTie) {
+    // run these tests twice, once tieing map scores ([1,0] all) snd run [a,0] all
+    // where a is variant (here depending on group number for simplicity)
+    var g = new T.GroupStage(9, 3);
+
+    // verify initial conditions
+    var res0 = g.results();
+    t.ok(res0, "got res0");
+    var found = [];
+    res0.forEach(function (r) {
+      t.equal(r.pos, 9, r.seed + " should be tied with everyone pre-start");
+      t.equal(r.wins, 0, r.seed + " should have exactly zero wins pre-start");
+      t.equal(r.draws, 0, r.seed + " should have exactly zero draws pre-start");
+      t.equal(r.losses, 0, r.seed + " should have exactly zero losses pre-start");
+      t.equal(r.maps, 0, r.seed + " should have exactly zero map scrs pre-start");
+      t.ok(1 <= r.grp && r.grp <= 3, r.seed + " should have grp stored");
+      t.equal(r.gpos, undefined, r.seed + " should have gpos deleted stored");
+      t.ok(r.seed > 0 && r.seed <= 9, "seeds are 1-indexed: " + r.seed);
+      t.ok(found.indexOf(r.seed) < 0, "seeds are unique: " + r.seed);
+      found.push(r.seed);
     });
-  };
+    t.equal(found.length, 9, "result length is 9");
+    found.forEach(function (f) {
+      t.equal(Math.ceil(f), f, "found seed number is an integer: " + f);
+    });
 
-  scoreRnd(1);
-  var res1 = g.results();
-  t.ok(res1, "got res1");
-  res1.forEach(function (r) {
-    if (r.wins === 1) {
-      t.equal(r.pos, 4, "winners of first match guaranteed 4th");
-    }
-    else if (r.wins === 0) {
-      t.equal(r.pos, 7, "group losers still tied at 7th");
-    }
-    else {
-      t.ok(false, "all players should have a wins property in {0,1} after r1");
-    }
-  });
+    // score rounds one by one and verify that everything ties as expected
+    score(g, mapsTie, 1);
+    var res1 = g.results();
+    t.ok(res1, "got res1");
+    res1.forEach(function (r) {
+      t.equal(r.pos, 9, "all players are tied at 9th before done");
+      t.equal(r.pts, 3*r.wins, "pts are 3x wins (when no draws)");
+    });
 
-  scoreRnd(2);
-  var res2 = g.results();
-  t.ok(res2, "got res2");
-  res2.forEach(function (r) {
-    if (r.wins === 2) {
-      t.equal(r.pos, 1, "group winners are tied 1st");
-    }
-    else if (r.wins === 1) {
-      t.equal(r.pos, 4, "group mids are tied 4th");
-    }
-    else if (r.wins === 0) {
-      t.equal(r.pos, 7, "group losers tied at 7th");
-    }
-    else {
-      t.ok(false, "all players should have a wins property in {0,1,2} after r2");
-    }
+    score(g, mapsTie, 2);
+    var res2 = g.results();
+    t.ok(res2, "got res2");
+    res2.forEach(function (r) {
+      t.equal(r.pos, 9, "all players are tied at 9th before done");
+      t.equal(r.pts, 3*r.wins, "pts are 3x wins (when no draws)");
+    });
+
+    // score remaining matches, now pos should only tie in a particular situation
+    score(g, mapsTie, 3);
+    [false, true].forEach(function (mapsBreak) {
+      var res3 = g.results({mapsBreak: mapsBreak});
+      t.ok(res3, "got res3");
+      res3.forEach(function (r) {
+        if (r.seed <= 3) { // top 3 (1st-placers)
+          if (mapsTie || !mapsBreak) {
+            t.equal(r.pos, 1, "1st placers tied at 1st");
+          }
+          else { // !mapsTie && mapsBreak
+            t.equal(r.pos, r.grp, r.seed + " broken by maps (1st placer)");
+          }
+        }
+        else if (r.seed <= 6) { // 2nd-placers
+          if (mapsTie || !mapsBreak) {
+            t.equal(r.pos, 4, "2nd placers tied at 4th");
+          }
+          else {
+            t.equal(r.pos, 3 + r.grp, r.seed + " broken by maps (2nd placers)");
+          }
+        }
+        else { // 3rd-placers
+          t.equal(r.pos, 7, "3rd placers tied at 7th"); // always, because zero score
+        }
+        t.equal(r.pts, 3*r.wins, "pts are 3x wins (when no draws)");
+      });
+    });
+
   });
 
   t.end();
