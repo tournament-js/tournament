@@ -2,7 +2,7 @@
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "tournament",
   "description": "Tournament management library",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/clux/tournament.git"
@@ -12,7 +12,7 @@
     "node": ">=0.8.0"
   },
   "keywords": [
-  "elimination",
+    "elimination",
     "duel",
     "groupstage",
     "knockout",
