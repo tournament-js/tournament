@@ -1,6 +1,6 @@
 # Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
 
-Tournament is a library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics, as well as providing the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
+Tournament is a pure library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players viewing ongoing statistics, as well as providing the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
 
 ## Usage
 Create a new tournament instance from the class at the respective tournament type entry point, then interact with helper functions to score and calculate results.
@@ -61,7 +61,7 @@ d.results();
 If you want all the tournament types and helpers you can `var t = require('tournament')` then access all the constructors on this object. In this document `t` is assumed to refer to the result of this full require.
 
 ## Creation
-All matches for a tournament is created up front. For most tournament types, not all players is known for the next round and is until that point filled in with zeroes. Note that zero never clashes with the actual numbers because the player arrays only refer to them via their 1-indexed seeding number.
+All matches for a tournament are created up front. For most tournament types, not all players is known for the future rounds and is until some point filled in with zeroes. Zero is never a real player seed as these are 1-indexed.
 
 ### GroupStage
 A group stage tournament splits `n` players into `g` groups. If `n` is a multiple of the resulting group length and this length is even, then this splitting is done in such a way so that the sum of seeds is constant across all groups. Otherwise it will differ by up to the group length. See [Group Stage Algorithms](#group-stage-algorithms).
