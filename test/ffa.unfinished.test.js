@@ -3,9 +3,58 @@ var tap = require('tap')
   , $ = require('interlude')
   , T = require('../');
 
+test("ffa 5 [5] [] limit 4", function (t) {
+  var ffa = new T.FFA(5, [5], [], {limit: 4});
+  var ms = ffa.matches;
+  t.ok(!ffa.score(ms[0].id, [5,4,3,2,2]), "cannot score so we are tied at limit");
+  t.ok(ffa.score(ms[0].id, [5,4,3,2,1]), "scoring works when untied");
+
+  var res = ffa.results();
+  res.forEach(function (r, i) {
+    t.equal(r.pos, i+1, "positions should be linear from 1");
+  });
+
+  t.end();
+});
+
+test("ffa 10 [5] [] limit 4", function (t) {
+  var ffa = new T.FFA(10, [5], [], {limit: 4});
+  var ms = ffa.matches;
+  t.ok(!ffa.score(ms[0].id, [5,4,4,2,1]), "cannot score so we are tied at limit/NG");
+  t.ok(ffa.score(ms[0].id, [5,4,3,2,1]), "scoring of M1 works when untied");
+  t.ok(ffa.score(ms[1].id, [5,4,3,2,1]), "scoring of M2 works when untied");
+
+  var res = ffa.results();
+  res.forEach(function (r, i) {
+    var nearestOdd = 2*Math.floor(i/2) + 1;
+    t.equal(r.pos, nearestOdd, "positions should tie on odds");
+  });
+
+  t.end();
+});
+
+test("ffa 15 [5] [] limit 6", function (t) {
+  var ffa = new T.FFA(15, [5], [], {limit: 6}); // limit must divide num groups
+  var ms = ffa.matches;
+  t.ok(!ffa.score(ms[0].id, [5,4,4,2,1]), "cannot score so we are tied at limit");
+  t.ok(ffa.score(ms[0].id, [5,4,3,2,1]), "scoring of M1 works when untied");
+  t.ok(ffa.score(ms[1].id, [5,4,3,2,1]), "scoring of M2 works when untied");
+  t.ok(ffa.score(ms[2].id, [5,4,3,2,1]), "scoring of M3 works when untied");
+
+  var res = ffa.results();
+  res.forEach(function (r, i) {
+    var nearestPlus3 = 3*Math.floor(i/3) + 1;
+    t.equal(r.pos, nearestPlus3, "positions should tie on every 3rd (and =1 mod3)");
+  });
+
+  t.end();
+});
+
 test("ffa 16 4 2 unfinished no limits", function (t) {
-  //var ffa = new T.FFA(16, [4,4], [2], {limit: 0});
-  // that should throw!
+  var reason = T.FFA.invalid(16, [4,4], [2], {limit: 0});
+  t.type(reason, 'string', "Should not be able to create non-finals without limits");
+  var ffa = new T.FFA(16, [4,4], [2], {limit: 0});
+  t.deepEqual(ffa.matches, [], "ffa creation should also fail");
 
   t.end();
 });
