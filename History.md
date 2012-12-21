@@ -8,6 +8,11 @@ PLANNED
   * `FFA` should also have a `mapsBreak` option
   * test common interfaces better - idString was inconsistent!
 
+0.10.2 / 2012-12-22
+==================
+  * `FFA` now able to create single match tournaments internally (for tiebreaking)
+  * `FFA` positioning only really worked for the one special case we tested for with `limit` set - now fixed (and more tests)
+
 0.10.1 / 2012-12-20
 ==================
   * `GroupStage` results fixed up `pos` positioning was inconsistent and wrong, now robust
