@@ -76,7 +76,7 @@ The positions therein will be tied based purely on points, however, so whether t
 ### Duel Elimination
 Duel elimination tournaments consist of two players / teams per match. after each match the winner is advanced to the right in the bracket, and if loser bracket is in use, the loser is put in the loser bracket.
 
-Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers that do not affect the scores in any way and will run an unbalanced tournament in the fairest possible way.
+Duel tournaments can be of any size although perfect powers of 2 are the nicest. That said, the module will fill out the gaps with walkover markers (`-1`)that do not affect the scores in any way and will run an unbalanced tournament in the fairest possible way.
 
 ```js
 var duel1 = new t.Duel(16, 1); // 16 players in single elimination

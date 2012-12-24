@@ -6,7 +6,12 @@ PLANNED
   * move `ffa_cost` and `balancer` to own libraries?
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
-  * test common interfaces better - idString was inconsistent!
+
+0.10.3 / 2012-12-24
+==================
+  * `FFA` restrictions on `limit` removed (apart from multiple of last rounds numMatches)
+  * publically exported helpers now include `findMatch` :: matches -> id -> match
+  * `KnockOut` now also contain a `numPlayers` instance variable for consistency
 
 0.10.2 / 2012-12-22
 ==================
