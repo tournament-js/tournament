@@ -2,7 +2,6 @@ var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
   , T = require('../')
-  , byId = require('../lib/common').byId
   , rep = T.GroupStage.idString;
 
 test("group stage 10 6 fromJSON", function (t) {
@@ -133,7 +132,7 @@ test("upcoming 6 3", function (t) {
     t.ok([1, 2].indexOf(up.r) >= 0, "playing at least in one of the first rounds");
 
     // now verify that n exists in the match and that it's unscored
-    var m = $.firstBy(byId.bind(null, up), ms);
+    var m = T.findMatch(ms, up);
     t.ok(m.p.indexOf(n) >= 0, "player " + n + " exists in .p");
     t.ok(!m.m, "given match was not scored");
   });
@@ -159,7 +158,7 @@ test("upcoming/scorable 16 8", function (t) {
       t.equal(up.r, r, "previous round scored all now wait for round" + r);
 
       // now verify that n exists in the match and that it's unscored
-      var m = $.firstBy(byId.bind(null, up), ms);
+      var m = T.findMatch(ms, up);
       t.ok(m.p.indexOf(n) >= 0, "player " + n + " exists in .p");
       t.ok(!m.m, "given match was not scored");
     });
