@@ -4,8 +4,14 @@ PLANNED
     - only KnockOut/Duel/GroupStage left - and KnockOut should be easy!
   * group stages should have tiebreaker handling
   * move `ffa_cost` and `balancer` to own libraries?
+  * remove logule - logging is now entirely superfluous now that reasons are returned
+    (may have to move unscorable/invalid to interface classes though)
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
+
+0.10.4 / 2012-12-XX
+==================
+  * removed `deep-equal` dependency (overkill solution)
 
 0.10.3 / 2012-12-24
 ==================

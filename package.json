@@ -27,8 +27,7 @@
     "test": "tap test"
   },
   "dependencies": {
-    "interlude": "~1.0.2",
-    "deep-equal": "~0.0.0"
+    "interlude": "~1.0.2"
   },
   "optionalDependencies": {
     "logule": "~2"
