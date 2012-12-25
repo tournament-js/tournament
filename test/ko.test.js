@@ -94,8 +94,6 @@ test("ko 10 [2,4,2] results", function (t) {
   });
 
 
-
-
   // round 1
   var failScores = [10,9,8,7,6,5,4,3,3,1]; // ties at border
   t.equal(ko.unscorable({s:1, r:1, m:1}, $.range(10)), null, "can score r" + 1);

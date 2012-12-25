@@ -5,7 +5,9 @@ PLANNED
   * group stages should have tiebreaker handling
   * move `ffa_cost` and `balancer` to own libraries?
   * remove logule - logging is now entirely superfluous now that reasons are returned
-    (may have to move unscorable/invalid to interface classes though)
+    before this is entirely possible we will have to also:
+    - move unscorable/invalid to interface classes
+    - implement error reasons for fromJSON as well
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
 
