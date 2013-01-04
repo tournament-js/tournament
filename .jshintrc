@@ -10,7 +10,6 @@
     "noarg"         : true,  // prevent arguments.callee and arguments.caller
     "noempty"       : true,  // prevent empty code blocks
     "plusplus"      : true,  // prevent ++ usage
-    "regexp"        : true,  // prevent . in regexps
     "undef"         : true,  // prevent accessing undeclared vars
     "unused"        : true,  // prevent having unused vars
     "trailing"      : true,  // prevent trailing whitespace
