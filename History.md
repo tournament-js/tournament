@@ -11,9 +11,12 @@ PLANNED
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
 
-0.10.4 / 2012-12-XX
+0.10.4 / 2013-01-XX
 ==================
   * removed `deep-equal` dependency (overkill solution)
+  * reduced 3 player restriction on `GroupStage` to 3 (for tiebreaker scenario)
+  * reduced 3 player restriction on `FFA` to 2 (for tiebreaker scenario)
+  * (2 player `GroupStage` is equivalent to a 2 player `FFA` so further reduction unnecessary)
 
 0.10.3 / 2012-12-24
 ==================
