@@ -10,6 +10,7 @@ PLANNED
     - implement error reasons for fromJSON as well
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
+  * undo affected history when changing past
 
 0.10.4 / 2013-01-XX
 ==================
