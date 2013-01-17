@@ -1,5 +1,3 @@
-require('logule').init(module, 'tournament');
-
 var helpers = require('./lib/public')
   , algs = require('./lib/balancer');
 
