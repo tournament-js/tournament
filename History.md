@@ -1,19 +1,16 @@
-PLANNED
+PLANNED (most stuff in issue form now)
 ==================
-  * MULTISTAGE: All constructors get an optional `limit` option to set how many of the top you would like to extract (so that the tournament can generate tiebreakers if necessary).
-    - only KnockOut/Duel/GroupStage left - and KnockOut should be easy!
-  * group stages should have tiebreaker handling
+  * MULTISTAGE: `GroupStage` is the hard one in dev atm, see issues
   * move `ffa_cost` and `balancer` to own libraries?
-  * remove logule - logging is now entirely superfluous now that reasons are returned
-    before this is entirely possible we will have to also:
-    - move unscorable/invalid to interface classes
-    - implement error reasons for fromJSON as well
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
 
-0.10.4 / 2013-01-XX
+0.11.0 / 2013-01-XX
 ==================
+  * removed `logule` dependency - error messages can be provided by helpers completely now
+  so it's unnecessary to break browserification
+  * `TieBreaker` module included for (currently only `GroupStage`) `limit` like functionality (docs to come)
   * removed `deep-equal` dependency (overkill solution)
   * reduced 3 player restriction on `GroupStage` to 3 (for tiebreaker scenario)
   * reduced 3 player restriction on `FFA` to 2 (for tiebreaker scenario)
