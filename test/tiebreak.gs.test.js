@@ -33,10 +33,19 @@ test("gs 9 3 all equal scores - proceed 3", function (t) {
   var isAllR1 = tms.map($.get('id', 'r')).every($.eq(1));
   t.ok(isAllR1, "should only have R1 tiebreakers (within groups)");
 
+  tms.forEach(function (m, i) {
+    t.ok(!tb.score(m.id, [2,2,2]), "cant tie-score tb " + i);
+    t.ok(!tb.score(m.id, [1,2,2]), "cant tie-score tb " + i);
+    t.ok(!tb.score(m.id, [1,2,1]), "cant tie-score tb " + i);
+    t.ok(!tb.score(m.id, [2,1,2]), "cant tie-score tb " + i);
+    t.equal(m.p.length, 3, "3 players in tb " + i);
+    t.ok(tb.score(m.id, [3,2,1]), "can score tb " + i);
+  });
+
   t.end();
 });
 
-test("gs 9 3 tied only, but fully between - proceed any", function (t) {
+test("gs 9 3 tied only between - proceed any", function (t) {
   var gs = new T.GroupStage(9, 3);
   var ms = gs.matches;
 
