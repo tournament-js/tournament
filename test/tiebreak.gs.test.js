@@ -71,6 +71,7 @@ test("gs 9 3 tied only between - proceed any", function (t) {
       t.equal(tms[0].id.r, 2, "and it should be in R2");
       t.equal(tms[0].p.length, 3, "and we need to tiebreak 3 players");
       t.ok(tms[0].p.every(Number.isFinite), "every player is a finite number");
+      t.ok(tb.score(tms[0].id, [3,2,1]), "can score the r2 match");
 
       // now sketch out all the different possibilities:
       if (n === 1 || n === 2) {
@@ -109,50 +110,81 @@ test("gs 6 3 unique groups !mapsBreak", function (t) {
   // just to verify:
   // grp1 should have pts 6 3 0 maps 7 2 0
   // grp2 should have pts 3 3 3 maps 5 4 3
-  var res = gs.results();
-  var resGrpX = function (grp) {
-    return res.filter(function (r) {
-      return r.grp === grp;
+  [false, true].forEach(function (mapsBreak) {
+    var res = gs.results({mapsBreak: mapsBreak});
+    var resGrpX = function (grp) {
+      return res.filter(function (r) {
+        return r.grp === grp;
+      });
+    };
+    var resGrp1 = resGrpX(1);
+    var resGrp2 = resGrpX(2);
+    var pts1 = $.pluck('pts', resGrp1).sort($.compare(-1));
+    var pts2 = $.pluck('pts', resGrp2).sort($.compare(-1));
+    t.deepEqual(pts1, [6, 3, 0], "pts group 1");
+    t.deepEqual(pts2, [3, 3, 3], "pts group 2");
+
+    // with !mapsBreak, should have ties and tiebreakers within group 2
+    var gpos1 = $.pluck('gpos', resGrp1).sort($.compare());
+    var gpos2 = $.pluck('gpos', resGrp2).sort($.compare());
+    t.deepEqual(gpos1, [1, 2, 3], "gpos group 1");
+    if (!mapsBreak) {
+      t.deepEqual(gpos2, [1, 1, 1], "gpos group 2");
+    }
+    else {
+      t.deepEqual(gpos2, [1, 2, 3], "gpos group2 mapsBreak");
+    }
+
+
+    t.ok(!T.TieBreaker.isNecessary(res, 6), "tiebreaker necessary for " + 6);
+    [2, 4].forEach(function (n) {
+      if (!mapsBreak) {
+        t.ok(T.TieBreaker.isNecessary(res, n), "tiebreaker necessary for " + n);
+        var tb = new T.TieBreaker(res, n);
+        var tms = tb.matches;
+        t.equal(tms.length, 1, "should be one within tiebreaker for " + n);
+        t.equal(tms[0].id.r, 1, "it should be a round 1 match then");
+        t.deepEqual(tms[0].p, [2, 4, 5], "entire group 2 must be broken");
+      }
     });
-  };
-  var resGrp1 = resGrpX(1);
-  var resGrp2 = resGrpX(2);
-  var pts1 = $.pluck('pts', resGrp1).sort($.compare(-1));
-  var pts2 = $.pluck('pts', resGrp2).sort($.compare(-1));
-  t.deepEqual(pts1, [6, 3, 0], "pts group 1");
-  t.deepEqual(pts2, [3, 3, 3], "pts group 2");
 
-  // with !mapsBreak, should have ties and tiebreakers within group 2
-  var gpos1 = $.pluck('gpos', resGrp1).sort($.compare());
-  var gpos2 = $.pluck('gpos', resGrp2).sort($.compare());
-  t.deepEqual(gpos1, [1, 2, 3], "gpos group 1");
-  t.deepEqual(gpos2, [1, 1, 1], "gpos group 2");
+    // will always be TieBreakers when n is not a multiple of 3
+    // as mapsBreak is only applied on the within group level
+    [1,3].forEach(function (n) {
+      t.ok(T.TieBreaker.isNecessary(res, n), "tiebreaker necessary for " + n);
+      var tb = new T.TieBreaker(res, n);
+      var tms = tb.matches;
 
+      var verifyR2 = function (m, r1m) {
+        t.equal(m.id.r, 2, "between match should be in R2");
+        t.equal(m.p.length, 2, "and we then will need to tiebreak 2 players");
 
-  t.ok(!T.TieBreaker.isNecessary(res, 6), "tiebreaker necessary for " + 6);
-  [2, 4].forEach(function (n) {
-    t.ok(T.TieBreaker.isNecessary(res, n), "tiebreaker necessary for " + n);
-    var tb = new T.TieBreaker(res, n);
-    var tms = tb.matches;
-    t.equal(tms.length, 1, "should be one within tiebreaker for " + n);
-    t.equal(tms[0].id.r, 1, "it should be a round 1 match then");
-    t.deepEqual(tms[0].p, [2, 4, 5], "entire group 2 must be broken");
-  });
+        if (r1m) {
+          t.deepEqual(m.p, [0, 0], "one player known, but not advanced till end");
+          // scoring in this match so that results for grp one is as follows:
+          // 1st: 2, 2nd: 5, 3rd: 4 (this matches how it is if mapsBreak)
+          t.ok(tb.score(r1m.id, [3,1,2]), "can score R1 match");
+        }
 
-  // will always be TieBreakers when n is not a multiple of 3
-  // as mapsBreak is only applied on the within group level
-  [1,3].forEach(function (n) {
-    t.ok(T.TieBreaker.isNecessary(res, n), "tiebreaker necessary for " + n);
-    var tb = new T.TieBreaker(res, n);
-    var tms = tb.matches;
-    t.equal(tms.length, 2, "should be two tiebreakers for " + n);
+        if (n === 1) {
+          t.deepEqual(m.p, [1, 2], "winners proceeded to R2 now");
+        }
+        if (n === 3) {
+          t.deepEqual(m.p, [5, 6], "winners proceeded to R2 now");
+        }
+      };
 
-    t.equal(tms[0].id.r, 1, "first should be a round 1 match");
-    t.deepEqual(tms[0].p, [2, 4, 5], "and entire group 2 must be broken");
-
-    t.equal(tms[1].id.r, 2, "between match should be in R2");
-    t.equal(tms[1].p.length, 2, "and we then will need to tiebreak 2 players");
-    t.deepEqual(tms[1].p, [0, 0], "one player known, but not advanced till end");
+      if (!mapsBreak) {
+        t.equal(tms.length, 2, "two tiebreakers for " + n);
+        t.equal(tms[0].id.r, 1, "first should be a round 1 match");
+        t.deepEqual(tms[0].p, [2, 4, 5], "and entire group 2 must be broken");
+        verifyR2(tms[1], tms[0]);
+      }
+      else {
+        t.equal(tms.length, 1, "one tiebreakers for " + n);
+        verifyR2(tms[0]);
+      }
+    });
   });
   t.end();
 });
