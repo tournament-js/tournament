@@ -39,7 +39,8 @@ test("gs 9 3 all equal scores - proceed 3", function (t) {
     t.ok(!tb.score(m.id, [1,2,1]), "cant tie-score tb " + i);
     t.ok(!tb.score(m.id, [2,1,2]), "cant tie-score tb " + i);
     t.equal(m.p.length, 3, "3 players in tb " + i);
-    t.ok(tb.score(m.id, [3,2,1]), "can score tb " + i);
+    t.equal(tb.unscorable(m.id, [3,2,1]), null, "but this should work");
+    t.ok(tb.score(m.id, [3,2,1]), "and it does");
   });
 
   t.end();
@@ -155,15 +156,18 @@ test("gs 6 3 unique groups !mapsBreak", function (t) {
       var tb = new T.TieBreaker(res, n);
       var tms = tb.matches;
 
-      var verifyR2 = function (m, r1m) {
+      var verifyR2 = function (m, r1m) { // m is always the round 2 match
         t.equal(m.id.r, 2, "between match should be in R2");
         t.equal(m.p.length, 2, "and we then will need to tiebreak 2 players");
+        //t.ok(!tb.isDone(), "not done yet 1");
 
         if (r1m) {
           t.deepEqual(m.p, [0, 0], "one player known, but not advanced till end");
+          t.ok(tb.unscorable(m.id, [2,1]), "can't score r2 yet");
           // scoring in this match so that results for grp one is as follows:
           // 1st: 2, 2nd: 5, 3rd: 4 (this matches how it is if mapsBreak)
           t.ok(tb.score(r1m.id, [3,1,2]), "can score R1 match");
+          t.ok(!tb.isDone(), "not done yet 2");
         }
 
         if (n === 1) {
@@ -172,6 +176,9 @@ test("gs 6 3 unique groups !mapsBreak", function (t) {
         if (n === 3) {
           t.deepEqual(m.p, [5, 6], "winners proceeded to R2 now");
         }
+        t.equal(tb.unscorable(m.id, [2,1]), null, "can score r2 now");
+        t.ok(tb.score(m.id, [2,1]), "could score r2");
+        t.ok(tb.isDone(), "should all be done now");
       };
 
       if (!mapsBreak) {
