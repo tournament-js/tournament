@@ -75,18 +75,27 @@ test("gs 9 3 tied only between - proceed any", function (t) {
       t.ok(tb.score(tms[0].id, [3,2,1]), "can score the r2 match");
 
       // now sketch out all the different possibilities:
-      if (n === 1 || n === 2) {
-        t.deepEqual(tms[0].p, [1,2,3], "the 3 needs to be the group winners");
-      }
-      else if (n === 4 || n === 5) {
-        t.deepEqual(tms[0].p, [4,5,6], "the 3 needs to be the 2nd placers");
-      }
-      else if (n === 7 || n === 8) {
-        t.deepEqual(tms[0].p, [7,8,9], "the 3 needs to be the group losers");
-      }
-      else {
-        t.ok(false, "should not be in this case");
-      }
+      var verifyFinal = function (tb) {
+        var tms = tb.matches;
+        if (n === 1 || n === 2) {
+          t.deepEqual(tms[0].p, [1,2,3], "the 3 needs to be the group winners");
+        }
+        else if (n === 4 || n === 5) {
+          t.deepEqual(tms[0].p, [4,5,6], "the 3 needs to be the 2nd placers");
+        }
+        else if (n === 7 || n === 8) {
+          t.deepEqual(tms[0].p, [7,8,9], "the 3 needs to be the group losers");
+        }
+        else {
+          t.ok(false, "should not be in this case");
+        }
+        t.ok(tb.isDone(), "tb done now");
+      };
+      verifyFinal(tb);
+      // verify serialization works as well
+      var tb2 = T.TieBreaker.fromJSON(tb.matches, res, n);
+      t.ok(tb2, "tb2 exists");
+      verifyFinal(tb2);
     }
   });
   t.end();
