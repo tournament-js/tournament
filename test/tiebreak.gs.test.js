@@ -60,11 +60,12 @@ test("gs 9 3 tied only between - proceed any", function (t) {
   var wins = $.nub($.pluck('wins', res)).sort($.compare(+1));
   t.deepEqual(wins, [0, 1, 2], "full spectrum of wins");
 
-  $.range(9).forEach(function (n) {
+  $.range(8).forEach(function (n) {
+    t.equal(T.TieBreaker.invalid(res, n), null, "configuration valid");
     var tb = new T.TieBreaker(res, n);
     var tms = tb.matches;
 
-    if ([3, 6, 9].indexOf(n) >= 0) {
+    if ([3, 6].indexOf(n) >= 0) {
       t.equal(tms.length, 0, "no TBs when picking equally from each group");
     }
     else {
