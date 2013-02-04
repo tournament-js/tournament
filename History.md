@@ -1,16 +1,16 @@
 PLANNED (most stuff in issue form now)
 ==================
-  * MULTISTAGE: `GroupStage` is the hard one in dev atm, see issues
   * move `ffa_cost` and `balancer` to own libraries?
+  * move `tieCompute` stuff from GroupStage and TieBreaker to groups algs
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
 
-0.11.0 / 2013-01-XX
+0.11.0 / 2013-02-04
 ==================
   * removed `logule` dependency - error messages can be provided by helpers completely now
   so it's unnecessary to break browserification
-  * `TieBreaker` module included for (currently only `GroupStage`) `limit` like functionality (docs to come)
+  * `TieBreaker` module included for (currently only `GroupStage`) `limit` like functionality (docs to come) for tiebreaking all the possible ties possible in GroupStage
   * removed `deep-equal` dependency (overkill solution)
   * reduced 3 player restriction on `GroupStage` to 3 (for tiebreaker scenario)
   * reduced 3 player restriction on `FFA` to 2 (for tiebreaker scenario)
