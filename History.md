@@ -6,6 +6,11 @@ PLANNED (most stuff in issue form now)
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
 
+0.11.1 / 2013-02-04
+==================
+  * removed spurious console.log in `TieBreaker`
+  * added a doc/ for this `TieBreaker` class
+
 0.11.0 / 2013-02-04
 ==================
   * removed `logule` dependency - error messages can be provided by helpers completely now
