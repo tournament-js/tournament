@@ -73,6 +73,8 @@ var gs = new t.GroupStage(16, 4); // 16 players in groups of 4
 At the end of a group stage, the `results()` will be sorted in order of points, then map wins.
 The positions therein will be tied based purely on points, however, so whether to act on map wins as a secondary ordering rather than manually tie-breaking is purely advisory.
 
+Manually tie-breaking can be done with the built in [`TieBreaker` class]('./doc/tiebreaker.md').
+
 ### Duel Elimination
 Duel elimination tournaments consist of two players / teams per match. after each match the winner is advanced to the right in the bracket, and if loser bracket is in use, the loser is put in the loser bracket.
 
