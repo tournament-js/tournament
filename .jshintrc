@@ -22,7 +22,6 @@
     "maxlen"        : 85,    // max line length
 
     // relaxing opts
-    "es5"           : true,  // allow ES5 features (keywords as propNames in partic.)
     "esnext"        : true,  // allow harmony syntax (const in partic.)
     "laxcomma"      : true,  // allow comma-first style
     "validthis"     : true,  // allow using this in non-constructor function

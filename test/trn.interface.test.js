@@ -17,11 +17,16 @@ var publics = ['WO', 'NA', 'WB', 'LB', 'TB', 'findMatch']
 
 var makeInstance = function (C) {
   switch (C.name) {
-    case 'Duel':        return new C(4, 1);
-    case 'FFA':         return new C(4, [4], []);
-    case 'KnockOut':    return new C(5, [2]);
-    case 'GroupStage':  return new C(8, 4);
-    default: throw new Error("invalid class: " + C.name);
+  case 'Duel':
+    return new C(4, 1);
+  case 'FFA':
+    return new C(4, [4], []);
+  case 'KnockOut':
+    return new C(5, [2]);
+  case 'GroupStage':
+    return new C(8, 4);
+  default:
+    throw new Error("invalid class: " + C.name);
   }
 };
 
