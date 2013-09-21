@@ -1,4 +1,4 @@
-# Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
+# Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament) [![Dependency Status](https://david-dm.org/clux/tournament.png)](https://david-dm.org/clux/tournament)
 
 Tournament is a pure library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players, viewing ongoing statistics, as well as providing the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
 
