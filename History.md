@@ -5,6 +5,12 @@ PLANNED (most stuff in issue form now)
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
+  * Proper API documentation
+
+
+0.12.0 / 2013-09-XX
+==================
+  * Added a bunch of helper methods on a common base class
 
 0.11.1 / 2013-02-04
 ==================
