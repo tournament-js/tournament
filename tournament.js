@@ -2,10 +2,10 @@ var helpers = require('./lib/public')
   , algs = require('./lib/balancer');
 
 var t = {
-  FFA: require('./lib/ffa'),
-  Duel: require('./lib/duel'),
-  KnockOut: require('./lib/knockout'),
-  GroupStage: require('./lib/groupstage'),
+  FFA: require('./ffa'),
+  Duel: require('./duel'),
+  KnockOut: require('./knockout'),
+  GroupStage: require('./groupstage'),
   TieBreaker: require('./lib/tiebreak_groups'),
 
   groups: algs.groups,
@@ -13,7 +13,9 @@ var t = {
 };
 
 Object.keys(helpers).forEach(function (key) {
-  t[key] = helpers[key];
+  if(key !== "prototype") {
+    t[key] = helpers[key];
+  }
 });
 
 module.exports = t;
