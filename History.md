@@ -12,6 +12,7 @@ PLANNED (most stuff in issue form now)
 ==================
   * Added a bunch of helper methods on a common base class
   * helper `t.findMatch(d.matches, id)` changed to be avilable on instance `d.findMatch(id)`
+  * Added instance methods `round` and `rounds` to get one or multiple rounds
 
 0.11.1 / 2013-02-04
 ==================
