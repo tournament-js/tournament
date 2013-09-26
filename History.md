@@ -11,6 +11,7 @@ PLANNED (most stuff in issue form now)
 0.12.0 / 2013-09-XX
 ==================
   * Added a bunch of helper methods on a common base class
+  * helper `t.findMatch(d.matches, id)` changed to be avilable on instance `d.findMatch(id)`
 
 0.11.1 / 2013-02-04
 ==================

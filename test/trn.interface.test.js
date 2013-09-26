@@ -10,11 +10,13 @@ var mains = {
   Duel : require('../duel')
 };
 
-var publics = ['WO', 'NA', 'WB', 'LB', 'TB', 'findMatch']
+var publics = ['WO', 'NA', 'WB', 'LB', 'TB']
   , commonStatics = ['invalid', 'idString', 'fromJSON']
   , commonMethods = ['score', 'unscorable', 'upcoming', 'results', 'isDone']
+  , baseMethods = ['findMatch', 'round', 'rounds']
   , commonMembers = ['matches', 'numPlayers'];
 
+// TODO: test TieBreaker
 var makeInstance = function (C) {
   switch (C.name) {
   case 'Duel':
@@ -42,7 +44,7 @@ var classHasCommons = function (C, t) {
   });
 
   var inst = makeInstance(C);
-  commonMembers.forEach(function (m) {
+  commonMembers.concat(baseMethods).forEach(function (m) {
     t.ok(inst[m] !== undefined, m + " member exists on inst of " + C.name);
     t.ok(inst[m] !== 'function', m + ' is a non-function on inst of ' + C.name);
   });
