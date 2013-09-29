@@ -120,8 +120,7 @@ test("group stage 50 10", function (t) {
 });
 
 test("upcoming 6 3", function (t) {
-  var g = new T.GroupStage(6, 3)
-    , ms = g.matches;
+  var g = new T.GroupStage(6, 3);
   // grps == [1,3,6] + [2,4,5]
   $.range(6).forEach(function (n) {
     var up = g.upcoming(n);

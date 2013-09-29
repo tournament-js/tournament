@@ -9,7 +9,7 @@ var t = {
   TieBreaker: require('./lib/tiebreak_groups'),
 
   groups: algs.groups,
-  robin: algs.robin,
+  robin: algs.robin
 };
 
 Object.keys(helpers).forEach(function (key) {
