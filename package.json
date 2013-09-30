@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "lint": "jshint lib test *.js",
-    "test": "tap test"
+    "test": "tap test/*.js"
   },
   "dependencies": {
     "interlude": "~1.0.2"
