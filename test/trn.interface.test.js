@@ -13,7 +13,7 @@ var mains = {
 var publics = ['WO', 'NA', 'WB', 'LB'] // TODO: these should not always exist
   , commonStatics = ['invalid', 'idString', 'fromJSON']
   , commonMethods = ['score', 'unscorable', 'upcoming', 'results', 'isDone']
-  , baseMethods = ['findMatch', 'round', 'rounds']
+  , baseMethods = ['findMatch', 'findMatches', 'rounds']
   , commonMembers = ['matches', 'numPlayers'];
 
 // TODO: test TieBreaker

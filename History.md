@@ -8,7 +8,7 @@ PLANNED (most stuff in issue form now)
   * Proper API documentation
 
 
-0.12.0 / 2013-09-XX
+0.12.0 / 2013-10-XX
 ==================
   * Added a bunch of helper methods on a common base class
   * helper `t.findMatch(d.matches, id)` changed to be avilable on instance `d.findMatch(id)`
