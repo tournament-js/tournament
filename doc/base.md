@@ -6,7 +6,7 @@ The matches can be inspected yourself, but you should not change the existing da
 
 In this document `d` refers to an instance of some `Base` subclass, i.e. either `Duel`, `FFA`, `GroupStage`, `TieBreaker`, or `KnockOut`.
 
-## Identical Methods
+## Common Methods
 ### Match helpers
 #### d::findMatch(id) :: Match
 The normal helper to get a match from the matches array if it exists.
@@ -17,11 +17,11 @@ var d = new t.Duel(4, t.WB);
 d.findMatch({s:t.WB, r:1, m:1});
 { id: { s: 1, r: 1, m: 1 }, p: [ 1, 4 ] }
 
-d.findMatch({s:t.LB, r:1, m:1});
+d.findMatch({s:t.WB, r:1, m:9});
 undefined
 ```
 
-#### d.findMatches(partialId) :: [Match]
+#### d.findMatches(idPartial) :: [Match]
 Find all matches for which the set properties of a partial id match.
 
 ```js
@@ -43,7 +43,7 @@ gs.findMatches({s:1}) // group 1
     p: [ 1, 4 ] } ]
 ```
 
-#### d.findMatchesRanged(lowerPartialId, upperPartialId) :: [Match]
+#### d.findMatchesRanged(lowerIdPartial, upperIdPartial) :: [Match]
 Find all matches for which the set lower and upper properties of two partial ids match.
 
 ```js
@@ -76,9 +76,12 @@ gs.findMatchesRanged({s:2}, {s:2, r:2}); // 1 <= round <= 2 matches in group 2
 #### currentRound([section]) :: round
 Returns the first round from `d.rounds(section)` where some match is not yet scored.
 
+NB: `d.currentRound()` may not return the same as `d.currentRound(specifiedSection)` because one section may have come further than the other.
+
 #### nextRound([section]) :: round
 Returns the first round after `d.currentRound(section)`.
 
+NB: `d.nextRound()` may not return the same as `d.nextRound(specifiedSection)` because one section may have come further than the other.
 
 ### Advanced Partitioning Methods
 The following two are advanced methods to partition the matches into an array of arrays of matches.
@@ -89,20 +92,18 @@ Partition the internal matches array into an array of rounds, optionally fixing 
 ```js
 var d = new t.Duel(4, t.LB);
 d.rounds(t.WB); // all rounds in the winners bracket
-[ [ { id: [Object], p: [Object] },
-    { id: [Object], p: [Object] } ],
-  [ { id: [Object], p: [Object] } ] ]
+[ [ { id: { s: 1, r: 1, m: 1 }, p: [ 1, 4 ] },
+    { id: { s: 1, r: 1, m: 2 }, p: [ 3, 2 ] } ],
+  [ { id: { s: 1, r: 1, m: 2 }, p: [ 0, 0 ] } ] ]
 
 
 var gs = new t.GroupStage(16, 4);
 gs.rounds(2)[0]; // first round in group 2
-[ { id: { s: 2, r: 1, m: 1 },
-    p: [ 2, 15 ] },
-  { id: { s: 2, r: 1, m: 2 },
-    p: [ 6, 11 ] } ]
+[ { id: { s: 2, r: 1, m: 1 }, p: [ 2, 15 ] },
+  { id: { s: 2, r: 1, m: 2 }, p: [ 6, 11 ] } ]
 ```
 
-#### sections([round]) :: [section1, section2, ...]
+#### d.sections([round]) :: [section1, section2, ...]
 Partition the internal matches array into an array of sections, optionally fixing `round`.
 
 ```js
@@ -120,7 +121,7 @@ gs.sections(1); // all round one matches partitioned by group
 
 
 ### Player Helpers
-#### matchesFor(seed) :: [Match]
+#### d.matchesFor(seed) :: [Match]
 Returns all the matches that currently contain the player with given `seed`.
 Can be used to track progress of a player.
 
@@ -131,18 +132,13 @@ d.score({s:1, r:1, m:2}, [0, 1]); // 3 << 2
 d.score({s:1, r:2, m:1}, [1, 0]); // 1 >> 2
 
 d.matchesFor(2);
-[ { id: { s: 1, r: 1, m: 2 },
-    p: [ 3, 2 ],
-    m: [ 0, 1 ] },
-  { id: { s: 1, r: 2, m: 1 },
-    p: [ 1, 2 ],
-    m: [ 1, 0 ] },
-  { id: { s: 2, r: 2, m: 1 },
-    p: [ 2, 0 ] } ]
+[ { id: { s: 1, r: 1, m: 2 }, p: [ 3, 2 ], m: [ 0, 1 ] },
+  { id: { s: 1, r: 2, m: 1 }, p: [ 1, 2 ], m: [ 1, 0 ] },
+  { id: { s: 2, r: 2, m: 1 }, p: [ 2, 0 ] } ]
 // Note that player 2 is waiting in LB final
 ```
 
-#### players(partialId) :: [seeds]
+#### d.players(partialId) :: [seeds]
 Returns all the unique players seed numbers found in the slice of the tournament with the partialId.
 Equivalent to flattened, unique'd array of players plucked from `this.findMatches(partialId)`.
 
@@ -152,8 +148,8 @@ gs.players({s:1}); // players in group 1
 [1, 5, 12, 16]
 ```
 
-#### resultsFor(seed) :: result entry
-Equivalent to calling results() and then finding only the entry with `.seed` === `seed`.
+#### d.resultsFor(seed) :: result entry
+Equivalent to calling results() and then picking out the entry with `.seed` === `seed`.
 
 ## Overridden Methods
 The behaviour of these methods change minimally between tournament types because they all call these methods.
@@ -196,12 +192,16 @@ Every result entry will at least contain:
 }
 ```
 
+But most tournament types will contain a good number of extra statistics.
+
 ## Custom Data
 If you want custom data stored on a match, the `data` keys is forever left free for you to set any data you want.
 
 ```js
+// ex: want to store the names and profile ids associated with the seeds on the match itself
 d.matches[0].data = {
   names: {1 : 'clux', 4: 'pibbz'},
   ids: {1: 3454354, 4: 123123}
 };
 ```
+h
