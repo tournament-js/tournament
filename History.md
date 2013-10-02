@@ -8,11 +8,13 @@ PLANNED (most stuff in issue form now)
   * Proper API documentation
 
 
-0.12.0 / 2013-10-XX
+0.12.0 / 2013-10-02
 ==================
   * Added a bunch of helper methods on a common base class
   * helper `t.findMatch(d.matches, id)` changed to be avilable on instance `d.findMatch(id)`
-  * Added instance methods `round` and `rounds` to get one or multiple rounds
+  * Instance method `d.findMatches(partialId)` added to find a set of "similar" matches
+  * Added instance methods `section()` and `rounds()` to help partition the `matches` array
+  * Bunch of default helper methods added on the base class see `base.md` in the doc dir
 
 0.11.1 / 2013-02-04
 ==================
