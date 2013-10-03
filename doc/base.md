@@ -138,9 +138,9 @@ d.matchesFor(2);
 // Note that player 2 is waiting in LB final
 ```
 
-#### d.players(partialId) :: [seeds]
-Returns all the unique players seed numbers found in the slice of the tournament with the partialId.
-Equivalent to flattened, unique'd array of players plucked from `this.findMatches(partialId)`.
+#### d.players(idPartial) :: [seeds]
+Returns all the unique players seed numbers found in the slice of the tournament with the partial id.
+Equivalent to flattened, unique'd array of players plucked from `this.findMatches(idPartial)`.
 
 ```
 var gs = new t.GroupStage(16, 4);
@@ -204,4 +204,3 @@ d.matches[0].data = {
   ids: {1: 3454354, 4: 123123}
 };
 ```
-h
