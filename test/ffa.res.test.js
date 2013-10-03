@@ -47,12 +47,7 @@ test("ffa 16 4 2", function (t) {
 
 
   // verify snd round filled in
-  var r2 = gs.filter(function (m) {
-    return m.id.r === 2;
-  });
-
-  var r2p = $.flatten($.pluck('p', r2)).sort($.compare());
-  t.deepEqual(r2p, $.range(8), "r2 players are winners of r1");
+  t.deepEqual(ffa.players({r:2}), $.range(8), "r2 players are winners of r1");
 
   // check r2 stats computed correctly
   var res2 = ffa.results();
@@ -97,12 +92,7 @@ test("ffa 16 4 2", function (t) {
   });
 
     // verify snd round filled in
-  var r3 = gs.filter(function (m) {
-    return m.id.r === 3;
-  });
-
-  var r3p = $.flatten($.pluck('p', r3)).sort($.compare());
-  t.deepEqual(r3p, $.range(4), "r3 players are winners of r2");
+  t.deepEqual(ffa.players({r:3}), $.range(4), "r3 players are winners of r2");
 
   var res3 = ffa.results();
   t.ok(res3, "got results 3");
@@ -239,12 +229,7 @@ test("ffa 81 3 1", function (t) {
   });
 
   // verify snd round filled in
-  var r2 = gs.filter(function (m) {
-    return m.id.r === 2;
-  });
-
-  var r2p = $.flatten($.pluck('p', r2)).sort($.compare());
-  t.deepEqual(r2p, $.range(27), "r2 players are winners of r1");
+  t.deepEqual(ffa.players({r:2}), $.range(27), "r2 players are winners of r1");
 
   // check r2 stats computed correctly
   var res2 = ffa.results();
@@ -284,13 +269,8 @@ test("ffa 81 3 1", function (t) {
     ffa.score({s: 1, r: 2, m: m}, [3, 2, 1]);
   });
 
-    // verify snd round filled in
-  var r3 = gs.filter(function (m) {
-    return m.id.r === 3;
-  });
-
-  var r3p = $.flatten($.pluck('p', r3)).sort($.compare());
-  t.deepEqual(r3p, $.range(9), "r3 players are winners of r2");
+  // verify snd round filled in
+  t.deepEqual(ffa.players({r:3}), $.range(9), "r3 players are winners of r2");
 
   var res3 = ffa.results();
   t.ok(res3, "got results 3");
@@ -341,13 +321,8 @@ test("ffa 81 3 1", function (t) {
     ffa.score({s: 1, r: 3, m: m}, [3, 2, 1]);
   });
 
-    // verify next round filled in
-  var r4 = gs.filter(function (m) {
-    return m.id.r === 4;
-  });
-
-  var r4p = $.flatten($.pluck('p', r4)).sort($.compare());
-  t.deepEqual(r4p, $.range(3), "r4 players are winners of r3");
+  // verify next round filled in
+  t.deepEqual(ffa.players({r:4}), $.range(3), "r4 players are winners of r3");
 
   var res4 = ffa.results();
   t.ok(res4, "got results 4");
@@ -409,10 +384,7 @@ test("ffa 81 3 1", function (t) {
   t.equal(ffa.unscorable({s: 1, r: 4, m: 1}, [3,2,1]), null, "gf scorable");
   ffa.score({s: 1, r: 4, m: 1}, [3, 2, 1]);
 
-  var r5 = gs.some(function (m) {
-    return m.id.r === 5;
-  });
-  t.ok(!r5, "r5 sohuld not exist");
+  t.deepEqual(ffa.findMatches({r:5}), [], "r5 should not exist");
 
   var res5 = ffa.results();
   t.ok(res5, "got results 5");
