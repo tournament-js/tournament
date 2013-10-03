@@ -12,7 +12,7 @@ test("ffa 16 4 2 fromJSON", function (t) {
   var ffa2 = T.FFA.fromJSON(gs);
 
   t.deepEqual(ffa.matches, ffa2.matches, "matches same");
-  t.deepEqual(ffa.adv, ffa2.adv, "advancers recalculated correctly");
+  t.deepEqual(ffa.advs, ffa2.advs, "advancers recalculated correctly");
   t.equal(ffa.numPlayers, ffa2.numPlayers, "numPlayers kept correctly");
 
   ffa2.matches.forEach(function (g) {
