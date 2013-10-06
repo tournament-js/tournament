@@ -202,7 +202,7 @@ else {
 }
 
 // administrator access - can rewrite history
-va reason = duel.unscorable(id, score, true); // 3rd param true for rewrite access
+var reason = duel.unscorable(id, score, true); // 3rd param true for rewrite access
 if (reason !== null) {
   console.log(reason); // parameters invalid in some normal way
 }
