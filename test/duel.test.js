@@ -389,9 +389,7 @@ test("upcoming/scorable 8 LB", function (t) {
     });
 
     // score
-    ms.filter(function (g) {
-      return (g.id.r === r && g.id.s === T.WB);
-    }).forEach(function (g) {
+    d.findMatches({s:T.WB, r:r}).forEach(function (g) {
       t.equal(d.unscorable(g.id, [1,0]), null, "WB R" + r + " are scorable");
       t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "scored m in R" + r);
     });
@@ -406,12 +404,8 @@ test("upcoming/scorable 8 LB", function (t) {
   var maxr = $.maximum($.pluck('r', $.pluck('id', ms)));
   $.range(maxr - 1).forEach(function (r) { // all rounds but gf2 round
 
-    var roundPls = $.nub($.flatten($.pluck('p', ms.filter(function (g) {
-      return (g.id.r === r && g.id.s === T.LB);
-    }))));
-
     // upcoming
-    roundPls.forEach(function (n) {
+    d.players({s: T.LB, r:r}).forEach(function (n) {
       t.ok(n >= T.NA, "player found was filled in and not a WO marker");
 
       var up = d.upcoming(n);
@@ -421,9 +415,7 @@ test("upcoming/scorable 8 LB", function (t) {
     });
 
     // check all matches in this round
-    ms.filter(function (g) {
-      return (g.id.r === r && g.id.s === T.LB);
-    }).forEach(function (g) {
+    d.findMatches({s:T.LB, r:r}).forEach(function (g) {
       t.equal(d.unscorable(g.id, [1,0]), null, "LB R" + r + " is scorable");
       t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "scored m in R" + r);
     });

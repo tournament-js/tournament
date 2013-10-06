@@ -25,12 +25,6 @@ test("ffa 16 4 2 fromJSON", function (t) {
 var getMaxLen = function (rnd) {
   return $.maximum($.pluck('length', $.pluck('p', rnd)));
 };
-var getRnd = function (gs, r) {
-  return gs.filter(function (g) {
-    return g.id.r === r;
-  });
-};
-
 
 // currently will also work if you put [7, 7, 7]
 // because group reduction is automatic like before
@@ -39,9 +33,9 @@ test("ffa 28 [7, 6, 6] [3, 3]", function (t) {
   var ffa = new T.FFA(28, [7, 6, 6], [3, 3])
     , gs = ffa.matches;
 
-  var r1 = getRnd(gs, 1)
-    , r2 = getRnd(gs, 2)
-    , r3 = getRnd(gs, 3);
+  var r1 = ffa.findMatches({r: 1})
+    , r2 = ffa.findMatches({r: 2})
+    , r3 = ffa.findMatches({r: 3});
 
   t.equal(r1.length, 4, "4 full rounds gets all 28 players in r1");
   t.equal(getMaxLen(r1), 7, "4x7 in r1");
@@ -62,8 +56,8 @@ test("ffa 32 8 2", function (t) {
   var ffa = new T.FFA(32, [8, 8], [2])
     , gs = ffa.matches;
 
-  var r1 = getRnd(gs, 1)
-    , r2 = getRnd(gs, 2);
+  var r1 = ffa.findMatches({r: 1})
+    , r2 = ffa.findMatches({r: 2});
 
   t.equal(r1.length, 4, "4 full rounds gets all 32 players in r1");
   t.equal(getMaxLen(r1), 8, "4x8 in r1");
@@ -80,8 +74,8 @@ test("ffa 25 5 1", function (t) {
   var ffa = new T.FFA(25, [5, 5], [1])
     , gs = ffa.matches;
 
-  var r1 = getRnd(gs, 1)
-    , r2 = getRnd(gs, 2);
+  var r1 = ffa.findMatches({r: 1})
+    , r2 = ffa.findMatches({r: 2});
 
   t.equal(r1.length, 5, "5 full rounds gets all 25 players in r1");
   t.equal(getMaxLen(r1), 5, "5x5 in r1");
@@ -100,9 +94,9 @@ test("ffa 28 7 3", function (t) {
   var ffa = new T.FFA(28, [7,6,6], [3,3])
     , gs = ffa.matches;
 
-  var r1 = getRnd(gs, 1)
-    , r2 = getRnd(gs, 2)
-    , r3 = getRnd(gs, 3);
+  var r1 = ffa.findMatches({r: 1})
+    , r2 = ffa.findMatches({r: 2})
+    , r3 = ffa.findMatches({r: 3});
 
   t.equal(r1.length, 4, "4 full rounds gets all 28 players in r1");
   t.equal(getMaxLen(r1), 7, "4x7 in r1");
@@ -122,9 +116,9 @@ test("ffa 28 7 3", function (t) {
   var ffa = new T.FFA(36, [6,6,6], [3,2])
     , gs = ffa.matches;
 
-  var r1 = getRnd(gs, 1)
-    , r2 = getRnd(gs, 2)
-    , r3 = getRnd(gs, 3);
+  var r1 = ffa.findMatches({r: 1})
+    , r2 = ffa.findMatches({r: 2})
+    , r3 = ffa.findMatches({r: 3});
 
   t.equal(r1.length, 6, "6 full rounds gets all 36 players in r1");
   t.equal(getMaxLen(r1), 6, "6x6 in r1");
@@ -144,9 +138,9 @@ test("ffa 49 7 3", function (t) {
   var ffa = new T.FFA(49, [7,7,6], [3,2])
     , gs = ffa.matches;
 
-  var r1 = getRnd(gs, 1)
-    , r2 = getRnd(gs, 2)
-    , r3 = getRnd(gs, 3);
+  var r1 = ffa.findMatches({r: 1})
+    , r2 = ffa.findMatches({r: 2})
+    , r3 = ffa.findMatches({r: 3});
 
   t.equal(r1.length, 7, "7 full rounds gets all 49 players in r1");
   t.equal(getMaxLen(r1), 7, "7x7 in r1");
@@ -166,11 +160,11 @@ test("ffa 16 4 3", function (t) {
   var ffa = new T.FFA(16, [4,4,3,3,4], [3,3,2,2])
     , gs = ffa.matches;
 
-  var r1 = getRnd(gs, 1)
-    , r2 = getRnd(gs, 2)
-    , r3 = getRnd(gs, 3)
-    , r4 = getRnd(gs, 4)
-    , r5 = getRnd(gs, 5);
+  var r1 = ffa.findMatches({r: 1})
+    , r2 = ffa.findMatches({r: 2})
+    , r3 = ffa.findMatches({r: 3})
+    , r4 = ffa.findMatches({r: 4})
+    , r5 = ffa.findMatches({r: 5});
 
   t.equal(r1.length, 4, "4 rounds gets all 16 players in r1");
   t.equal(getMaxLen(r1), 4, "4x4 in r1");
