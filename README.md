@@ -171,7 +171,7 @@ Matches in a group stage allow individual match draws. If this is unsuited to yo
 Matches in FFA tournaments only ensures it can discriminate between the last advancer and the first non-advancers. If these two scores are identical, the ambiguity is disallowed and `.score()` will return false (equivalently `unscorable()` will tell you this).
 
 ### NB: Duel Tournaments
-Duel tournaments does not allow ties at any stage. It's meant to eliminate all but one, so you have to do your own best of 3 / overtime methods etc to determine winners in case of draws.
+Duel tournaments does not allow ties at any stage. It's meant to _eliminate_, so you have to do your own best of 3 / overtime methods etc to determine winners in case of draws.
 
 ### NB: Knockouts
 KnockOuts allow for ties everywhere except between the first knocked out player and the last advancing player. In the final, ties are fully allowed, so multiple players can share the first place. Check for this if it's unsuited to your game/application.
