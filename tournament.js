@@ -2,6 +2,7 @@ var helpers = require('./lib/public')
   , algs = require('./lib/balancer');
 
 var t = {
+  Base: require('./lib/base'),
   FFA: require('./lib/ffa'),
   Duel: require('./lib/duel'),
   KnockOut: require('./lib/knockout'),
