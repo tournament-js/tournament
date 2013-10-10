@@ -11,6 +11,7 @@ PLANNED (most stuff in issue form now)
 0.XX.X / 2013-10-XX
 ==================
   * Exposed `Base` class for external implementors (with extra entry point for just this)
+  * Base class implements a default `score` - now used by `GroupStage`
 
 
 0.12.0 / 2013-10-02
