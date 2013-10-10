@@ -8,6 +8,11 @@ PLANNED (most stuff in issue form now)
   * Proper API documentation
 
 
+0.XX.X / 2013-10-XX
+==================
+  * Exposed `Base` class for external implementors (with extra entry point for just this)
+
+
 0.12.0 / 2013-10-02
 ==================
   * Added a bunch of helper methods on a common base class
