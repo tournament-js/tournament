@@ -11,6 +11,9 @@ Each tournament implementation inherits from a common base class. A large amount
 In this document `d` refers to an instance of some `Base` subclass, i.e. `Duel`, `FFA`, `GroupStage`, `TieBreaker`, or `KnockOut`.
 
 # Base class
+
+    Stability: 2 - Unstable
+
 ## Match methods
 The entire matches array is available on `d.matches`, but using this structure directly may lead to surprises and confusion - even for people who understand all the details.
 

@@ -66,6 +66,27 @@ var score = function (id, score) {
 ### groupFor(seedNumber) :: [Match]
 Get all the matches in the group that a given player is in.
 
+## Special helpers
+If you are requiring the tournament under the full entry point (i.e. `var t = require('tournament')`) then the meaty algorithms behind splitting up a list of seeds into fair groups and round robin scheduling for a group of size `n` are exposed for your experimental needs:
+
+### t.groups(numPlayers, groupSize) :: [Groups]
+
+```js
+t.groups(15, 5); // 15 players in groups of 5
+[ [ 1, 4, 7, 12, 15 ],
+  [ 2, 5, 8, 11, 14 ],
+  [ 3, 6, 9, 10, 13 ] ]
+```
+
+### t.robin(numPlayers) :: [Rounds]
+
+```js
+t.robin(4); // 4 player round robin pairups
+[ [ [ 1, 4 ], [ 2, 3 ] ],   // round 1
+  [ [ 1, 3 ], [ 4, 2 ] ],   // round 2
+  [ [ 1, 2 ], [ 3, 4 ] ] ]  // round 3
+```
+
 ## Caveats
 ### End results
 Acting on end results in a group stage is sometimes problematic. Ties are allowed, and complex, unexpected results can cause multi-way ties (it is possible for an entire group to tie), and `results()` even if ties have been disallowed. We cannot sensibly compensate for that without additional input:
@@ -82,7 +103,7 @@ Unlike any other tournament `GroupStage` can compute results in a variable manne
 ```
 
 #### Tiebreaking
-But in some cases, even this is insufficient. For this you need to forward the `gs.results()` to a [`TieBreaker` tournament](./tiebreaker.md).
+But in some cases, even this is insufficient. For this you need to forward the `gs.results()` to a [`TieBreaker` tournament](./tiebreaker.md). This tournament can also be used as a test of whether or not tiebreaking is needed.
 
 ### Seeding and groups
 Like for most other tournaments, seeding is important. The initial player partitioning into groups is done in such a way so that there is a variety of differently skilled players:

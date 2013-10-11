@@ -1,4 +1,8 @@
 # TieBreaker
+
+    Stability: 1 - Experimental
+
+## Overview
 The `TieBreaker` class is a tournament type that slightly differs from all the others, in that it cannot be created from scratch, but rather from the results of a finished `GroupStage` only. To see why this tournament type is better to have than just a `limit` parameter for `GroupStage` consider the following.
 
 ## GroupStage Results
