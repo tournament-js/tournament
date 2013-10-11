@@ -1,8 +1,14 @@
 # GroupStage
 
-Group stages are preliminary tournaments designed to pick out the best players by splitting them up in fair groups of requested size. They are advantageous compared to eliminations because they guarantee at least `groupSize-1` matches per player as opposed to `Duel` which guarantee only one or two (in double elimination).
+    Stability: 3 - Stable
 
-GroupStage tournaments are simple, customizable, and add an interesting filter to other tournaments. This class is well tested and stable.
+## Overview
+GroupStage is a simple and customizable way to add a preliminary stage to a tournament.
+A group stage is designed to pick out the best players by first splitting them up in fair groups of requested size, then round robin schedule each group.
+
+They are advantageous compared to eliminations because they guarantee exactly `groupSize-1` matches per player. A `Duel` tournament, by contrast, only guarantees at least one or two matches (latter in double elimination mode), whereas a full round robin scheduled league forces everyone to battle everyone, and no final matches are played.
+
+By combining a group stage with a later elimination round, the best players get picked out for an exciting finale.
 
 ## Construction
 Specify the number of players and the group size.

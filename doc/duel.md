@@ -1,7 +1,13 @@
 # Duel tournaments
 
-Duel elimination tournaments are the simplest and most well-defined tournaments you can play.
-This class is well tested and stable.
+    Stability: 3 - Stable
+
+## Overview
+Duel elimination tournaments consist of two players / teams per match. after each match the winner is advanced to the right in the bracket, and if loser bracket is in use, the loser is put in the loser bracket.
+
+Duel tournaments can be of any size although perfect powers of 2 are the nicest because they are perfectly balanced. That said, the module will fill out the gaps with walkover markers (`-1`) and will run an unbalanced tournament in the fairest possible way. Unbalanced tournaments typically benefits the highest seeds as these are the players receiving walk-overs in the first round.
+
+A nice property of this duel tournament implementation is that if the seeding is perfect (i.e. if player a is seeded higher than player b, then player a wins over player b) then the top X in the results are also the top X seeded players. As an example, seed 1 can only meet seed 2 in the final in single elimination.
 
 ## Efficiency Tip
 If you are *ONLY* using duel tournaments and not any other type, you should require the specific duel entrypoint rather than the full tournament. If you are browserifying the module, this will reduce the amount of code you send to your browser.
