@@ -61,23 +61,23 @@ d.results();
 ## Tournament Types
 ### Duel Elimination
 Allows for single elimination, and double elimination (both winners and losers bracket) variants.
-See [duel documentation](./duel.md).
+See [duel documentation](./doc/duel.md).
 
 ### FFA Elimination
 Allows for single elimination mode with many players per match.
-See [ffa documentation](./ffa.md).
+See [ffa documentation](./doc/ffa.md).
 
 ### KnockOut
 Allows for repeated matches knocking out a subset of the players each round.
-See [knockout documentation](./knockout.md).
+See [knockout documentation](./doc/knockout.md).
 
 ### GroupStage
 A simple set of matches that are round robin scheduled after splitting matches into fair groups.
-See [groupstage documentation](./groupstage.md).
+See [groupstage documentation](./doc/groupstage.md).
 
 ### TieBreaker
 A sometime non-zero set of matches needed to pick out the top `n` players from a tied `GroupStage`
-See [tiebreaker documentation](./tiebreaker.md).
+See [tiebreaker documentation](./doc/tiebreaker.md).
 
 
 ## Inspecting Matches
