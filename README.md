@@ -2,9 +2,6 @@
 
 Tournament is a pure library for managing the state and generating statistics for a collection of matches in a tournament. Tournaments are created up front and are mutated simply by scoring individual matches. State can be serialized/deserialized via a simple interface.
 
-
-Tournament is a pure library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players, viewing ongoing statistics, as well as providing the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
-
 ## Usage
 Create a new tournament instance from the class at the respective tournament type entry point, then interact with helper functions to score and calculate results.
 
@@ -67,11 +64,11 @@ true
 ```
 
 ## Tournament API
-- [Duel](./doc/duel.md) Elimination
-- [FFA](./doc/ffa.md) Elimination
+- [Duel Elimination](./doc/duel.md)
+- [FFA Elimination](./doc/ffa.md)
 - [KnockOut](./doc/knockout.md)
 - [GroupStage](./doc/groupstage.md)
-- [TieBreaker](./doc/tiebreaker.md) for `GroupStage`
+- [TieBreaker](./doc/tiebreaker.md) for GroupStage
 - [Base](./doc/base.md)
 
 ## Inspecting Matches
