@@ -1,5 +1,8 @@
 # Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament) [![Dependency Status](https://david-dm.org/clux/tournament.png)](https://david-dm.org/clux/tournament)
 
+Tournament is a pure library for managing the state and generating statistics for a collection of matches in a tournament. Tournaments are created up front and are mutated simply by scoring individual matches. State can be serialized/deserialized via a simple interface.
+
+
 Tournament is a pure library for creating and managing match objects in extended competitive events. In particular it creates fair, round robin scheduled group stages, single & double elimination duel tournaments, FFA elimination tournaments and knockout tournaments. It includes easy helper functions for scoring of matches, tracking players, viewing ongoing statistics, as well as providing the matches in a simple JSON format that can be used to completely serialize the tournament and later deserialize it back.
 
 ## Usage
@@ -56,17 +59,20 @@ d.results();
     maps: 0,
     wins: 0,
     pos: 4 } ]
+
+// can serialize via usual toString method, or implicitly:
+var serialized = d + '';
+t.parse(serialized) instanceof Duel;
+true
 ```
 
 ## Tournament API
-- [Duel](./doc/duel.md) - allows for single elimination, and double elimination (both winners and losers bracket) variants
-- [FFA](./doc/ffa.md) - allows for single elimination mode with many players per match.
-- [KnockOut](./doc/knockout.md) - allows for repeated matches knocking out a subset of the players each round
-- [GroupStage](./doc/groupstage.md) - a simple set of matches that are round robin scheduled after splitting matches into fair groups
-- [TieBreaker](./doc/tiebreaker.md) - a sometimes non-zero set of matches needed to pick out the top `n` players from a tied `GroupStage`
-- [Base](./doc/base.md) - the tounament base class for additional tournament type implementors
-
-
+- [Duel](./doc/duel.md) Elimination
+- [FFA](./doc/ffa.md) Elimination
+- [KnockOut](./doc/knockout.md)
+- [GroupStage](./doc/groupstage.md)
+- [TieBreaker](./doc/tiebreaker.md) for `GroupStage`
+- [Base](./doc/base.md)
 
 ## Inspecting Matches
 All tournament types have a `.matches` member that can be inspected and used for UI creation.
