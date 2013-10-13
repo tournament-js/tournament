@@ -58,26 +58,14 @@ d.results();
     pos: 4 } ]
 ```
 
-## Tournament Types
-### Duel Elimination
-Allows for single elimination, and double elimination (both winners and losers bracket) variants.
-See [duel documentation](./doc/duel.md).
+## Tournament API
+- [Duel](./doc/duel.md) - allows for single elimination, and double elimination (both winners and losers bracket) variants
+- [FFA](./doc/ffa.md) - allows for single elimination mode with many players per match.
+- [KnockOut](./doc/knockout.md) - allows for repeated matches knocking out a subset of the players each round
+- [GroupStage](./doc/groupstage.md) - a simple set of matches that are round robin scheduled after splitting matches into fair groups
+- [TieBreaker](./doc/tiebreaker.md) - a sometimes non-zero set of matches needed to pick out the top `n` players from a tied `GroupStage`
+- [Base](./doc/base.md) - the tounament base class for additional tournament type implementors
 
-### FFA Elimination
-Allows for single elimination mode with many players per match.
-See [ffa documentation](./doc/ffa.md).
-
-### KnockOut
-Allows for repeated matches knocking out a subset of the players each round.
-See [knockout documentation](./doc/knockout.md).
-
-### GroupStage
-A simple set of matches that are round robin scheduled after splitting matches into fair groups.
-See [groupstage documentation](./doc/groupstage.md).
-
-### TieBreaker
-A sometime non-zero set of matches needed to pick out the top `n` players from a tied `GroupStage`
-See [tiebreaker documentation](./doc/tiebreaker.md).
 
 
 ## Inspecting Matches
