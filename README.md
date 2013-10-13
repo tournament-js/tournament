@@ -58,10 +58,6 @@ d.results();
     wins: 0,
     pos: 4 } ]
 
-// can serialize via usual toString method, or implicitly:
-var serialized = d + '';
-t.parse(serialized) instanceof Duel;
-true
 ```
 
 ## Tournament API
