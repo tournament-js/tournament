@@ -3,7 +3,7 @@
 Tournament is a pure library for managing the state and generating statistics for a collection of matches in a tournament. Tournaments are created up front and are mutated simply by scoring individual matches. State can be serialized/deserialized via a simple interface.
 
 ## Usage
-Create a new tournament instance from the class at the respective tournament type entry point, then interact with helper functions to score and calculate results.
+Create a new tournament instance from one of the exposed classes, then interact with helper functions to score and calculate results.
 
 ```js
 var t = require('tournament');
@@ -19,6 +19,7 @@ d.matches; // in playable order
   { id: { s: 2, r: 1, m: 1 }, // bronze final
     p: [ 0, 0 ] } ]
 
+// let's pretend we scored these individually in a more realistic manner
 d.matches.forEach(function (m) {
   d.score(m.id, [1, 0]);
 });
