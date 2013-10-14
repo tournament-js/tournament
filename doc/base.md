@@ -15,7 +15,29 @@ In this document `d` refers to an instance of some `Base` subclass, i.e. `Duel`,
     Stability: 2 - Unstable
 
 ## Match methods
-The entire matches array is available on `d.matches`, but using this structure directly may lead to surprises and confusion - even for people who understand all the details.
+The entire matches array is available on `d.matches`:
+
+### d.matches :: [Match]
+Each element in the match array contain something like the following:
+
+```js
+var match = ffa.matches[0]; // example scored FFA match with 4 players
+match;
+{ id: { s: 1, r: 1, m: 1 },
+  p: [ 1, 5, 12, 16 ] // these 4 seeds play
+, m: [ 4, 3, 2, 1 ] } // these are their scores (in order of players above)
+```
+
+Note that:
+
+- `Array.isArray(match.m)` if and only if `match` is `.score()`d
+- `match.p` contains the array of players for this match
+- `match.id` contains `s`, `r` and `m` properties for "section", "round" and "match"
+
+
+The players array is their seed numbers. You need to store a map from external player ids to tournament seeds somewhere (maybe on each instance and/or match). Seeding is important as the most tournament types contain strong algorithms to balance matches early on, ensuring the most interesting ones come later on.
+
+The full `.matches` array is sorted in by comparing first `s` then `r` then `m`. This means a Double elimination duel tournament would have WB matches listed first in order of rounds. Thus, they are listed like you would look at a typical printed bracket representation, down each round, one round right, repeat down then right, next bracket, repeat.
 
 ### d::findMatch(id) :: Match
 The normal helper to get a match from the matches array if it exists. Returns either a single match, or undefined.
@@ -160,7 +182,7 @@ gs.players({s:1}); // players in group 1
 ### d.results() :: [Result]
 Return the current minimally guaranteed results for each player in the tournament, sorted by current minimally attained position.
 
-Depending on the tournament type, this may or may not be able to compute positions until the tournament is completely done.
+Results can be generated at any stage in a tournament. If called before `d.isDone()`, the position (`.pos`) will represent the current guaranteed to attain position in the tournament (if everything other match was lost).
 
 Every result entry will minimally contain:
 
@@ -174,26 +196,54 @@ Every result entry will minimally contain:
 
 But most tournament types will contain a good number of extra statistical properties.
 
+#### Example
+```js
+var duel = new t.Duel(8, 1);
+duel.matches.forEach(function (m) {
+  duel.score(m.id, [2, 1]); // upper player always proceeds and gets 2 to 1 map points
+});
+duel.results().slice(0, 4); // get top 4
+[ { seed: 1, maps: 6, wins: 3, pos: 1 }, // player 1 wins everything always on top
+  { seed: 3, maps: 5, wins: 2, pos: 2 },
+  { seed: 5, maps: 5, wins: 2, pos: 3 }, // player 5 won bronze final
+  { seed: 7, maps: 4, wins: 1, pos: 4 } ]
+```
+
 ### d.resultsFor(seed) :: result entry
 Get the results for just a single player in the tournament.
 
 ### d.upcoming(playerId) :: Match
 Return the upcoming match for the next player if it exists.
 
+```js
+var duel = new t.Duel(4, 1, {short: true}); // 4 player single elim without bronze final
+duel.score({ s: 1, r: 1, m: 1}, [1, 0]); // this match is player 1 vs. player 4
+
+duel.upcoming(1); // 1 advanced to semi
+{ s: 1, r: 2, m: 1}
+
+duel.upcoming(4); // 4 was knocked out
+undefined
+```
 
 ## Progress methods
-### d.score(id, mapScore, allowPast) :: Boolean
-The *only* way to move the tournament along. Sets `mapScore` on the match (with given `id`) `.m` property provided `unscorable()` did not complain.
+### d.score(matchId, mapScore, allowPast) :: Boolean
+The *only* way to move the tournament along. Sets `mapScore` on the match's `.m` property, provided `unscorable()` did not complain.
 If `unscorable()` returns a String, this method will return `false` and log this string.
 Otherwise, this method will return true, and update the match.
 
-Depending on the tournament type, this may or may not trigger player propagation to later rounds/sections.
+Depending on the tournament type, this may or may not trigger player propagation to later rounds/sections. Note that the `mapScore` is an array that is expected to zip with the players array in that match:
+
+```js
+var m = duel.matches[0]; // first match of some duel tournament
+duel.score(m.id, [2, 1]); // m.p[0] won 2 - 1 over m.p[1]
+```
 
 #### Note for implementors
 This method SHOULD be manually implemented in the sub class with the same signature. If it is implemented, the `Base` implementation MUST NOT be called in the new implementation.
 
-### d.unscorable(id, mapScore, allowPast) :: String || Null
-Return the String reason why the match with the given `id` cannot be `score()`d with the current `mapScore`.
+### d.unscorable(matchId, mapScore, allowPast) :: String || Null
+Return the String reason why the match with the given `matchId` cannot be `score()`d with the current `mapScore`.
 
 If scoring is safe, this function will return `null`. Always guard on this to ensure `score()` succeeds. If `score()` is attempted without this check, `score()` will simply log the error reason and not do the scoring.
 
@@ -207,7 +257,8 @@ This usually means that all the matches have been played (`Duel` tournaments are
 
 
 # Common conventions
-## Custom Data
+## Custom data
+### Match data
 If you want custom data stored on a match, the `data` keys is forever left free for you to set any data you want.
 
 ```js
@@ -216,6 +267,17 @@ d.matches[0].data = {
   names: {1 : 'clux', 4: 'pibbz'},
   ids: {1: 3454354, 4: 123123}
 };
+```
+
+### Tournament data
+More global custom data can be stored on the tournament instance directly under the reserved `data` key.
+
+```js
+var d = new t.Duel(4, t.WB);
+d.data = {
+  players: { 'clux': 1, 'Thhethssmuz': 2, 'e114': 3, 'pibbz': 4 }
+};
+// when serializing the tournament this is now saved
 ```
 
 ## Ensuring Scorability & Consistency
@@ -281,3 +343,31 @@ else {
   return false;
 }
 ```
+
+## UI Helpers
+### Match Representation
+Every tournament type has a static `.idString()` method that takes an `id` of any match in a tournament. This will create a unique string representation for that match differing slightly depending on tournament type.
+
+```js
+t.Duel.idString({s: t.LB, r: 2, m: 3});
+"LB R2 M3"
+
+t.FFA.idString({s: 1, r: 3, m: 2});
+"R3 M2"
+
+t.GroupStage.idString({s: 5, r: 2, m: 1});
+"G5 R5 M1"
+
+t.KnockOut.idString({s: 1, r:2, m: 1});
+"R2"
+```
+
+#### Note for implementors
+This function MUST be implemented and placed on the constructor's `idString` property.
+
+
+## Serialization
+TODO: explain new method
+
+## Multi-Stage Tournaments
+Some manual support through `limit` and `GroupStage`-`TieBreaker` interaction. Follow the [multi-stage issue](https://github.com/clux/tournament/issues/1)
