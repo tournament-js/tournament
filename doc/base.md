@@ -369,5 +369,6 @@ This function MUST be implemented and placed on the constructor's `idString` pro
 ## Serialization
 TODO: explain new method
 
+
 ## Multi-Stage Tournaments
 Some manual support through `limit` and `GroupStage`-`TieBreaker` interaction. Follow the [multi-stage issue](https://github.com/clux/tournament/issues/1)

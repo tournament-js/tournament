@@ -17,12 +17,14 @@ Object.keys(helpers).forEach(function (key) {
   t[key] = helpers[key];
 });
 
+// A general parser that will find out which tournament type to parse it as
 t.parse = function (str) {
   var data = JSON.parse(str);
-  if (!data.type) {
-    throw new Error("Cannot deserialize tournaments stored in the pre 2.0 way");
+  if (data.type == null) {
+    // NB: First time parsing of old ones need to go to the specific class
+    throw new Error("Need to migrate over pre1.0 serialized tournaments");
   }
-  if (!t[data.type]) {
+  if (typeof t[data.type] !== 'function') {
     throw new Error("Invalid tournament type: " + data.type);
   }
   return t[data.type].parse(data);

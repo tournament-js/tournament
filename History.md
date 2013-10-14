@@ -5,13 +5,18 @@ PLANNED (most stuff in issue form now)
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
-  * Proper API documentation
+  * move groupstage and tiebreaker into its own and entagle them
+  * move out FFA/Duel/KnockOut into own libraries
+  * once that done, can REGISTER libraries with tourament OR drop the global `parse`
+  * that way can load individual base classes.. not great but works..
 
 
-0.XX.X / 2013-10-XX
+0.13.0 / 2013-10-XX
 ==================
   * Exposed `Base` class for external implementors (with extra entry point for just this)
   * Base class implements a default `score` - now used by `GroupStage`
+  * Serialization now uses `inst.toString()` and `t.parse(str)`
+  * Migration to new format should be done THROUGH this version, `fromJSON` will be gone in next.
 
 
 0.12.0 / 2013-10-02

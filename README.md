@@ -57,9 +57,16 @@ d.results();
 - [TieBreaker](./doc/tiebreaker.md) for GroupStage
 
 ## Installation
+For node server usage:
 
 ```bash
-$ npm install tournament
+$ npm install tournament --save
+```
+
+For the browser, bundle it up with [browserify](https://npmjs.org/package/browserify), say:
+
+```bash
+$ browserify -r tournament > bundle.js
 ```
 
 ## Running tests
