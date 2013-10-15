@@ -10,14 +10,14 @@ PLANNED (most stuff in issue form now)
   * once that done, can REGISTER libraries with tourament OR drop the global `parse`
   * that way can load individual base classes.. not great but works..
 
-0.15.0 / 2013-10-XX
+0.15.0 / 2013-10-15
 ==================
   * tournament no longer exports any tournament types, but only the `Base` class
   * see modules:
    - [duel](https://npmjs.org/package/duel)
    - [ffa](https://npmjs.org/package/ffa)
-   - [groupstage](https://npmjs.org/package.groupstage)
-   - ?knockout?
+   - [groupstage](https://npmjs.org/package/groupstage)
+   - [masters](https://npmjs.org/package/masters)
 
 0.14.0 / 2013-10-15
 ==================
