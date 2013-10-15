@@ -10,6 +10,12 @@ PLANNED (most stuff in issue form now)
   * once that done, can REGISTER libraries with tourament OR drop the global `parse`
   * that way can load individual base classes.. not great but works..
 
+
+0.15.1 / 2013-10-XX
+==================
+  * tests now remaining - now tests consistency of the 4 factored out modules
+
+
 0.15.0 / 2013-10-15
 ==================
   * tournament no longer exports any tournament types, but only the `Base` class
