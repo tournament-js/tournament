@@ -6,8 +6,8 @@ Tournament is a pure library for managing the state and generating statistics fo
 Create a new tournament instance from one of the exposed classes, then interact with helper functions to score and calculate results.
 
 ```js
-var t = require('tournament');
-var d = new t.Duel(4, 1); // 4 players - single elimination
+var Duel = require('tournament').Duel;
+var d = new Duel(4, Duel.WB); // 4 players - single elimination
 
 d.matches; // in playable order
 [ { id: { s: 1, r: 1, m: 1 }, // semi 1
