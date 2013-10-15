@@ -5,11 +5,9 @@ PLANNED (most stuff in issue form now)
   * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
-  * move groupstage and tiebreaker into its own and entagle them
-  * move out FFA/Duel/KnockOut into own libraries
-  * once that done, can REGISTER libraries with tourament OR drop the global `parse`
-  * that way can load individual base classes.. not great but works..
-
+  * move issues and this stuff over to correct libraries
+  * rename masters? it's dumb..
+  * fix up docs, and add an implementors.md
 
 0.15.1 / 2013-10-XX
 ==================
