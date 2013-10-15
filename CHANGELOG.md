@@ -16,7 +16,7 @@ PLANNED (most stuff in issue form now)
 ==================
   * Exposed `Base` class for external implementors (with extra entry point for just this)
   * Base class implements a default `score` - now used by `GroupStage`
-  * Serialization now uses `inst.toString()` and `t.parse(str)`
+  * Serialization now uses `inst.toString()` and `Klass.parse(str)`
   * Migration to new format should be done THROUGH this version, `fromJSON` will be gone in next.
   * `WB`, `LB` and `WO` now only available on `Duel` class not on every entry point.
   * `NA` constant removed - instead added `trn.isPlayable(match)` helper

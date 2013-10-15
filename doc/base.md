@@ -382,7 +382,16 @@ This function MUST be implemented and placed on the constructor's `idString` pro
 
 
 ## Serialization
-TODO: explain new method
+Every tournament instance can be coerced into a string sensibly:
+
+```js
+var trn = new FFA(16, [4, 4, 4], [2, 2]);
+var serialized = trn.toString();
+
+var trn2 = FFA.parse(serialized);
+```
+
+Here trn2 and trn are identical. Match progression and custom data is preserved.
 
 
 ## Multi-Stage Tournaments
