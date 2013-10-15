@@ -5,21 +5,11 @@
 ## Overview
 Knockout tournaments consist of a pool of players, repeatedly fighting against each other and gradually reducing the number of players each round. We specify the number of players to knock out each round as an array of integers.
 
-## Efficiency Tip
-If you are *ONLY* using KnockOut tournaments and not any other type, you should require the specific knockout entrypoint rather than the full tournament. If you are browserifying the module, this will reduce the amount of code you send to your browser.
-
-```
-var t = require('tournament'); // full
-var t = require('tournament/knockout'); // ko only entry point
-```
-
-As far as this doc is concerned, the contents on this variable is identical.
-
 ## Construction
 Simply specify the number of players and an array of numbers to knock out per rounds. The resulting tournament will have the same number of matches as that array's length + 1.
 
 ```js
-var ko = new t.KnockOut(10, [3, 2, 2]);
+var ko = new KnockOut(10, [3, 2, 2]);
 ```
 
 This example will create a 10 player match in round 1, a 7 player match in round 2, a 5 player match in round 3, and a 3 player final.

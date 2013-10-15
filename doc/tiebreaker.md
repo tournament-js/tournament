@@ -8,7 +8,7 @@ The `TieBreaker` class is a tournament type that slightly differs from all the o
 ## GroupStage Results
 Unlike every other tournament type, `GroupStage` cannot give out current positions in `results()` via the `.pos` attribute. This is because so many different combinations of ties are possible - both within groups, and between groups - that winning a few matches may not always result in a net increase in `.pos`. Instead, `GroupStage` needs all the matches played before `.pos` and `gpos` is calculated.
 
-To illustrate the current behaviour, consider a fully scored 8 players `GroupStage` with 2 groups of 4 players in each, i.e. `new t.GroupStage(8, 4)`. This will create groups via `t.groups(8,4)` and round robin schedule each group via `t.robin(4, playerAry)` i.e. 6 matches over 3 rounds per group.
+To illustrate the current behaviour, consider a fully scored 8 players `GroupStage` with 2 groups of 4 players in each, i.e. `new GroupStage(8, 4)`. This will create groups via `t.groups(8,4)` and round robin schedule each group via `t.robin(4, playerAry)` i.e. 6 matches over 3 rounds per group.
 
 We score:
 
@@ -86,7 +86,7 @@ I.e. the final `GroupStage` group positions were:
 So if we want the top six to advance, then we need to split up the cluster in group 1:
 
 ```js
-var tb = new t.TieBreaker(gs.results(), 6);
+var tb = new TieBreaker(gs.results(), 6);
 tb.matches;
 [ { id: { s: 0, r: 1, m: 1 }, p: [ 1, 6, 8 ] } ]
 ```
@@ -96,7 +96,7 @@ Only the first three-way tie between players [1,6,8] must be resolved. The three
 However, if you requested the top 4:
 
 ```js
-var tb = new t.TieBreaker(gs.results(), 4);
+var tb = new TieBreaker(gs.results(), 4);
 tb.matches;
 [ { id: { s: 0, r: 1, m: 1 }, p: [ 1, 6, 8 ] },
   { id: { s: 0, r: 1, m: 2 }, p: [ 4, 5, 7 ] } ]
@@ -108,7 +108,7 @@ Both three-way ties must here be resolved.
 An even more complicated case is when you want to advance a number that is not actually a multiple of the number of groups:
 
 ```js
-var tb = new t.TieBreaker(gs.results(), 5);
+var tb = new TieBreaker(gs.results(), 5);
 tb.matches;
 [ { id: { s: 0, r: 1, m: 1 }, p: [ 1, 6, 8 ] },
   { id: { s: 0, r: 1, m: 2 }, p: [ 4, 5, 7 ] },

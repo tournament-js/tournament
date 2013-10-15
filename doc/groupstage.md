@@ -15,10 +15,10 @@ Specify the number of players and the group size.
 
 ```js
 // 16 players in groups of 4
-var gs1 = new t.GroupStage(16, 4);
+var gs1 = new GroupStage(16, 4);
 
 // 9 players in groups of 3
-var gs2 = new t.GroupStage(9, 3);
+var gs2 = new GroupStage(9, 3);
 ```
 
 The `GroupStage.invalid(numPlayers, groupSize)` will tell you whether the constructor arguments produce a valid tournament. Read its entry in the [tournament commonalities doc](./base.md#ensuring-constructibility) for info on this.
