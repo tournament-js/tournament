@@ -12,7 +12,7 @@ PLANNED (most stuff in issue form now)
   * `new` protection in all subclasses
 
 
-0.13.0 / 2013-10-XX
+0.13.0 / 2013-10-15
 ==================
   * Exposed `Base` class for external implementors (with extra entry point for just this)
   * Base class implements a default `score` - now used by `GroupStage`
