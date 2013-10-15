@@ -9,6 +9,7 @@ PLANNED (most stuff in issue form now)
   * move out FFA/Duel/KnockOut into own libraries
   * once that done, can REGISTER libraries with tourament OR drop the global `parse`
   * that way can load individual base classes.. not great but works..
+  * `new` protection in all subclasses
 
 
 0.13.0 / 2013-10-XX
@@ -18,7 +19,7 @@ PLANNED (most stuff in issue form now)
   * Serialization now uses `inst.toString()` and `t.parse(str)`
   * Migration to new format should be done THROUGH this version, `fromJSON` will be gone in next.
   * `WB`, `LB` and `WO` now only available on `Duel` class not on every entry point.
-  * `NA` constant removed - instead new helpers for this will be included TODO
+  * `NA` constant removed - instead added `trn.isPlayable(match)` helper
 
 
 0.12.0 / 2013-10-02

@@ -35,6 +35,7 @@ Note that:
 
 - `Array.isArray(match.m)` if and only if `match` is `.score()`d
 - `match.p` contains the array of players for this match
+- `match` is ready to be played if and only if `trn.isPlayable(match)`
 - `match.id` contains `s`, `r` and `m` properties for "section", "round" and "match"
 
 
@@ -53,6 +54,18 @@ d.findMatch({s:1, r:1, m:1});
 
 d.findMatch({s:1, r:1, m:9});
 undefined
+```
+
+### trn.isPlayable(match) :: Boolean
+If all the players have been propagated into the players (`.p`) array, then the match is playable:
+
+```js
+var d = new Duel(4, Duel.WB);
+d.isPlayable(d.matches[0]); // first match gets prepared in immediately
+true
+
+d.isPlayable(d.findMatch({s:1, r:2, m:1})); // but round 2 is not ready until round 1 is scored
+false
 ```
 
 ### trn.findMatches(idPartial) :: [Match]
