@@ -11,18 +11,17 @@ PLANNED (most stuff in issue form now)
   * that way can load individual base classes.. not great but works..
 
 
-0.14.0 / 2013-10-XX
+0.14.0 / 2013-10-15
 ==================
-  * `new` protection in all subclasses
+  * `new` protection for all subclasses
   * `fromJSON` remoted, use version "0.13.0" to migrate to the full string
-
 
 0.13.0 / 2013-10-15
 ==================
   * Exposed `Base` class for external implementors (with extra entry point for just this)
   * Base class implements a default `score` - now used by `GroupStage`
   * Serialization now uses `inst.toString()` and `Klass.parse(str)`
-  * Migration to new format should be done THROUGH this version, `fromJSON` will be gone in next.
+  * Migration to new format should be done THROUGH this version, `fromJSON` will be gone in next (you MUST also set `trn.version = 1` on your instance)
   * `WB`, `LB` and `WO` now only available on `Duel` class not on every entry point.
   * `NA` constant removed - instead added `trn.isPlayable(match)` helper
 
