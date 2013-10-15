@@ -9,7 +9,12 @@ PLANNED (most stuff in issue form now)
   * move out FFA/Duel/KnockOut into own libraries
   * once that done, can REGISTER libraries with tourament OR drop the global `parse`
   * that way can load individual base classes.. not great but works..
+
+
+0.14.0 / 2013-10-XX
+==================
   * `new` protection in all subclasses
+  * `fromJSON` remoted, use version "0.13.0" to migrate to the full string
 
 
 0.13.0 / 2013-10-15

@@ -12,7 +12,7 @@ var mains = {
 
 // NB: publics used to be ['WO', 'NA', 'WB', 'LB']
 var publics = []
-  , commonStatics = ['invalid', 'idString', 'fromJSON']
+  , commonStatics = ['invalid', 'idString', 'parse']
   , commonMethods = ['score', 'unscorable', 'upcoming', 'results', 'isDone']
   , baseMethods = ['findMatch', 'findMatches', 'rounds']
   , commonMembers = ['matches', 'numPlayers'];

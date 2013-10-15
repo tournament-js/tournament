@@ -1,7 +1,7 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , FFA = require('../ffa')
+  , FFA = require('../ffa');
 
 test("ffa 5 [5] [] limit 4", function (t) {
   var ffa = new FFA(5, [5], [], {limit: 4});
@@ -60,10 +60,10 @@ test("ffa 16 4 2 unfinished no limits", function (t) {
 });
 
 test("ffa 16 4 2 unfinished res limits", function (t) {
-  var ffaB = new FFA(16, [4,4], [2], {limit: 4});
+  var ffaB = FFA(16, [4,4], [2], {limit: 4});
 
   // quick serialization test as only case atm
-  var ffa = FFA.fromJSON(ffaB.matches, {limit: 4})
+  var ffa = FFA.parse(ffaB + '')
     , gs = ffa.matches;
 
   t.ok(gs.length > 0, "could create ffa with limits");

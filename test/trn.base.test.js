@@ -2,7 +2,7 @@ var tap = require('tap')
   , $ = require('interlude')
   , test = tap.test
   , T = require('../') // main interface
-  , comp = T.Base.compareMatches
+  , comp = T.Base.compareMatches;
 
 const WB = T.Duel.WB;
 const LB = T.Duel.LB;

@@ -382,7 +382,7 @@ This function MUST be implemented and placed on the constructor's `idString` pro
 
 
 ## Serialization
-Every tournament instance can be coerced into a string sensibly:
+Every tournament instance can be coerced into a string:
 
 ```js
 var trn = new FFA(16, [4, 4, 4], [2, 2]);

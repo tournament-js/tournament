@@ -4,10 +4,10 @@ var tap = require('tap')
   , GroupStage = require('../groupstage')
   , rep = GroupStage.idString;
 
-test("group stage 10 6 fromJSON", function (t) {
+test("group stage 10 6 serialize", function (t) {
   t.equal(GroupStage.invalid(10, 6), null, "can construct a 10 6 group stage");
   var gs = new GroupStage(10, 6);
-  var gs2 = GroupStage.fromJSON(gs.matches);
+  var gs2 = GroupStage.parse(gs + '');
 
   t.equal(gs.groupSize, 5, "group size reduced to as insufficient players");
 
@@ -23,9 +23,9 @@ test("group stage 10 6 fromJSON", function (t) {
 });
 
 
-test("group stage 16 4 fromJSON", function (t) {
+test("group stage 16 4 serialize", function (t) {
   var gs = new GroupStage(16, 4);
-  var gs2 = GroupStage.fromJSON(gs.matches);
+  var gs2 = GroupStage.parse(gs + '');
 
   t.deepEqual(gs.matches, gs2.matches, "matches same");
   t.equal(gs.groupSize, gs2.groupSize, "groupSize recalculated correctly");

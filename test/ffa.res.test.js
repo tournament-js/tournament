@@ -1,7 +1,7 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , FFA = require('../ffa')
+  , FFA = require('../ffa');
 
 
 // full test of a 16 4 2 ffa tournament

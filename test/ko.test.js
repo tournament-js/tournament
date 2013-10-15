@@ -4,13 +4,13 @@ var tap = require('tap')
   , KnockOut = require('../knockout')
   , rep = KnockOut.idString;
 
-test("ko 10 [2,4,2] fromJSON", function (t) {
+test("ko 10 [2,4,2] serialize", function (t) {
   var kos = [2,4,2];
   t.ok(!KnockOut.invalid(10, kos), "10 kos not invalid");
   var ko = new KnockOut(10, kos);
 
   for (var i = 0; i < 4; i += 1) {
-    var konew = KnockOut.fromJSON(ko.matches);
+    var konew = KnockOut.parse(ko + '');
     t.deepEqual(ko.matches, konew.matches, "matches the same");
     t.deepEqual(ko.kos, konew.kos, "kos the same");
 

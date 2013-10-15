@@ -94,7 +94,7 @@ test("gs 9 3 tied only between - proceed any", function (t) {
       };
       verifyFinal(tb);
       // verify serialization works as well
-      var tb2 = T.TieBreaker.fromJSON(tb.matches, res, n);
+      var tb2 = T.TieBreaker.parse(tb + '');
       t.ok(tb2, "tb2 exists");
       verifyFinal(tb2);
     }

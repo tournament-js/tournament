@@ -52,11 +52,11 @@ test("duel LB underdog + scorable", function (t) {
   t.end();
 });
 
-test("duel 16 WB fromJSON", function (t) {
+test("duel 16 WB serialize", function (t) {
   var duel = new Duel(16, WB)
     , gs = duel.matches;
 
-  var duel2 = Duel.fromJSON(gs);
+  var duel2 = Duel.parse(duel + '');
 
   t.equal(gs.length, Math.pow(2, duel.p), "np == matches.length with bronze final");
 
@@ -78,13 +78,13 @@ test("duel 16 WB fromJSON", function (t) {
 });
 
 // same test wo bronze final
-test("duel 16 WB short fromJSON", function (t) {
+test("duel 16 WB short serialize", function (t) {
   var duel = new Duel(16, WB, {short: true})
     , gs = duel.matches;
 
   t.equal(gs.length, Math.pow(2, duel.p) - 1, "np -1 == matches.length  w/o bronze");
 
-  var duel2 = Duel.fromJSON(gs);
+  var duel2 = Duel.parse(duel + '');
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
@@ -105,7 +105,7 @@ test("duel 16 WB short fromJSON", function (t) {
 });
 
 // same tests with LB
-test("duel 16 LB fromJSON", function (t) {
+test("duel 16 LB serialize", function (t) {
   var duel = new Duel(16, LB)
     , gs = duel.matches;
 
@@ -114,7 +114,7 @@ test("duel 16 LB fromJSON", function (t) {
   var longDeLength = (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 2;
   t.equal(gs.length, longDeLength, "long DE length");
 
-  var duel2 = Duel.fromJSON(gs);
+  var duel2 = Duel.parse(duel + '');
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
@@ -134,11 +134,11 @@ test("duel 16 LB fromJSON", function (t) {
   t.end();
 });
 
-test("duel 16 LB short fromJSON", function (t) {
+test("duel 16 LB short serialize", function (t) {
   var duel = new Duel(16, LB, {short: true})
     , gs = duel.matches;
 
-  var duel2 = Duel.fromJSON(gs);
+  var duel2 = Duel.parse(duel + '');
 
   // sizeof WB === 2^p - 1
   // sizeof LB === 2*(sizeof one p smaller WB) + 1 (as no gf2 this time)
