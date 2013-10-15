@@ -1,14 +1,16 @@
 var tap = require('tap')
   , $ = require('interlude')
   , test = tap.test
-  , T = require('../') // main interface
-  , comp = T.Base.compareMatches;
+  , Base = require('../') // main interface
+  , Duel = require('duel')
+  , GroupStage = require('groupstage')
+  , comp = Base.compareMatches;
 
-const WB = T.Duel.WB;
-const LB = T.Duel.LB;
+const WB = Duel.WB;
+const LB = Duel.LB;
 
 test("match partitioning Duel", function (t) {
-  var d = new T.Duel(8, WB);
+  var d = new Duel(8, WB);
   t.deepEqual(d.findMatch({s:WB, r:1, m:1}),
     { id: { s: 1, r: 1, m: 1 }, p: [ 1, 8 ] },
     "find returns sensible Duel result"
@@ -45,7 +47,7 @@ test("match partitioning Duel", function (t) {
 });
 
 test("match partitioning GroupStage", function (t) {
-  var gs = new T.GroupStage(16, 4);
+  var gs = new GroupStage(16, 4);
   t.deepEqual(gs.findMatch({s:1, r:1, m:1}),
     { id: { s: 1, r: 1, m: 1 }, p: [ 1, 16 ] },
     "find returns sensible GroupStage result"
@@ -93,11 +95,11 @@ test("match partitioning GroupStage", function (t) {
 });
 
 test("current and next round Duel", function (t) {
-  var rep = T.Duel.idString;
+  var rep = Duel.idString;
   var scorer = function (m) {
     t.ok(d.score(m.id, m.p[0] < m.p[1] ? [1,0] : [0,1]), "score " + rep(m.id));
   };
-  var d = new T.Duel(8, WB, {short: true});
+  var d = new Duel(8, WB, {short: true});
   t.deepEqual(d.currentRound(), d.rounds()[0], "current === round 1");
   t.equal(d.currentRound(LB), undefined, "no current LB round");
   t.deepEqual(d.nextRound(), d.rounds()[1], "next === round 2");
@@ -120,12 +122,12 @@ test("current and next round Duel", function (t) {
 });
 
 test("current and next round GroupStage", function (t) {
-  var rep = T.GroupStage.idString;
+  var rep = GroupStage.idString;
   var scorer = function (m) {
     t.ok(gs.score(m.id, m.p[0] < m.p[1] ? [1,0] : [0,1]), "score " + rep(m.id));
   };
 
-  var gs = new T.GroupStage(16, 4);
+  var gs = new GroupStage(16, 4);
   t.deepEqual(gs.currentRound(1), gs.findMatches({s:1, r:1}), "current === G1R1");
   t.deepEqual(gs.currentRound(), gs.findMatches({r:1}), "currentAll R1");
 
@@ -159,7 +161,7 @@ test("current and next round GroupStage", function (t) {
 });
 
 test("player helpers GroupStage", function (t) {
-  var gs = new T.GroupStage(16, 4); // 4 groups with 3 rounds in each
+  var gs = new GroupStage(16, 4); // 4 groups with 3 rounds in each
   t.equal(gs.matchesFor(1).length, 3, "player 1 battles 3 others in group 1");
   t.deepEqual(gs.players({s:1}), [1, 5, 12, 16], "group 1 players");
   t.equal(gs.players({r:1}).length, 16, "all players play round 1");

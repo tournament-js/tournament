@@ -1,13 +1,13 @@
 var tap = require('tap')
   , test = tap.test
-  , T = require('../'); // main interface
+  , Base = require('../'); // main interface
 
 // individual class entry proints
 var mains = {
-  KnockOut : require('../knockout'),
-  FFA : require('../ffa'),
-  GroupStage : require('../groupstage'),
-  Duel : require('../duel')
+  KnockOut : require('masters'),
+  FFA : require('ffa'),
+  GroupStage : require('groupstage'),
+  Duel : require('duel')
 };
 
 // NB: publics used to be ['WO', 'NA', 'WB', 'LB']
@@ -59,11 +59,8 @@ var hasPublics = function (obj, t) {
 
 
 test("interfaces", function (t) {
-  T.name = "main"; // for nice output
-  hasPublics(T, t); // main interface has publics outside class
   ['Duel', 'FFA', 'GroupStage', 'KnockOut'].forEach(function (type) {
     // both main and individual entry points should have commons
-    classHasCommons(T[type], t);
     classHasCommons(mains[type], t);
     // if we required individual entry point, then publics exist directly on that
     hasPublics(mains[type], t);

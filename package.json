@@ -1,7 +1,7 @@
 {
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "tournament",
-  "description": "Tournament management library",
+  "description": "Tournament interface",
   "version": "0.15.0",
   "repository": {
     "type": "git",
@@ -30,7 +30,11 @@
     "interlude": "~1.0.2"
   },
   "devDependencies": {
-    "tap": "~0.4.4"
+    "tap": "~0.4.4",
+    "duel": "latest",
+    "ffa": "latest",
+    "groupstage": "latest",
+    "masters": "latest"
   },
   "bugs": {
     "url": "http://github.com/clux/tournament/issues"

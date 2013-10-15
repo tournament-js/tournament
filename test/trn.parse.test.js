@@ -1,10 +1,10 @@
 var test = require('tap').test
-  , Duel = require('../duel')
-  , FFA = require('../ffa')
-  , GroupStage = require('../groupstage')
-  , KnockOut = require('../knockout')
-  , TieBreaker = require('../lib/tiebreak_groups')
-  , Base = require('../').Base;
+  , Duel = require('duel')
+  , FFA = require('ffa')
+  , GroupStage = require('groupstage')
+  , KnockOut = require('masters')
+  //, TieBreaker = require('../lib/tiebreak_groups')
+  , Base = require('../');
 
 
 var create = function (Klass) {
@@ -21,17 +21,17 @@ var create = function (Klass) {
   if (type === 'GroupStage') {
     return new Klass(16, 4);
   }
-  if (type === 'TieBreaker') {
-    var gs = new GroupStage(16, 4);
-    gs.matches.forEach(function (m) {
-      gs.score(m.id, [1,0]);
-    });
-    return new Klass(gs.results(), 3);
-  }
+  //if (type === 'TieBreaker') {
+  //  var gs = new GroupStage(16, 4);
+  //  gs.matches.forEach(function (m) {
+  //    gs.score(m.id, [1,0]);
+  //  });
+  //  return new Klass(gs.results(), 3);
+  //}
 };
 
 test("serialize/deserialize tournaments", function (t) {
-  [Duel, FFA, KnockOut, GroupStage, TieBreaker].forEach(function (Klass) {
+  [Duel, FFA, KnockOut, GroupStage].forEach(function (Klass) {
     var inst = create(Klass);
     t.ok(inst instanceof Klass, "inst is a " + Klass.name + " instance");
     inst.data = { hi: true };
@@ -40,6 +40,7 @@ test("serialize/deserialize tournaments", function (t) {
 
     var str = inst + '';
     var parsed = Klass.parse(str); // specific parse
+    t.type(parsed, 'object', 'parsed str into an instance now');
 
     t.equal(parsed.data.hi, true, "saved a custom property on .data");
     t.equal(parsed.matches[0].data.info, "arst", "saved a custom property on .data");
