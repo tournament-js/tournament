@@ -1,12 +1,12 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../');
+  , FFA = require('../ffa')
 
 
 // full test of a 16 4 2 ffa tournament
 test("ffa 16 4 2", function (t) {
-  var ffa = new T.FFA(16, [4,4,4], [2,2])
+  var ffa = new FFA(16, [4,4,4], [2,2])
     , gs = ffa.matches;
 
   t.equal(gs.length, 4 + 2 + 1, "ffa right number of matches");
@@ -189,7 +189,7 @@ test("ffa 16 4 2", function (t) {
 
 // full test of a 81 3 1 ffa tournament
 test("ffa 81 3 1", function (t) {
-  var ffa = new T.FFA(81, [3,3,3,3], [1,1,1])
+  var ffa = new FFA(81, [3,3,3,3], [1,1,1])
     , gs = ffa.matches;
 
   t.equal(gs.length, 27 + 9 + 3 + 1, "ffa right number of matches");

@@ -10,7 +10,8 @@ var mains = {
   Duel : require('../duel')
 };
 
-var publics = ['WO', 'NA', 'WB', 'LB'] // TODO: these should not always exist
+// NB: publics used to be ['WO', 'NA', 'WB', 'LB']
+var publics = []
   , commonStatics = ['invalid', 'idString', 'fromJSON']
   , commonMethods = ['score', 'unscorable', 'upcoming', 'results', 'isDone']
   , baseMethods = ['findMatch', 'findMatches', 'rounds']

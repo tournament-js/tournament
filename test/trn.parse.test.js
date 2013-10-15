@@ -9,7 +9,7 @@ var test = require('tap').test
 var create = function (Klass) {
   var type = Klass.name;
   if (type === 'Duel') {
-    return new Klass(8, T.LB, {short: true});
+    return new Klass(8, Klass.LB, {short: true});
   }
   if (type === 'FFA') {
     return new Klass(16, [4,4,4], [2,2]);
@@ -54,6 +54,7 @@ test("serialize/deserialize tournaments", function (t) {
     var inst = create(Klass);
     t.ok(inst instanceof Klass, "inst is a " + Klass.name + " instance");
     inst.data = { hi: true };
+    t.ok(inst.matches.length, 'some matches must have been made');
     inst.matches[0].data = { info: "arst" };
 
     var str = inst + '';

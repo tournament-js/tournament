@@ -1,10 +1,10 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../');
+  , FFA = require('../ffa')
 
 test("ffa 5 [5] [] limit 4", function (t) {
-  var ffa = new T.FFA(5, [5], [], {limit: 4});
+  var ffa = new FFA(5, [5], [], {limit: 4});
   var ms = ffa.matches;
   t.ok(!ffa.score(ms[0].id, [5,4,3,2,2]), "cannot score so we are tied at limit");
   t.ok(ffa.score(ms[0].id, [5,4,3,2,1]), "scoring works when untied");
@@ -18,7 +18,7 @@ test("ffa 5 [5] [] limit 4", function (t) {
 });
 
 test("ffa 10 [5] [] limit 4", function (t) {
-  var ffa = new T.FFA(10, [5], [], {limit: 4});
+  var ffa = new FFA(10, [5], [], {limit: 4});
   var ms = ffa.matches;
   t.ok(!ffa.score(ms[0].id, [5,4,4,2,1]), "cannot score so we are tied at limit/NG");
   t.ok(ffa.score(ms[0].id, [5,4,3,2,1]), "scoring of M1 works when untied");
@@ -34,7 +34,7 @@ test("ffa 10 [5] [] limit 4", function (t) {
 });
 
 test("ffa 15 [5] [] limit 6", function (t) {
-  var ffa = new T.FFA(15, [5], [], {limit: 6}); // limit must divide num groups
+  var ffa = new FFA(15, [5], [], {limit: 6}); // limit must divide num groups
   var ms = ffa.matches;
   t.ok(!ffa.score(ms[0].id, [5,4,4,2,1]), "cannot score so we are tied at limit");
   t.ok(ffa.score(ms[0].id, [5,4,3,2,1]), "scoring of M1 works when untied");
@@ -51,19 +51,19 @@ test("ffa 15 [5] [] limit 6", function (t) {
 });
 
 test("ffa 16 4 2 unfinished no limits", function (t) {
-  var reason = T.FFA.invalid(16, [4,4], [2], {limit: 0});
+  var reason = FFA.invalid(16, [4,4], [2], {limit: 0});
   t.type(reason, 'string', "Should not be able to create non-finals without limits");
-  var ffa = new T.FFA(16, [4,4], [2], {limit: 0});
+  var ffa = new FFA(16, [4,4], [2], {limit: 0});
   t.deepEqual(ffa.matches, [], "ffa creation should also fail");
 
   t.end();
 });
 
 test("ffa 16 4 2 unfinished res limits", function (t) {
-  var ffaB = new T.FFA(16, [4,4], [2], {limit: 4});
+  var ffaB = new FFA(16, [4,4], [2], {limit: 4});
 
   // quick serialization test as only case atm
-  var ffa = T.FFA.fromJSON(ffaB.matches, {limit: 4})
+  var ffa = FFA.fromJSON(ffaB.matches, {limit: 4})
     , gs = ffa.matches;
 
   t.ok(gs.length > 0, "could create ffa with limits");

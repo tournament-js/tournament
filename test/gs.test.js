@@ -1,13 +1,13 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../')
-  , rep = T.GroupStage.idString;
+  , GroupStage = require('../groupstage')
+  , rep = GroupStage.idString;
 
 test("group stage 10 6 fromJSON", function (t) {
-  t.equal(T.GroupStage.invalid(10, 6), null, "can construct a 10 6 group stage");
-  var gs = new T.GroupStage(10, 6);
-  var gs2 = T.GroupStage.fromJSON(gs.matches);
+  t.equal(GroupStage.invalid(10, 6), null, "can construct a 10 6 group stage");
+  var gs = new GroupStage(10, 6);
+  var gs2 = GroupStage.fromJSON(gs.matches);
 
   t.equal(gs.groupSize, 5, "group size reduced to as insufficient players");
 
@@ -24,8 +24,8 @@ test("group stage 10 6 fromJSON", function (t) {
 
 
 test("group stage 16 4 fromJSON", function (t) {
-  var gs = new T.GroupStage(16, 4);
-  var gs2 = T.GroupStage.fromJSON(gs.matches);
+  var gs = new GroupStage(16, 4);
+  var gs2 = GroupStage.fromJSON(gs.matches);
 
   t.deepEqual(gs.matches, gs2.matches, "matches same");
   t.equal(gs.groupSize, gs2.groupSize, "groupSize recalculated correctly");
@@ -40,8 +40,8 @@ test("group stage 16 4 fromJSON", function (t) {
 
 // couple of tests to ensure correct lengths
 test("group stage 16 4", function (t) {
-  t.equal(T.GroupStage.invalid(16, 4), null, "can construct a 16 4 group stage");
-  var gs = new T.GroupStage(16, 4)
+  t.equal(GroupStage.invalid(16, 4), null, "can construct a 16 4 group stage");
+  var gs = new GroupStage(16, 4)
     , ms = gs.matches;
   // should be 4 rounds, with 3 matches for each player, i.e. 3! matches
 
@@ -57,8 +57,8 @@ test("group stage 16 4", function (t) {
 });
 
 test("group stage 32 8", function (t) {
-  t.equal(T.GroupStage.invalid(32, 8), null, "can construct a 32 8 group stage");
-  var gs = new T.GroupStage(32, 8)
+  t.equal(GroupStage.invalid(32, 8), null, "can construct a 32 8 group stage");
+  var gs = new GroupStage(32, 8)
     , ms = gs.matches;
 
   var numGroups = $.maximum(ms.map($.get('id', 's')));
@@ -104,8 +104,8 @@ test("group stage 32 8", function (t) {
 
 
 test("group stage 50 10", function (t) {
-  t.equal(T.GroupStage.invalid(50, 10), null, "can construct a 50 10 group stage");
-  var gs = new T.GroupStage(50, 10)
+  t.equal(GroupStage.invalid(50, 10), null, "can construct a 50 10 group stage");
+  var gs = new GroupStage(50, 10)
     , ms = gs.matches;
 
   var numGroups = $.maximum(ms.map($.get('id', 's')));
@@ -120,7 +120,7 @@ test("group stage 50 10", function (t) {
 });
 
 test("upcoming 6 3", function (t) {
-  var g = new T.GroupStage(6, 3);
+  var g = new GroupStage(6, 3);
   // grps == [1,3,6] + [2,4,5]
   $.range(6).forEach(function (n) {
     var up = g.upcoming(n);
@@ -141,8 +141,8 @@ test("upcoming 6 3", function (t) {
 
 
 test("upcoming/scorable 16 8", function (t) {
-  t.equal(T.GroupStage.invalid(16, 4), null, "can construct a 16 4 group stage");
-  var g = new T.GroupStage(16, 4)
+  t.equal(GroupStage.invalid(16, 4), null, "can construct a 16 4 group stage");
+  var g = new GroupStage(16, 4)
     , ms = g.matches;
   // grps == 4 of 4
 
@@ -215,7 +215,7 @@ test("res test 9 3 without allow map breaks for ties", function (t) {
   [true, false].forEach(function (mapsTie) {
     // run these tests twice, once tieing map scores ([1,0] all) snd run [a,0] all
     // where a is variant (here depending on group number for simplicity)
-    var g = new T.GroupStage(9, 3);
+    var g = new GroupStage(9, 3);
 
     // verify initial conditions
     var res0 = g.results();

@@ -17,6 +17,8 @@ PLANNED (most stuff in issue form now)
   * Base class implements a default `score` - now used by `GroupStage`
   * Serialization now uses `inst.toString()` and `t.parse(str)`
   * Migration to new format should be done THROUGH this version, `fromJSON` will be gone in next.
+  * `WB`, `LB` and `WO` now only available on `Duel` class not on every entry point.
+  * `NA` constant removed - instead new helpers for this will be included TODO
 
 
 0.12.0 / 2013-10-02

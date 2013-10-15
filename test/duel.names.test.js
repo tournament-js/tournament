@@ -1,11 +1,10 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../');
-
+  , Duel = require('../duel.js');
 
 test("names 32 WB", function (t) {
-  var d = new T.Duel(32, T.WB) // using bronze final
+  var d = new Duel(32, Duel.WB) // using bronze final
     , gs = d.matches;
 
   var rounds = $.nub(gs.map($.get('id', 'r'))).sort($.compare());
@@ -15,7 +14,7 @@ test("names 32 WB", function (t) {
   var checkMatch = function (m) {
     var r = m.id.r;
     var name = d.roundName(m.id);
-    if (m.id.s === T.LB) {
+    if (m.id.s === 2) {
       t.equal(name, "Bronze final", "Round 1 LB name");
     }
     else {
@@ -36,7 +35,7 @@ test("names 32 WB", function (t) {
 });
 
 test("names 32 LB", function (t) {
-  var d = new T.Duel(32, T.LB) // using double final
+  var d = new Duel(32, Duel.LB) // using double final
     , gs = d.matches;
   // should be 2*p === LB rounds === 2*5 = 10
   var checkLb = function (r, name) {
@@ -71,7 +70,7 @@ test("names 32 LB", function (t) {
   gs.forEach(function (m) {
     var r = m.id.r;
     var name = d.roundName(m.id);
-    if (m.id.s === T.LB) {
+    if (m.id.s === 2) {
       checkLb(r, name);
     }
     else {

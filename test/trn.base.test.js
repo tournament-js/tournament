@@ -1,42 +1,45 @@
 var tap = require('tap')
   , $ = require('interlude')
   , test = tap.test
-  , comp = require('../lib/common').compareMatches
-  , T = require('../'); // main interface
+  , T = require('../') // main interface
+  , comp = T.Base.compareMatches
+
+const WB = T.Duel.WB;
+const LB = T.Duel.LB;
 
 test("match partitioning Duel", function (t) {
-  var d = new T.Duel(8, T.WB);
-  t.deepEqual(d.findMatch({s:T.WB, r:1, m:1}),
+  var d = new T.Duel(8, WB);
+  t.deepEqual(d.findMatch({s:WB, r:1, m:1}),
     { id: { s: 1, r: 1, m: 1 }, p: [ 1, 8 ] },
     "find returns sensible Duel result"
   );
-  t.ok(d.findMatch({s:T.LB, r:1, m:1}), "bf exists");
+  t.ok(d.findMatch({s:LB, r:1, m:1}), "bf exists");
   t.equal(d.findMatch({s:3, r:1, m:1}), undefined, "garbage id does not exist");
 
-  t.deepEqual(d.findMatches({s:T.WB}), d.sections()[0], "WB is WB");
-  t.deepEqual(d.findMatches({s:T.LB}), d.sections()[1], "LB is LB");
-  t.equal(d.rounds(T.WB).length, 3, "3 rounds in WB");
-  t.equal(d.rounds(T.LB).length, 1, "1 round in LB");
+  t.deepEqual(d.findMatches({s:WB}), d.sections()[0], "WB is WB");
+  t.deepEqual(d.findMatches({s:LB}), d.sections()[1], "LB is LB");
+  t.equal(d.rounds(WB).length, 3, "3 rounds in WB");
+  t.equal(d.rounds(LB).length, 1, "1 round in LB");
   t.equal(d.sections().length, 2, "WB and LB exists");
   t.equal(d.sections(1).length, 2, "Both sections exist in round 1");
   t.equal(d.sections(2).length, 1, "Only WB section exists in round 2");
   t.equal(d.sections(3).length, 1, "Only WB section exists in round 3");
   t.equal(d.sections(4).length, 0, "No data in round 4");
-  t.deepEqual(d.findMatches({s:T.WB, r:1}), d.rounds(T.WB)[0], "R1 === R1");
-  t.deepEqual(d.findMatches({s:T.WB, r:2}), d.rounds(T.WB)[1], "R2 === R2");
-  t.deepEqual(d.findMatches({s:T.WB, r:3}), d.rounds(T.WB)[2], "R3 === R3");
+  t.deepEqual(d.findMatches({s:WB, r:1}), d.rounds(WB)[0], "R1 === R1");
+  t.deepEqual(d.findMatches({s:WB, r:2}), d.rounds(WB)[1], "R2 === R2");
+  t.deepEqual(d.findMatches({s:WB, r:3}), d.rounds(WB)[2], "R3 === R3");
 
   var len = d.matches.length;
-  t.equal(d.findMatchesRanged({s:T.WB}, {s:T.LB}).length, len, "bounds 1");
-  t.equal(d.findMatchesRanged({}, {s:T.LB}).length, len, "bounds 2");
-  t.equal(d.findMatchesRanged({s:T.WB}).length, len, "bounds 3");
-  t.equal(d.findMatchesRanged({s:T.LB}).length, 1, "bounds 4");
+  t.equal(d.findMatchesRanged({s:WB}, {s:LB}).length, len, "bounds 1");
+  t.equal(d.findMatchesRanged({}, {s:LB}).length, len, "bounds 2");
+  t.equal(d.findMatchesRanged({s:WB}).length, len, "bounds 3");
+  t.equal(d.findMatchesRanged({s:LB}).length, 1, "bounds 4");
   t.equal(d.findMatchesRanged({r:1}).length, len, "bounds 5");
   t.equal(d.findMatchesRanged({}, {r:3}).length, len, "bounds 6");
-  t.equal(d.findMatchesRanged({s:T.LB}, {r:1}).length, 1, "bounds 7");
+  t.equal(d.findMatchesRanged({s:LB}, {r:1}).length, 1, "bounds 7");
   t.equal(d.findMatchesRanged({r:3}, {r:2}).length, 0, "invalid range 1");
-  t.equal(d.findMatchesRanged({s:T.LB}, {s:T.WB}).length, 0, "invalid range 2");
-  t.equal(d.findMatchesRanged({s:T.LB, r:3}).length, 0, "out of bounds");
+  t.equal(d.findMatchesRanged({s:LB}, {s:WB}).length, 0, "invalid range 2");
+  t.equal(d.findMatchesRanged({s:LB, r:3}).length, 0, "out of bounds");
 
   t.end();
 });
@@ -94,11 +97,11 @@ test("current and next round Duel", function (t) {
   var scorer = function (m) {
     t.ok(d.score(m.id, m.p[0] < m.p[1] ? [1,0] : [0,1]), "score " + rep(m.id));
   };
-  var d = new T.Duel(8, T.WB, {short: true});
+  var d = new T.Duel(8, WB, {short: true});
   t.deepEqual(d.currentRound(), d.rounds()[0], "current === round 1");
-  t.equal(d.currentRound(T.LB), undefined, "no current LB round");
+  t.equal(d.currentRound(LB), undefined, "no current LB round");
   t.deepEqual(d.nextRound(), d.rounds()[1], "next === round 2");
-  t.equal(d.nextRound(T.LB), undefined, "no next LB round");
+  t.equal(d.nextRound(LB), undefined, "no next LB round");
   d.findMatches({r:1}).forEach(scorer);
   t.deepEqual(d.currentRound(), d.rounds()[1], "current === round 2");
   t.deepEqual(d.nextRound(), d.rounds()[2], "next === round 3");

@@ -1,11 +1,15 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../');
+  , Duel = require('../duel');
+
+const WB = Duel.WB;
+const LB = Duel.LB;
+const WO = Duel.WO;
 
 test("duel LB underdog + scorable", function (t) {
   // long LB underdog lost
-  var duel = new T.Duel(16, T.LB, {short:false});
+  var duel = new Duel(16, LB, {short:false});
   duel.matches.slice(0, -2).map(function (m, i) {
     t.equal(duel.unscorable(m.id, [1,0]), null, "can score long m" + i);
     t.ok(duel.score(m.id, m.p[0] < m.p[1] ? [2,1] : [1,2]), "can score long m" + i);
@@ -17,7 +21,7 @@ test("duel LB underdog + scorable", function (t) {
   t.ok(!duel.score($.last(duel.matches).id, [2, 1]), "could NOT score GF2");
 
   // long LB underdog won
-  duel = new T.Duel(16, T.LB, {short:false});
+  duel = new Duel(16, LB, {short:false});
   duel.matches.slice(0, -2).map(function (m, i) {
     t.equal(duel.unscorable(m.id, [1,0]), null, "can score long m" + i);
     t.ok(duel.score(m.id, m.p[0] < m.p[1] ? [2,1] : [1,2]), "can score long m" + i);
@@ -30,7 +34,7 @@ test("duel LB underdog + scorable", function (t) {
   t.ok(duel.isDone(), "long GF2 played so we are done");
 
   // short LB underdog lost
-  duel = new T.Duel(16, T.LB, {short:true});
+  duel = new Duel(16, LB, {short:true});
   duel.matches.map(function (m, i) {
     t.equal(duel.unscorable(m.id, [1,0]), null, "can score short m" + i);
     t.ok(duel.score(m.id, [1,2]), "can score short m" + i);
@@ -38,7 +42,7 @@ test("duel LB underdog + scorable", function (t) {
   t.ok(duel.isDone(), "duel tournament should be done now");
 
   // short LB underdog won
-  duel = new T.Duel(16, T.LB, {short:true});
+  duel = new Duel(16, LB, {short:true});
   duel.matches.map(function (m, i) {
     t.equal(duel.unscorable(m.id, [1,0]), null, "can score short m" + i);
     t.ok(duel.score(m.id, [2,1]), "can score short m" + i);
@@ -49,10 +53,10 @@ test("duel LB underdog + scorable", function (t) {
 });
 
 test("duel 16 WB fromJSON", function (t) {
-  var duel = new T.Duel(16, T.WB)
+  var duel = new Duel(16, WB)
     , gs = duel.matches;
 
-  var duel2 = T.Duel.fromJSON(gs);
+  var duel2 = Duel.fromJSON(gs);
 
   t.equal(gs.length, Math.pow(2, duel.p), "np == matches.length with bronze final");
 
@@ -75,12 +79,12 @@ test("duel 16 WB fromJSON", function (t) {
 
 // same test wo bronze final
 test("duel 16 WB short fromJSON", function (t) {
-  var duel = new T.Duel(16, T.WB, {short: true})
+  var duel = new Duel(16, WB, {short: true})
     , gs = duel.matches;
 
   t.equal(gs.length, Math.pow(2, duel.p) - 1, "np -1 == matches.length  w/o bronze");
 
-  var duel2 = T.Duel.fromJSON(gs);
+  var duel2 = Duel.fromJSON(gs);
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
@@ -102,7 +106,7 @@ test("duel 16 WB short fromJSON", function (t) {
 
 // same tests with LB
 test("duel 16 LB fromJSON", function (t) {
-  var duel = new T.Duel(16, T.LB)
+  var duel = new Duel(16, LB)
     , gs = duel.matches;
 
   // sizeof WB === 2^p - 1
@@ -110,7 +114,7 @@ test("duel 16 LB fromJSON", function (t) {
   var longDeLength = (Math.pow(2, duel.p)-1) + 2*(Math.pow(2, duel.p - 1) - 1) + 2;
   t.equal(gs.length, longDeLength, "long DE length");
 
-  var duel2 = T.Duel.fromJSON(gs);
+  var duel2 = Duel.fromJSON(gs);
 
   t.deepEqual(duel.matches, duel2.matches, "matches same");
   t.equal(duel.numPlayers, duel2.numPlayers, "numPlayers kept correctly");
@@ -131,10 +135,10 @@ test("duel 16 LB fromJSON", function (t) {
 });
 
 test("duel 16 LB short fromJSON", function (t) {
-  var duel = new T.Duel(16, T.LB, {short: true})
+  var duel = new Duel(16, LB, {short: true})
     , gs = duel.matches;
 
-  var duel2 = T.Duel.fromJSON(gs);
+  var duel2 = Duel.fromJSON(gs);
 
   // sizeof WB === 2^p - 1
   // sizeof LB === 2*(sizeof one p smaller WB) + 1 (as no gf2 this time)
@@ -159,7 +163,7 @@ test("duel 16 LB short fromJSON", function (t) {
 });
 
 test("duel WB general", function (t) {
-  var duel = new T.Duel(32, T.WB)
+  var duel = new Duel(32, WB)
     , gs = duel.matches
     , p = duel.p;
 
@@ -175,7 +179,7 @@ test("duel WB general", function (t) {
 
   t.ok(lastM.m, "map scores recorded for last match");
   var lastPls = lastM.p.filter(function (n) {
-    return (n !== 0 && n !== T.WO);
+    return (n !== 0 && n !== WO);
   });
   // note this only true because this case gets a double final
   t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
@@ -188,7 +192,7 @@ test("duel WB general", function (t) {
 });
 
 test("duel LB general", function (t) {
-  var duel = new T.Duel(32, T.LB)
+  var duel = new Duel(32, LB)
     , gs = duel.matches
     , p = duel.p;
 
@@ -206,7 +210,7 @@ test("duel LB general", function (t) {
 
   t.ok(lastM.m, "map scores recorded for last match");
   var lastPls = lastM.p.filter(function (n) {
-    return (n !== 0 && n !== T.WO);
+    return (n !== 0 && n !== WO);
   });
   // note this only true because this case gets a double final
   t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
@@ -220,7 +224,7 @@ test("duel LB general", function (t) {
 
 test("duel simple WB", function (t) {
   // try scoring everything in order
-  var duel = new T.Duel(5, T.WB)
+  var duel = new Duel(5, WB)
     , gs = duel.matches;
 
   var lastM = gs[gs.length-1];
@@ -233,7 +237,7 @@ test("duel simple WB", function (t) {
 
   t.ok(lastM.m, "map scores recorded for last match");
   var lastPls = lastM.p.filter(function (n) {
-    return (n !== 0 && n !== T.WO);
+    return (n !== 0 && n !== WO);
   });
   // note this only true because this case gets a double final
   t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
@@ -280,7 +284,7 @@ test("duel simple WB", function (t) {
 
 test("duel simple but big LB", function (t) {
   // try scoring everything in order
-  var duel = new T.Duel(128, T.LB)
+  var duel = new Duel(128, LB)
     , gs = duel.matches
     , p = duel.p;
 
@@ -296,7 +300,7 @@ test("duel simple but big LB", function (t) {
 
   t.ok(lastM.m, "map scores recorded for last match");
   var lastPls = lastM.p.filter(function (n) {
-    return (n !== 0 && n !== T.WO);
+    return (n !== 0 && n !== WO);
   });
   // note this only true because this case gets a double final
   t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
@@ -314,7 +318,7 @@ test("duel simple but big LB", function (t) {
 
 test("duel detailed LB", function (t) {
   // try scoring everything in order
-  var duel = new T.Duel(5, T.LB)
+  var duel = new Duel(5, LB)
     , gs = duel.matches;
 
   var lastM = gs[gs.length-1];
@@ -327,7 +331,7 @@ test("duel detailed LB", function (t) {
 
   t.ok(lastM.m, "map scores recorded for last match");
   var lastPls = lastM.p.filter(function (n) {
-    return (n !== 0 && n !== T.WO);
+    return (n !== 0 && n !== WO);
   });
   // note this only true because this case gets a double final
   t.equal(lastPls.length, 2, "got two players at the end when scoring everything");
@@ -374,7 +378,7 @@ test("duel detailed LB", function (t) {
 
 
 test("upcoming/scorable 8 LB", function (t) {
-  var d = new T.Duel(8, T.LB) // NO WO markers in this (easy case)
+  var d = new Duel(8, LB) // NO WO markers in this (easy case)
     , ms = d.matches;
 
   // WB check
@@ -385,18 +389,18 @@ test("upcoming/scorable 8 LB", function (t) {
       var up = d.upcoming(n);
       t.ok(up, "upcoming match exists for round " + r + " advancer");
       t.equal(up.r, r, "upcoming match for this round is in round " + r);
-      t.equal(up.s, T.WB, "upcoming match for round " + r + " is in WB");
+      t.equal(up.s, WB, "upcoming match for round " + r + " is in WB");
     });
 
     // score
-    d.findMatches({s:T.WB, r:r}).forEach(function (g) {
+    d.findMatches({s:WB, r:r}).forEach(function (g) {
       t.equal(d.unscorable(g.id, [1,0]), null, "WB R" + r + " are scorable");
       t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "scored m in R" + r);
     });
 
     if (r === 3) {
       var up = d.upcoming(1);
-      t.equal(up.s, T.LB, "upcoming match for WB final winner is in LB");
+      t.equal(up.s, LB, "upcoming match for WB final winner is in LB");
     }
   });
 
@@ -405,17 +409,16 @@ test("upcoming/scorable 8 LB", function (t) {
   $.range(maxr - 1).forEach(function (r) { // all rounds but gf2 round
 
     // upcoming
-    d.players({s: T.LB, r:r}).forEach(function (n) {
-      t.ok(n >= T.NA, "player found was filled in and not a WO marker");
-
+    d.players({s: LB, r:r}).forEach(function (n) {
+      t.ok(n > WO, "player found was filled in and not a WO marker");
       var up = d.upcoming(n);
       t.ok(up, "upcoming match exists for round " + r + " advancer");
       t.equal(up.r, r, "upcoming match for this round is in round " + r);
-      t.equal(up.s, T.LB, "upcoming match for round " + r + " is in LB");
+      t.equal(up.s, LB, "upcoming match for round " + r + " is in LB");
     });
 
     // check all matches in this round
-    d.findMatches({s:T.LB, r:r}).forEach(function (g) {
+    d.findMatches({s:LB, r:r}).forEach(function (g) {
       t.equal(d.unscorable(g.id, [1,0]), null, "LB R" + r + " is scorable");
       t.ok(d.score(g.id, (g.p[0] > g.p[1]) ? [1, 2] : [2, 1]), "scored m in R" + r);
     });

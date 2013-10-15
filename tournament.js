@@ -1,5 +1,4 @@
-var helpers = require('./lib/public')
-  , algs = require('./lib/balancer');
+var algs = require('./lib/balancer');
 
 var t = {
   Base: require('./lib/base'),
@@ -12,10 +11,6 @@ var t = {
   groups: algs.groups,
   robin: algs.robin
 };
-
-Object.keys(helpers).forEach(function (key) {
-  t[key] = helpers[key];
-});
 
 // A general parser that will find out which tournament type to parse it as
 t.parse = function (str) {

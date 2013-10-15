@@ -1,16 +1,16 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../')
-  , rep = T.KnockOut.idString;
+  , KnockOut = require('../knockout')
+  , rep = KnockOut.idString;
 
 test("ko 10 [2,4,2] fromJSON", function (t) {
   var kos = [2,4,2];
-  t.ok(!T.KnockOut.invalid(10, kos), "10 kos not invalid");
-  var ko = new T.KnockOut(10, kos);
+  t.ok(!KnockOut.invalid(10, kos), "10 kos not invalid");
+  var ko = new KnockOut(10, kos);
 
   for (var i = 0; i < 4; i += 1) {
-    var konew = T.KnockOut.fromJSON(ko.matches);
+    var konew = KnockOut.fromJSON(ko.matches);
     t.deepEqual(ko.matches, konew.matches, "matches the same");
     t.deepEqual(ko.kos, konew.kos, "kos the same");
 
@@ -25,7 +25,7 @@ test("ko 10 [2,4,2] fromJSON", function (t) {
 // detailed simple knockout
 test("ko 10 [2,4,2]", function (t) {
   var kos = [2,4,2];
-  var ko = new T.KnockOut(10, kos)
+  var ko = new KnockOut(10, kos)
     , ms = ko.matches;
 
   t.equal(ms.length, kos.length + 1, "games required");
@@ -39,7 +39,7 @@ test("ko 10 [2,4,2]", function (t) {
     var r = i+1;
     // remaining matches unscored
     ms.slice(r).forEach(function (m) {
-      t.equal($.nub(m.p).length, 1, "all T.NA in " + rep(m.id));
+      t.equal($.nub(m.p).length, 1, "all NA in " + rep(m.id));
     });
 
     // ensure results match the current round
@@ -75,7 +75,7 @@ test("ko 10 [2,4,2]", function (t) {
 
 test("ko 10 [2,4,2] results", function (t) {
   var kos = [2,4,2];
-  var ko = new T.KnockOut(10, kos);
+  var ko = new KnockOut(10, kos);
 
   // pre-scoring:
   var res = ko.results();

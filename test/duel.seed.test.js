@@ -1,12 +1,12 @@
 var tap = require('tap')
   , test = tap.test
   , $ = require('interlude')
-  , T = require('../')
-  , rep = T.Duel.idString;
+  , Duel = require('../duel')
+  , rep = Duel.idString;
 
 
 test("seeding assumption", function (t) {
-  var d = new T.Duel(512, T.WB, {short:true}) // no need to test with bronze final
+  var d = new Duel(512, Duel.WB, {short:true}) // bf irrelevant
     , gs = d.matches;
 
   var verifyRound = function (r, len) {

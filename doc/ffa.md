@@ -59,7 +59,7 @@ Individual ties are only allowed as long as we can discriminate between the last
 ### Upcoming
 Unlike the normal implementation of `d.upcoming(seedNumber)`, `FFA` does extra work:
 
-If the current round has not been fully completed yet, then `ffa.upcoming(seed)` may return a partial id, like `{s: WB, r: 4}` missing a game number, as each round creates new seeds for a fair new round based on previous performance, and thus all the game results from this round are needed to determine a player's next game number. Note that such an id can still be represented via the `.idString()` function.
+If the current round has not been fully completed yet, then `ffa.upcoming(seed)` may return a partial id, like `{r: 4}` missing a game number, as each round creates new seeds for a fair new round based on previous performance, and thus all the game results from this round are needed to determine a player's next game number. Note that such an id can still be represented via the `.idString()` function.
 
 
 ## Caveats
