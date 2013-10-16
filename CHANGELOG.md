@@ -12,6 +12,7 @@ PLANNED (most stuff in issue form now)
 0.15.1 / 2013-10-XX
 ==================
   * tests now remaining - now tests consistency of the 4 factored out modules
+  * `isPlayable` now used in `unscorable` for consistency
 
 
 0.15.0 / 2013-10-15

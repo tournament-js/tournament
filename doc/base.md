@@ -255,16 +255,10 @@ var m = duel.matches[0]; // first match of some duel tournament
 duel.score(m.id, [2, 1]); // m.p[0] won 2 - 1 over m.p[1]
 ```
 
-#### Note for implementors
-This method SHOULD be manually implemented in the sub class with the same signature. If it is implemented, the `Base` implementation MUST NOT be called in the new implementation.
-
 ### trn.unscorable(matchId, mapScore, allowPast) :: String || Null
 Return the String reason why the match with the given `matchId` cannot be `score()`d with the current `mapScore`.
 
 If scoring is safe, this function will return `null`. Always guard on this to ensure `trn.score()` succeeds. If `score()` is attempted without this check, `trn.score()` will simply log the error reason and not do the scoring.
-
-#### Note for implementors
-This method SHOULD be implemented manually. If it is implemented, the `Base` implementation MUST be called first in the new implementation.
 
 ### trn.isDone() :: Boolean
 Returns whether or not the tournament is finished.
@@ -376,10 +370,6 @@ GroupStage.idString({s: 5, r: 2, m: 1});
 KnockOut.idString({s: 1, r:2, m: 1});
 "R2"
 ```
-
-#### Note for implementors
-This function MUST be implemented and placed on the constructor's `idString` property.
-
 
 ## Serialization
 Every tournament instance can be coerced into a string:

@@ -1,12 +1,26 @@
 # Tournament [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament) [![Dependency Status](https://david-dm.org/clux/tournament.png)](https://david-dm.org/clux/tournament)
 
-Tournament is a pure library for managing the state and generating statistics for a collection of matches in a tournament. Tournaments are created up front and are mutated simply by scoring individual matches. State can be serialized/deserialized via a simple interface.
+Tournament provides a base class for stateful tournament types that used to be implemented in this repository.
 
-## Usage
-Create a new tournament instance from one of the exposed classes, then interact with helper functions to score and calculate results.
+All tournaments have a huge amount of common logic so the helper methods included on this base class is worth reading about even if you don't use this module directly.
+
+You should read at least one of:
+
+- [tournament base class and commonalities](./doc/base.md)
+- [implementors guide](./doc/implementors.md)
+
+Implementions:
+
+- [duel](https://npmjs.org/package/duel)
+- [ffa](https://npmjs.org/package/ffa)
+- [groupstage](https://npmjs.org/package/groupstage)
+- [masters](https://npmjs.org/package/masters)
+
+## Example implementation usage
+Create a new tournament instance from one of the separate implementations, then interact with helper functions to score and calculate results.
 
 ```js
-var Duel = require('tournament').Duel;
+var Duel = require('duel');
 var d = new Duel(4, Duel.WB); // 4 players - single elimination
 
 d.matches; // in playable order
@@ -45,28 +59,20 @@ d.results();
   { seed: 3, maps: 1, wins: 1, pos: 2 },
   { seed: 2, maps: 1, wins: 1, pos: 3 },
   { seed: 4, maps: 0, wins: 0, pos: 4 } ]
-
 ```
-
-## API
-- [Base Class](./doc/base.md) plus commonalities
-- [Duel Elimination](./doc/duel.md)
-- [FFA Elimination](./doc/ffa.md)
-- [KnockOut](./doc/knockout.md)
-- [GroupStage](./doc/groupstage.md)
-- [TieBreaker](./doc/tiebreaker.md) for GroupStage
 
 ## Installation
-For node server usage:
+For specific tournament usage, install the modules you want:
 
 ```bash
-$ npm install tournament --save
+$ npm install duel ffa groupstage --save
 ```
 
-For the browser, bundle it up with [browserify](https://npmjs.org/package/browserify), say:
+To use these on in the browser, bundle it up with [browserify](https://npmjs.org/package/browserify:
 
 ```bash
-$ browserify -r tournament > bundle.js
+$ npm dedupe
+$ browserify -r duel -r ffa -r groupstage > bundle.js
 ```
 
 ## Running tests
