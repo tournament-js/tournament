@@ -16,7 +16,7 @@ You must create your own matches, but they MUST have the following format:
 With the following restrictions:
 
  - All numbers MUST be 1-indexed integers
- - `.p` is the array of seeding numbers represetning player ids for this library
+ - `.p` MUST be the array of seeding numbers representning players
  - At least one of the `id` properties MUST exist
  - The `.data` key on the match must be reserved for users
  - The `.m` key on match MUST not be set on construction
@@ -83,7 +83,9 @@ Like in the outline, you MUST implement:
 - static `invalid` that can give a string reason why tournament options are invalid
 - method `results` to compute statistics/progression
 
-The latter is always the hard one
+The latter is always the hard one.
+
+Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
 
 ## Shoulds
 It usually useful to implement some of the following methods
@@ -92,7 +94,7 @@ It usually useful to implement some of the following methods
 - method `score` - if player propagation is necessary (tournaments with stages)
 - method `isDone` - if a tournament can be done before all matches are played
 
-## unscorable
+### unscorable
 
     If you implement `unscorable`, you MUST call the Base implementation
 
@@ -112,7 +114,7 @@ SomeTournament.prototype.unscorable = function (id, score, allowPast) {
 };
 ```
 
-## score
+### score
 
     If you implement `score`, you MUST call the Base implementation
 
@@ -129,7 +131,7 @@ SomeTournament.prototype.score = function (id, score) {
 };
 ```
 
-## upcoming
+### upcoming
 If a tournament needs to wait for a round before propagating, you SHOULD implement a better `upcoming` that accounts for this.
 
 ```js
@@ -143,6 +145,7 @@ SomeTournament.prototype.upcoming = function (playerId) {
 ```
 
 See the [FFA package](https://npmjs.org/package/ffa) for a full example of this.
+
 
 ## Remaining
 Other `Base` methods MUST NOT be overridden to maintain expected behaviour.
