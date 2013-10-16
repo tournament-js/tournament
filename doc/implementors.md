@@ -13,27 +13,16 @@ You must create your own matches, but they MUST have the following format:
 }
 ```
 
-With the following restrictions:
+With the following requirements:
 
  - All numbers MUST be 1-indexed integers
  - `.p` MUST be the array of seeding numbers representning players
- - At least one of the `id` properties MUST exist
- - The `.data` key on the match must be reserved for users
+ - All of the above `id` properties (`s`, `r`, and `m`) MUST exist even if some of them are identical for all matches
+ - The `.data` key on the match MUST be reserved for users
  - The `.m` key on match MUST not be set on construction
  - The `.m` key on match MUST only be touched by `.score`
- - A match `id` is always unique
+ - Every match `id` MUST always be unique
  - If we sort the match id by `s` difference, then `r` difference, then `m` difference, we can score all the matches in this order
-
-The `id` key omissions rule more specifically means you can do (at most) two of the following for all matches:
-
- - If your tournament has only one "section", you MAY omit the `.s` key on `id`
- - If your tournament has only one "round", you MAY omit the `.r` key on `id`
- - If your tournament has only one "match" per round, you MAY omit the `.m`. key on `id`
-
-But when dropping attributes, you should try to preserve the convention that:
-
- - Equal `.r` properties (same round) can be played simultaneously (at least within a section)
- - No player should be active in different `.s` (sections) at the *same time*
 
 ## Tournament outline
 This is the minimal amount of code you have to write:
