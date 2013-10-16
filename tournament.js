@@ -65,7 +65,7 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   if (!m) {
     return "match not found in tournament"; // TODO: idString %s or, %j in id?
   }
-  if (m.p.some($.eq(Base.NONE))) {
+  if (!this.isPlayable(m)) {
     return "match not ready - missing players";
   }
   if (!Array.isArray(score) || !score.every(Number.isFinite)) {
@@ -97,7 +97,7 @@ Base.prototype.score = function (id, score) {
 };
 
 Base.prototype.isPlayable = function (match) {
-  return match.p.every($.neq(Base.NONE));
+  return !match.p.some($.eq(Base.NONE));
 };
 
 // Public API extensions
