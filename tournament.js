@@ -59,7 +59,7 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   Klass.prototype = Object.create(Initial.prototype);
 
   Klass.parse = function (str) {
-    return parse(Klass, str);
+    return Base.parse(Klass, str);
   };
   Klass.idString = Initial.idString; // default
   Object.defineProperty(Klass.prototype, 'rep', {
@@ -69,7 +69,8 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   if (obj.score) {
     Klass.prototype.score = function (id, score) {
       if (Initial.prototype.score.call(this, id, score)) {
-        return obj.score.call(this, id, score);
+        obj.score.call(this, id, score);
+        return true;
       }
       return false;
     };
@@ -284,7 +285,7 @@ Base.prototype.players = function (id) {
 };
 
 
-// shortcut for
+// shortcut for results
 Base.prototype.resultsFor = function (seed) {
   var res = this.results();
   for (var i = 0; i < res.length; i += 1) {
