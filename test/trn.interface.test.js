@@ -4,7 +4,7 @@ var tap = require('tap')
 
 // individual class entry proints
 var mains = {
-  KnockOut : require('masters'),
+  Masters : require('masters'),
   FFA : require('ffa'),
   GroupStage : require('groupstage'),
   Duel : require('duel')
@@ -24,7 +24,7 @@ var makeInstance = function (C) {
     return new C(4, 1);
   case 'FFA':
     return new C(4, [4], []);
-  case 'KnockOut':
+  case 'Masters':
     return new C(5, [2]);
   case 'GroupStage':
     return new C(8, 4);
@@ -59,7 +59,7 @@ var hasPublics = function (obj, t) {
 
 
 test("interfaces", function (t) {
-  ['Duel', 'FFA', 'GroupStage', 'KnockOut'].forEach(function (type) {
+  ['Duel', 'FFA', 'GroupStage', 'Masters'].forEach(function (type) {
     // both main and individual entry points should have commons
     classHasCommons(mains[type], t);
     // if we required individual entry point, then publics exist directly on that

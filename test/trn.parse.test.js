@@ -2,7 +2,7 @@ var test = require('tap').test
   , Duel = require('duel')
   , FFA = require('ffa')
   , GroupStage = require('groupstage')
-  , KnockOut = require('masters')
+  , Masters = require('masters')
   //, TieBreaker = require('../lib/tiebreak_groups')
   , Base = require('../');
 
@@ -15,7 +15,7 @@ var create = function (Klass) {
   if (type === 'FFA') {
     return new Klass(16, [4,4,4], [2,2]);
   }
-  if (type === 'KnockOut') {
+  if (type === 'Masters') {
     return new Klass(10, [2,4,2]);
   }
   if (type === 'GroupStage') {
@@ -31,7 +31,7 @@ var create = function (Klass) {
 };
 
 test("serialize/deserialize tournaments", function (t) {
-  [Duel, FFA, KnockOut, GroupStage].forEach(function (Klass) {
+  [Duel, FFA, Masters, GroupStage].forEach(function (Klass) {
     var inst = create(Klass);
     t.ok(inst instanceof Klass, "inst is a " + Klass.name + " instance");
     inst.data = { hi: true };
