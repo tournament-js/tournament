@@ -2,12 +2,16 @@ PLANNED (most stuff in issue form now)
 ==================
   * move `ffa_cost` and `balancer` to own libraries?
   * move `tieCompute` stuff from GroupStage and TieBreaker to groups algs
-  * perhaps allow zero knockout rounds to allow friendly rounds ala. masterchef's 2x finals
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
-  * rename masters? it's dumb..
-  * fix up docs, and add an implementors.md
+
+0.16.0 / 2013-10-XX
+==================
+  * Following documented in the [implementors guide](./doc/implementors.md)
+    - `Base.parse` MUST NOT be bound anymore to avoid subclassing failing after the first
+    - `Base.sub` makes inheriting and implementing a tournament much easier
+
 
 0.15.1 / 2013-10-17
 ==================

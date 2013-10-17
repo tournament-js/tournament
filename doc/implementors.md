@@ -24,8 +24,33 @@ With the following requirements:
  - Every match `id` MUST always be unique
  - If we sort the match id by `s` difference, then `r` difference, then `m` difference, we can score all the matches in this order
 
-## Tournament outline
-This is the minimal amount of code you have to write:
+## Tournament outline - easy way
+
+```js
+var Base = require('tournament');
+
+// Specify tournament names and the named arguments for its constructor
+Base.sub('SomeTournament', ['numPlayers', 'opts'], {
+  init: function (cb) {
+    var matches = makeMatches(this.numPlayers, this.opts);
+    cb(matches); // goes to Base's constructor
+  },
+
+  score: function (id, score) {
+    // TODO: propagate players here if needed
+    return true;
+  },
+  unscorable: functoin (id, score) {
+    // TODO: check for extra conditions here if needed
+    return null;
+  }
+
+});
+
+
+
+## Tournament outline - manual inheritance
+If you prefer to have full control of your prototypes, you may inherit manually from the `Base` class. Note that as per expectations of implementations behaviour, you should follow this outline as closely as possible.
 
 ```js
 var Base = require('tournament');
@@ -43,7 +68,9 @@ function SomeTournament(numPlayers, opts) {
 SomeTournament.prototype = Object.create(Base.prototype);
 
 // statics
-SomeTournament.parse = Base.parse.bind(null, SomeTournament);
+SomeTournament.parse = function (str) {
+  return Base.parse(SomeTournament, str);
+};
 SomeTournament.invalid = function (np, opts) {
   if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
     return "SomeTournament must contain at least 2 players";
@@ -63,7 +90,7 @@ SomeTournament.prototype.results = function () {
 module.exports = SomeTournament;
 ```
 
-## Requirements
+### Requirements
 Like in the outline, you MUST implement:
 
 - constructor that calls the `Base` class constructor with the matches
@@ -76,14 +103,14 @@ The latter is always the hard one.
 
 Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
 
-## Shoulds
+### Shoulds
 It usually useful to implement some of the following methods
 
 - method `unscorable` - if extra scoring restrictions are necessary
 - method `score` - if player propagation is necessary (tournaments with stages)
 - method `isDone` - if a tournament can be done before all matches are played
 
-### unscorable
+#### unscorable
 
     If you implement `unscorable`, you MUST call the Base implementation
 
@@ -103,7 +130,7 @@ SomeTournament.prototype.unscorable = function (id, score, allowPast) {
 };
 ```
 
-### score
+#### score
 
     If you implement `score`, you MUST call the Base implementation
 
@@ -120,7 +147,7 @@ SomeTournament.prototype.score = function (id, score) {
 };
 ```
 
-### upcoming
+#### upcoming
 If a tournament needs to wait for a round before propagating, you SHOULD implement a better `upcoming` that accounts for this.
 
 ```js
@@ -136,5 +163,5 @@ SomeTournament.prototype.upcoming = function (playerId) {
 See the [FFA package](https://npmjs.org/package/ffa) for a full example of this.
 
 
-## Remaining
+### Remaining
 Other `Base` methods MUST NOT be overridden to maintain expected behaviour.
