@@ -1,7 +1,6 @@
 var $ = require('interlude');
 
-function Base(SubClass, ms) {
-  this.rep = SubClass.idString || $.constant('UNKNOWN');
+function Base(ms) {
   this.matches = ms;
 }
 
@@ -17,6 +16,24 @@ Base.parse = function (SubClass, str) {
   return $.extend(Object.create(SubClass.prototype), obj);
 };
 
+Base.sub = function (Klass, Initial) {
+  Initial = Initial || Base;
+  Klass.prototype = Object.create(Initial.prototype);
+  Klass.parse = function (str) {
+    return Base.parse(Klass, str); // always use the root one
+  };
+  Klass.idString = Initial.idString; // default
+  Object.defineProperty(Klass.prototype, 'rep', {
+    value: Klass.idString
+  });
+  Klass.sub = function (SubKlass) {
+    return Base.sub(SubKlass, Klass);
+  };
+};
+
+Base.idString = function (id) {
+  return "S" + id.s + " R" + id.r + " M" + id.m;
+};
 
 // comparators that used to be in common
 // to ensure first matches first and (for most part) forEach scorability
