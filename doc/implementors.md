@@ -19,7 +19,7 @@ With the following requirements:
  - `.p` MUST be the array of seeding numbers representning players
  - All of the above `id` properties (`s`, `r`, and `m`) MUST exist even if some of them are identical for all matches
  - The `.data` key on the match MUST be reserved for users
- - The `.m` key on match MUST not be set on construction
+ - The `.m` key on match MUST NOT be set on construction
  - The `.m` key on match MUST only be touched by `.score`
  - Every match `id` MUST always be unique
  - If we sort the match id by `s` difference, then `r` difference, then `m` difference, we can score all the matches in this order
