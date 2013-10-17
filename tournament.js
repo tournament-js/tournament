@@ -26,18 +26,22 @@ Base.compareMatches = function (g1, g2) {
   return (g1.id.s - g2.id.s) || (g1.id.r - g2.id.r) || (g1.id.m - g2.id.m);
 };
 
-// internal sorting of zipped player array with map score array : zip(g.p, g.m)
-// sorts by map score desc, then seed asc
-Base.compareZip = function (z1, z2) {
-  return (z2[1] - z1[1]) || (z1[0] - z2[0]);
-};
-
 // how to sort results array (of objects) : by position desc (or seed asc for looks)
 // only for sorting (more advanced `pos` algorithms may be used separately)
 Base.compareRes = function (r1, r2) {
   return (r1.pos - r2.pos) || (r1.seed - r2.seed);
 };
 
+// internal sorting of zipped player array with map score array : zip(g.p, g.m)
+// sorts by map score desc, then seed asc
+Base.compareZip = function (z1, z2) {
+  return (z2[1] - z1[1]) || (z1[0] - z2[0]);
+};
+
+// helper to get the player array in a match sorted by compareZip
+Base.sorted = function (match) {
+  return $.zip(match.p, match.m).sort(Base.compareZip).map($.get('0'));
+};
 
 
 // stuff that individual implementations can override
