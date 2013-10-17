@@ -9,10 +9,11 @@ PLANNED (most stuff in issue form now)
   * rename masters? it's dumb..
   * fix up docs, and add an implementors.md
 
-0.15.1 / 2013-10-XX
+0.15.1 / 2013-10-17
 ==================
   * tests now remaining - now tests consistency of the 4 factored out modules
   * `isPlayable` now used in `unscorable` for consistency
+  * `Base.sorted` gets the sorted player array of a match by `Base.compareZip`
 
 
 0.15.0 / 2013-10-15
