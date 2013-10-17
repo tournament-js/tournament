@@ -16,19 +16,79 @@ Base.parse = function (SubClass, str) {
   return $.extend(Object.create(SubClass.prototype), obj);
 };
 
-Base.sub = function (Klass, Initial) {
+// for .sub
+var construct = function (Ctor, args) {
+  var F = function () {
+    return Ctor.apply(this, args);
+  };
+  F.prototype = Ctor.prototype;
+  return new F();
+};
+// a crazy implementors helper that eliminates almost all boilerplate code
+Base.sub = function (name, namedArgs, obj, Initial) {
   Initial = Initial || Base;
+  var Klass = function () {
+    var args = Array.prototype.slice.call(arguments);
+    if (!(this instanceof Klass)) {
+      return construct(Klass, args);
+    }
+    var invReason = Klass.invalid.apply(Klass, args);
+    if (invReason !== null) {
+      console.error("Invalid %s configuration", name, args);
+      console.error("  :", invReason);
+      return;
+    }
+
+    // attach properties to this from obj
+    var keys = Object.keys(obj);
+    for (var i = 0; i < keys.length; i += 1) {
+      var key = keys[i];
+      if (['init', 'score', 'unscorable'].indexOf(key) < 0) {
+        this[key] = obj[key];
+      }
+    }
+
+    // attach properties to this from namedArgs
+    for (var k = 0; k < namedArgs.length; k += 1) {
+      this[namedArgs[k]] = args[k];
+    }
+
+    // call given init method, and pass in next constructor as cb
+    obj.init.call(this, Initial.bind(this));
+  };
   Klass.prototype = Object.create(Initial.prototype);
+
   Klass.parse = function (str) {
-    return Base.parse(Klass, str); // always use the root one
+    return parse(Klass, str);
   };
   Klass.idString = Initial.idString; // default
   Object.defineProperty(Klass.prototype, 'rep', {
     value: Klass.idString
   });
-  Klass.sub = function (SubKlass) {
-    return Base.sub(SubKlass, Klass);
+
+  if (obj.score) {
+    Klass.prototype.score = function (id, score) {
+      if (Initial.prototype.score.call(this, id, score)) {
+        return obj.score.call(this, id, score);
+      }
+      return false;
+    };
+  }
+
+  if (obj.unscorable) {
+    Klass.prototype.unscorable = function (id, score, allowPast) {
+      var invReason = Initial.prototype.unscorable.call(this, id, score, allowPast);
+      if (invReason !== null) {
+        return invReason;
+      }
+      return obj.unscorable.call(this, id, score) || null;
+    };
+  }
+
+  Klass.sub = function (subName, subArgs, subObj) {
+    return Initial.sub(subName, subArgs, subObj, Klass);
   };
+  return Klass;
 };
 
 Base.idString = function (id) {
