@@ -285,6 +285,23 @@ Base.prototype.players = function (id) {
 };
 
 
+// prepare a results array
+Base.prototype.results = function (blanks) {
+  blanks = blanks || {};
+  var res = new Array(this.numPlayers);
+  for (var s = 0; s < this.numPlayers; s += 1) {
+    res[s] = {
+      seed: s + 1,
+      wins: 0,
+      pos: this.numPlayers
+    }
+    for (var key in blanks) {
+      res[s][key] = blanks[key];
+    }
+  }
+  return res;
+};
+
 // shortcut for results
 Base.prototype.resultsFor = function (seed) {
   var res = this.results();
