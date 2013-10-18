@@ -82,7 +82,7 @@ Base.sub = function (name, namedArgs, obj, Initial) {
       if (invReason !== null) {
         return invReason;
       }
-      return obj.unscorable.call(this, id, score) || null;
+      return obj.unscorable.call(this, id, score);
     };
   }
 
