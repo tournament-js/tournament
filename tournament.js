@@ -25,6 +25,12 @@ var construct = function (Ctor, args) {
   return new F();
 };
 // a crazy implementors helper that eliminates almost all boilerplate code
+var specials = [
+  'init',
+  'score',
+  'unscorable',
+  'upcoming',
+];
 Base.sub = function (name, namedArgs, obj, Initial) {
   Initial = Initial || Base;
   var Klass = function () {
@@ -43,8 +49,13 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     var keys = Object.keys(obj);
     for (var i = 0; i < keys.length; i += 1) {
       var key = keys[i];
-      if (['init', 'score', 'unscorable'].indexOf(key) < 0) {
-        this[key] = obj[key];
+      if (specials.indexOf(key) < 0) {
+        if (typeof obj[key] === 'function') {
+          Klass.prototype[key] = obj[key];
+        }
+        else {
+          this[key] = obj[key];
+        }
       }
     }
 
@@ -66,6 +77,8 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     value: Klass.idString
   });
 
+  // TODO: what happens when `Initial` does not implement one of these?
+  // could happin in multi-level inheritance..
   if (obj.score) {
     Klass.prototype.score = function (id, score) {
       if (Initial.prototype.score.call(this, id, score)) {
@@ -84,6 +97,17 @@ Base.sub = function (name, namedArgs, obj, Initial) {
       }
       return obj.unscorable.call(this, id, score);
     };
+  }
+
+  if (obj.upcoming) {
+    Klass.prototype.upcoming = function (playerId) {
+      var id = Base.prototype.upcoming.call(this, playerId);
+      if (id) {
+        return id; // blank match waiting for player
+      }
+
+      return obj.upcoming.call(this, playerId);
+    }
   }
 
   Klass.sub = function (subName, subArgs, subObj) {
