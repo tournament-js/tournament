@@ -278,10 +278,10 @@ Base.prototype.matchesFor = function (playerId) {
 // similarly for FFA and TieBreaker.
 // NB: KnockOut structure is simple enough to use this.matches[r+1] instead of {r: r}
 Base.prototype.players = function (id) {
-  return $.nub(this.findMatches(id).reduce(function (acc, m) {
+  return $.nub(this.findMatches(id || {}).reduce(function (acc, m) {
     acc = acc.concat(m.p);
     return acc;
-  }, [])).sort($.compare()); // ascending order
+  }, [])).filter($.neq(Base.NONE)).sort($.compare()); // ascending order
 };
 
 
