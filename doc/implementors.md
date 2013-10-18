@@ -31,23 +31,87 @@ var Base = require('tournament');
 
 // Specify tournament names and the named arguments for its constructor
 Base.sub('SomeTournament', ['numPlayers', 'opts'], {
-  init: function (cb) {
+  init: function (initParent) {
     var matches = makeMatches(this.numPlayers, this.opts);
-    cb(matches); // goes to Base's constructor
+    initParent(matches); // goes to Base's constructor
   },
 
   score: function (id, score) {
     // TODO: propagate players here if needed
     return true;
   },
-  unscorable: functoin (id, score) {
+  unscorable: function (id, score) {
     // TODO: check for extra conditions here if needed
     return null;
+  },
+  upcoming: function (playerId) {
+    // TODO: check if we can figure out roughly where the player is headed
   }
 
 });
 
+### Requirements
 
+- `numPlayers` MUST exists as a named argument
+- `init` MUST be implemented
+- `init` MUST call the `initParent` cb with the arguments of `Base` (matches only)
+
+NB: For inheriting from another tournament, replace all references to `Base` with the tournament you are inheriting from.
+
+### Usefuls
+It's often useful to supply the following methods
+
+- `unscorable` - if extra scoring restrictions are necessary
+- `score` - if player propagation is necessary (tournaments with stages)
+- `upcoming` - if a player exists in limbo before a round is done
+- `isDone` - if a tournament can be done before all matches are played
+
+
+#### unscorable
+Unlike the normal inheritance way, we simply check extra conditions are satisfied. If this function gets called, we already know `id` and `score` got through the `Base.prototype.unscorable` check.
+
+```js
+  score : function (id, score) {
+    var m = this.findMatch(id);
+    if (score[0] === score[1]) {
+      return "cannot draw"; // NOT OK
+    }
+    return null; // OK
+  }
+```
+
+#### score
+Unlike the normal inheritance way, we simply propagate players here if we are in a position to do so. If this function gets called we know that our implementation (if we have one) of `unscorable` (and all the ones below us in the chain) did not stop us, and the match with given `id` was successfully scored with `score`.
+
+```js
+  score: function (id, score) {
+    var m = this.findMatch(id); // already scored
+    var next = this.findMatch({ s: 1, r: m.id.r + 1, m: 1 });
+    next.p = Base.sorted(m).slice(0, 2); // top 2 advance
+  }
+```
+
+If something goes wrong in this method, throw an error.
+
+#### upcoming
+Unlike the normal inheritance way, if this gets called, the inherited `upcoming` function failed. I.e. (if Base) no matches were found containing the playerId that have not yet been played. If there is a limbo stage (waiting for other matches to complete before the player advances), then check ONLY for this here.
+
+```js
+  upcoming: function (playerId) {
+    // player may be waiting for generation of next round
+    var m = $.firstBy(function (m) {
+      return m.p.indexOf(playerId) >= 0 && m.m;
+    }, this.currentRound() || []);
+
+    // if he played this round, check if he will advance
+    if (m && Base.sorted(m).slice(0, 2).indexOf(playerId) >= 0) {
+      return {s: 1, r: m.id.r + 1}; // yes, was in top 2, return a partial id
+    }
+  }
+```
+
+#### isDone
+TODO: how?
 
 ## Tournament outline - manual inheritance
 If you prefer to have full control of your prototypes, you may inherit manually from the `Base` class. Note that as per expectations of implementations behaviour, you should follow this outline as closely as possible.
@@ -59,6 +123,7 @@ function SomeTournament(numPlayers, opts) {
   if (!(this instanceof SomeTournament)) {
     return new someTournament(numPlayers, opts); // new protection
   }
+  this.numPlayers = numPlayers; // always store this
   // TODO: somehow create matches and guard on SomeTournament.invalid
   var matches = [];
   Base.call(this, SomeTournament, matches);
@@ -100,6 +165,8 @@ Like in the outline, you MUST implement:
 - method `results` to compute statistics/progression
 
 The latter is always the hard one.
+
+Note that the constructor MUST set `numPlayers` on `this` as `Base` class helpers expects this variable.
 
 Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
 
