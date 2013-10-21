@@ -77,11 +77,11 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     value: Klass.idString
   });
 
-  // TODO: what happens when `Initial` does not implement one of these?
-  // could happin in multi-level inheritance..
+  // TODO: rename to progress?
   if (obj.score) {
+    var prevScore = Initial.prototype.score || Base.prototype.score;
     Klass.prototype.score = function (id, score) {
-      if (Initial.prototype.score.call(this, id, score)) {
+      if (prevScore.call(this, id, score)) {
         obj.score.call(this, id, score);
         return true;
       }
@@ -89,24 +89,24 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     };
   }
 
+
+  // TODO: rename to something else?
   if (obj.unscorable) {
+    var prevUnscorable = Initial.prototype.unscorable || Base.prototype.unscorable;
     Klass.prototype.unscorable = function (id, score, allowPast) {
-      var invReason = Initial.prototype.unscorable.call(this, id, score, allowPast);
+      var invReason = prevUnscorable.call(this, id, score, allowPast);
       if (invReason !== null) {
         return invReason;
       }
       return obj.unscorable.call(this, id, score);
     };
   }
-
+  // TODO: rename to something else?
   if (obj.upcoming) {
+    var prevUpcoming = Initial.prototype.upcoming || Base.prototype.upcoming;
     Klass.prototype.upcoming = function (playerId) {
-      var id = Base.prototype.upcoming.call(this, playerId);
-      if (id) {
-        return id; // blank match waiting for player
-      }
-
-      return obj.upcoming.call(this, playerId);
+      var id = prevUpcoming.call(this, playerId);
+      return id || obj.upcoming.call(this, playerId);
     }
   }
 
