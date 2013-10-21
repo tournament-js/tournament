@@ -110,6 +110,13 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     }
   }
 
+  if (obj.results) {
+    Klass.prototype.results = function () {
+      var res = Base.prototype.results.call(this, obj.resultDefaults || {});
+      return obj.results.call(this, res);
+    };
+  }
+
   Klass.sub = function (subName, subArgs, subObj) {
     return Initial.sub(subName, subArgs, subObj, Klass);
   };
@@ -303,8 +310,7 @@ Base.prototype.matchesFor = function (playerId) {
 // NB: KnockOut structure is simple enough to use this.matches[r+1] instead of {r: r}
 Base.prototype.players = function (id) {
   return $.nub(this.findMatches(id || {}).reduce(function (acc, m) {
-    acc = acc.concat(m.p);
-    return acc;
+    return acc.concat(m.p);
   }, [])).filter($.neq(Base.NONE)).sort($.compare()); // ascending order
 };
 
