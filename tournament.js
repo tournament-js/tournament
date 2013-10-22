@@ -121,7 +121,13 @@ Base.sorted = function (match) {
 // Used by FFA, GroupStage, TieBreaker
 // KnockOut + Duel implement slightly different versions
 Base.prototype.isDone = function () {
-  return this.matches.every($.get('m'));
+  if (this.matches.every($.get('m'))) {
+    return true;
+  }
+  if (this.early) {
+    return this.early();
+  }
+  return false;
 };
 
 // Default used by Duel, KnockOut, GroupStage, TieBreaker
