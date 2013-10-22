@@ -43,8 +43,11 @@ Base.sub('SomeTournament', ['numPlayers', 'opts'], {
     // TODO: check for extra conditions here if needed
     return null;
   },
-  upcoming: function (playerId) {
+  limbo: function (playerId) {
     // TODO: check if we can figure out roughly where the player is headed
+  },
+  early: function () {
+    // TODO: return whether tournament is done early
   }
 
 });
@@ -62,8 +65,8 @@ It's often useful to supply the following methods
 
 - `unscorable` - if extra scoring restrictions are necessary
 - `progress` - if player propagation is necessary (tournaments with stages)
-- `upcoming` - if a player exists in limbo before a round is done
-- `isDone` - if a tournament can be done before all matches are played
+- `limbo` - if a player can exist in limbo (waiting for a round to finish)
+- `early` - if a tournament can be done before all matches are played
 
 
 #### verify
@@ -79,10 +82,10 @@ If you implement this, verify only extra restrictions that you would like to put
   }
 ```
 
-NB: return a reason for the user, or NULL for OK.
+The return value MUST be a reason for the user, or NULL for OK.
 
 #### progress
-Whenever a match is scored successfully (all the `unscorable` methods in the inheritance chain allowed the scoring to happen), `progress` will be called with the newly scored match.
+Whenever a match is scored successfully (all the `unscorable` - and, if exists, `verify` - methods in the inheritance chain allowed the scoring to happen), `progress` will be called with the newly scored match.
 
 ```js
   progress: function (match) {
@@ -95,11 +98,11 @@ Whenever a match is scored successfully (all the `unscorable` methods in the inh
 
 If something goes wrong in this method, throw an error.
 
-#### upcoming
-Unlike the normal inheritance way, if this gets called, the inherited `upcoming` function failed. I.e. (if Base) no matches were found containing the playerId that have not yet been played. If there is a limbo stage (waiting for other matches to complete before the player advances), then check ONLY for this here.
+#### limbo
+Called when `upcoming` is called with a `playerId` that was not found in any unscored matches. If your tournament type can keep players in "limbo" until a round or new stage is ready, you should do a best effort search here to see if you can figure out *PARTLY* where the player is going to end up.
 
 ```js
-  upcoming: function (playerId) {
+  limbo: function (playerId) {
     // player may be waiting for generation of next round
     var m = $.firstBy(function (m) {
       return m.p.indexOf(playerId) >= 0 && m.m;
@@ -107,13 +110,53 @@ Unlike the normal inheritance way, if this gets called, the inherited `upcoming`
 
     // if he played this round, check if he will advance
     if (m && Base.sorted(m).slice(0, 2).indexOf(playerId) >= 0) {
-      return {s: 1, r: m.id.r + 1}; // yes, was in top 2, return a partial id
+      // yes, was in top 2, return a partial id for next round (match number unknown)
+      return {s: 1, r: m.id.r + 1};
     }
   }
 ```
 
-#### isDone
-TODO: how?
+#### early
+Called when `isDone` is called and there are still matches remaining. If you implement this, you can decide if the tournament is done early, even if there are more matches to be played.
+
+```js
+  early: function () {
+    // Double elimination Duel can be done early if GF game 1 is won by WB player
+    var gf1 = this.matches[this.matches.length - 2];
+    return this.isLong && this.last === LB && gf1.m && gf1.m[0] > gf1.m[1];
+  }
+```
+
+#### NB: Inheritance
+If you implement one of the above, and inherit from another tournament that implements the same method, then you MUST call the the method you are inheriting from:
+
+```js
+  verify: function (match, score) {
+    var reason = SuperClass.verify.call(this, match, score);
+    if (reason) return reason;
+    // verify other conditions here as usual
+    return null;
+  },
+  progress: function (match) {
+    SuperClass.prototype.progress.call(this, match);
+    // specific progression here as usual
+  },
+  limbo: function (playerId) {
+    SuperClass.prototype.limbo.call(this, playerId);
+    // specific search strategy here as usual
+  },
+  early: function () {
+    SuperClass.prototype.early.call(this);
+    // specific check here
+  }
+```
+
+Note that if you are inheriting from another tournament, overriding these methods should only in rare cases be necessary.
+
+
+
+
+## NB: OUTDATED DOCS BELOW USE EASY METHOD
 
 ## Tournament outline - manual inheritance
 If you prefer to have full control of your prototypes, you may inherit manually from the `Base` class. Note that as per expectations of implementations behaviour, you should follow this outline as closely as possible.
@@ -175,44 +218,32 @@ Finally, you must leave the `data` key on the instance (`this`) untouched for us
 ### Shoulds
 It usually useful to implement some of the following methods
 
-- method `unscorable` - if extra scoring restrictions are necessary
-- method `score` - if player propagation is necessary (tournaments with stages)
+- method `verify` - if extra scoring restrictions are necessary
+- method `progress` - if player propagation is necessary (tournaments with stages)
 - method `isDone` - if a tournament can be done before all matches are played
 
-#### unscorable
-
-    If you implement `unscorable`, you MUST call the Base implementation
-
+#### verify
 This can be achieved in the following way:
 
 ```js
-SomeTournament.prototype.unscorable = function (id, score, allowPast) {
-  var invReason = Base.prototype.unscorable.call(this, id, score, allowPast);
-  if (invReason != null) {
-    return invReason;
+SomeTournament.prototype.verify = function (id, score, allowPast) {
+  if (score[0] === score[1]) {
+    return "cannot draw"; // NOT OK
   }
-  var m = this.findMatch(id);
-  // if extra conditions fail return a string explaining why
-
-  // otherwise, indicate scorable by returning null
-  return null;
+  return null; // OK
 };
 ```
 
-#### score
-
-    If you implement `score`, you MUST call the Base implementation
-
+#### progress
 The Base implementation simply guards on `!unscorable` and returns a Boolean indicating whether or not this succeeded.
 
 
 ```js
-SomeTournament.prototype.score = function (id, score) {
-  if (Base.prototype.score.call(this, id, score) {
-    // Do player propagation here
-    return true;
+SomeTournament.prototype.progress = function (match) {
+  var next = this.findMatch({ s: 1, r: match.id.r + 1, m: 1 });
+  if (next) {
+    next.p = Base.sorted(match).slice(0, 2); // top 2 advance
   }
-  return false;
 };
 ```
 
