@@ -74,14 +74,6 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     value: Klass.idString
   });
 
-  if (obj.upcoming) {
-    var prevUpcoming = Initial.prototype.upcoming || Base.prototype.upcoming;
-    Klass.prototype.upcoming = function (playerId) {
-      var id = prevUpcoming.call(this, playerId);
-      return id || obj.upcoming.call(this, playerId);
-    };
-  }
-
   if (obj.results) {
     Klass.prototype.results = function () {
       var res = Base.prototype.results.call(this, obj.resultDefaults || {});
@@ -142,6 +134,9 @@ Base.prototype.upcoming = function (playerId) {
     if (m.p.indexOf(playerId) >= 0 && !m.m) {
       return m.id;
     }
+  }
+  if (this.limbo) {
+    return this.limbo(playerId);
   }
 };
 
