@@ -62,7 +62,7 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   // TODO: maybe pass in parent as a cb?
   for (var i = 0; i < keys.length; i += 1) {
     var key = keys[i];
-    if (key !== 'init' && obj[key] === 'function') {
+    if (key !== 'init' && typeof obj[key] === 'function') {
       Klass.prototype[key] = obj[key];
     }
   }
