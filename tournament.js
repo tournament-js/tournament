@@ -59,12 +59,24 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   Klass.prototype = Object.create(Initial.prototype);
 
   // attach prototype methods from obj
+  // TODO: maybe pass in parent as a cb?
   for (var i = 0; i < keys.length; i += 1) {
     var key = keys[i];
     if (key !== 'init' && obj[key] === 'function') {
       Klass.prototype[key] = obj[key];
     }
   }
+  // ensure deeper sub classes preserve chains whenever they are set up
+  // this way any deeper sub classes can always just call the previous method
+  var returns = { verify: null, early: false };
+  ['verify', 'progress', 'limbo', 'early'].forEach(function (spec) {
+    if (!obj[spec] && Initial.prototype[spec]) {
+      Klass.prototype[spec] = Initial.prototype[spec];
+    }
+    if (!obj[spec] && !Initial.prototype[spec]) {
+      Klass.prototype[spec] = $.constant(returns[spec]); // usually undefined
+    }
+  });
 
   Klass.parse = function (str) {
     return Base.parse(Klass, str);
@@ -124,10 +136,7 @@ Base.prototype.isDone = function () {
   if (this.matches.every($.get('m'))) {
     return true;
   }
-  if (this.early) {
-    return this.early();
-  }
-  return false;
+  return this.early();
 };
 
 // Default used by Duel, KnockOut, GroupStage, TieBreaker
@@ -141,9 +150,7 @@ Base.prototype.upcoming = function (playerId) {
       return m.id;
     }
   }
-  if (this.limbo) {
-    return this.limbo(playerId);
-  }
+  return this.limbo(playerId);
 };
 
 Base.prototype.unscorable = function (id, score, allowPast) {
@@ -163,10 +170,7 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   if (!allowPast && Array.isArray(m.m)) {
     return "cannot re-score match";
   }
-  if (this.verify) {
-    return this.verify(m, score);
-  }
-  return null;
+  return this.verify(m, score);
 };
 
 
@@ -182,10 +186,8 @@ Base.prototype.score = function (id, score) {
   }
   var m = this.findMatch(id);
   m.m = score;
+  this.progress(m);
 
-  if (this.progress) {
-    this.progress(m);
-  }
   return true;
 };
 
