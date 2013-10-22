@@ -3,7 +3,7 @@
 The simplest way to learn is to look at the simplest full implementation: [masters](https://github.com/clux/masters) - a sort of musical chairs style tournament, but this doc will explain all the details of implementing your own.
 
 ## Matches
-You must create your own matches, but they MUST have the following format:
+You can create your own matches, but they MUST have the following format:
 
 ```js
 {
@@ -21,7 +21,7 @@ With the following requirements:
  - The `.data` key on the match MUST be reserved for users
  - The `.m` key on match MUST NOT be set on construction
  - The `.m` key on match MUST only be touched by `.score`
- - Every match `id` MUST always be unique
+ - Every match `id` MUST be unique
  - If we sort the match id by `s` difference, then `r` difference, then `m` difference, we can score all the matches in this order
 
 ## Tournament outline - easy way
@@ -35,7 +35,6 @@ Base.sub('SomeTournament', ['numPlayers', 'opts'], {
     var matches = makeMatches(this.numPlayers, this.opts);
     initParent(matches); // goes to Base's constructor
   },
-
   progress: function (match) {
     // TODO: propagate winners of match here if needed
   },
@@ -47,10 +46,11 @@ Base.sub('SomeTournament', ['numPlayers', 'opts'], {
     // TODO: check if we can figure out roughly where the player is headed
   },
   early: function () {
-    // TODO: return whether tournament is done early
+    // TODO: return true here if tournament is done early
+    return false;
   }
-
 });
+```
 
 ### Requirements
 
