@@ -25,14 +25,9 @@ var construct = function (Ctor, args) {
   return new F();
 };
 // a crazy implementors helper that eliminates almost all boilerplate code
-var specials = [
-  'init',
-  'score',
-  'unscorable',
-  'upcoming',
-];
 Base.sub = function (name, namedArgs, obj, Initial) {
   Initial = Initial || Base;
+  var keys = Object.keys(obj);
   var Klass = function () {
     var args = Array.prototype.slice.call(arguments);
     if (!(this instanceof Klass)) {
@@ -46,16 +41,10 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     }
 
     // attach properties to this from obj
-    var keys = Object.keys(obj);
     for (var i = 0; i < keys.length; i += 1) {
       var key = keys[i];
-      if (specials.indexOf(key) < 0) {
-        if (typeof obj[key] === 'function') {
-          Klass.prototype[key] = obj[key];
-        }
-        else {
-          this[key] = obj[key];
-        }
+      if (key !== 'init' && obj[key] !== 'function') {
+        this[key] = obj[key];
       }
     }
 
@@ -68,6 +57,14 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     obj.init.call(this, Initial.bind(this));
   };
   Klass.prototype = Object.create(Initial.prototype);
+
+  // attach prototype methods from obj
+  for (var i = 0; i < keys.length; i += 1) {
+    var key = keys[i];
+    if (key !== 'init' && obj[key] === 'function') {
+      Klass.prototype[key] = obj[key];
+    }
+  }
 
   Klass.parse = function (str) {
     return Base.parse(Klass, str);
