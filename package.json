@@ -12,14 +12,14 @@
     "node": ">=0.8.0"
   },
   "keywords": [
+    "tourney",
+    "competition",
     "elimination",
-    "duel",
-    "groupstage",
     "knockout",
-    "bracket",
-    "groups",
-    "AI",
-    "FFA",
+    "groupstage",
+    "duel",
+    "ai",
+    "ffa",
     "robin"
   ],
   "scripts": {
@@ -31,10 +31,10 @@
   },
   "devDependencies": {
     "tap": "~0.4.4",
-    "duel": "~0.1.1",
-    "ffa": "~0.1.1",
-    "groupstage": "~0.1.1",
-    "masters": "~0.1.1"
+    "duel": "~0.2",
+    "ffa": "~0.2",
+    "groupstage": "~0.2",
+    "masters": "~0.2"
   },
   "bugs": {
     "url": "http://github.com/clux/tournament/issues"

@@ -6,12 +6,14 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
-0.16.0 / 2013-10-XX
+0.16.0 / 2013-10-22
 ==================
+  * TOURNAMENTS MUST NO LONGER OVERRIDE `score`, `unscorable`, `upcoming` or `isDone`
   * Following documented in the [implementors guide](./doc/implementors.md)
     - `Base.parse` MUST NOT be bound anymore to avoid subclassing failing after the first
     - `Base.sub` makes inheriting and implementing a tournament much easier
-
+    - Implement `verify` and `progress` for shorter unscorable and score additions
+    - Implement `early` and `limbo` for better isDone and upcoming additions
 
 0.15.1 / 2013-10-17
 ==================
@@ -28,6 +30,10 @@ PLANNED (most stuff in issue form now)
    - [ffa](https://npmjs.org/package/ffa)
    - [groupstage](https://npmjs.org/package/groupstage)
    - [masters](https://npmjs.org/package/masters)
+
+=======================================
+# BEFORE THIS MODULE WAS INTERFACE ONLY
+=======================================
 
 0.14.0 / 2013-10-15
 ==================
