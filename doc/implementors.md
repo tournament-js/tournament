@@ -30,7 +30,7 @@ With the following requirements:
 var Base = require('tournament');
 
 // Specify tournament names and the named arguments for its constructor
-Base.sub('SomeTournament', ['numPlayers', 'opts'], {
+var SomeTournament = Base.sub('SomeTournament', ['numPlayers', 'opts'], {
   init: function (initParent) {
     var matches = makeMatches(this.numPlayers, this.opts);
     initParent(matches); // goes to Base's constructor
@@ -38,7 +38,7 @@ Base.sub('SomeTournament', ['numPlayers', 'opts'], {
   progress: function (match) {
     // TODO: propagate winners of match here if needed
   },
-  unscorable: function (id, score) {
+  verify: function (id, score) {
     // TODO: check for extra conditions here if needed
     return null;
   },
@@ -50,20 +50,53 @@ Base.sub('SomeTournament', ['numPlayers', 'opts'], {
     return false;
   }
 });
+
+SomeTournament.invalid = function (numPlayers, opts) {
+  if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
+    return "number of players must be at least 2";
+  }
+  return null;
+};
 ```
 
 ### Requirements
 
 - `numPlayers` MUST exists as a named argument
+- `invalid` MUST be defined on the class
 - `init` MUST be implemented
+- `results` MUST be implemented
 - `init` MUST call the `initParent` cb with the arguments of `Base` (matches only)
 
 NB: For inheriting from another tournament, replace all references to `Base` with the tournament you are inheriting from.
 
-### Usefuls
+Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
+
+#### invalid
+Invalid is a function that MUST have the same parameters as your constructor (i.e. the same as the named arguments passed to `Base.sub`), and must return a reason why the current parameters can not produce a valid tournament, if this is the case. If the parameters are valid, return null.
+
+This way you can produce sensible user feedback, ensured constructibility of tournaments, and set your own size limits.
+
+```js
+SomeTournament.invalid = function (numPlayers, opts) {
+  if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
+    return "number of players must be at least 2";
+  }
+  if (np > 64) {
+    return "number of players cannot exceed 64"; // arbitrary limit
+  }
+  return null;
+};
+```
+
+#### results
+The arguably most important feature of tournaments is the ability to figure out and to compute statistics and winners at the end. If you don't implement this, you only have a collection of matches.
+
+TODO: document HOW to do this well
+
+### Useful Methods
 It's often useful to supply the following methods
 
-- `unscorable` - if extra scoring restrictions are necessary
+- `verify` - if extra scoring restrictions are necessary
 - `progress` - if player propagation is necessary (tournaments with stages)
 - `limbo` - if a player can exist in limbo (waiting for a round to finish)
 - `early` - if a tournament can be done before all matches are played
@@ -153,7 +186,11 @@ If you implement one of the above, and inherit from another tournament that impl
 
 Note that if you are inheriting from another tournament, overriding these methods should only in rare cases be necessary.
 
-
+### Useful extras
+#### idString
+If you need to get the string of a tournament id and what `Base.prototype.idString` returns doesn't feel right, you should add your own `idString` function to `SomeTournament.idString` directly. Most tournaments do this.
+#### roundNames
+TODO: talk about these?
 
 
 ## NB: OUTDATED DOCS BELOW USE EASY METHOD
@@ -169,8 +206,15 @@ function SomeTournament(numPlayers, opts) {
     return new someTournament(numPlayers, opts); // new protection
   }
   this.numPlayers = numPlayers; // always store this
-  // TODO: somehow create matches and guard on SomeTournament.invalid
-  var matches = [];
+  var invReason = SomeTournament.invalid(numPlayers, opts);
+  if (invReason !== null) {
+    if (invReason !== null) {
+      console.error("Invalid %s configuration", name, args);
+      console.error("  :", invReason);
+      return;
+    }
+  }
+  var matches = []; // TODO: create your own matches
   Base.call(this, SomeTournament, matches);
 }
 
@@ -196,6 +240,20 @@ SomeTournament.prototype.results = function () {
   var res = []; // fill this in by analysing the matches
   return res;
 };
+SomeTournament.prototype.progress = function (match) {
+  // TODO: propagate winners of match here if needed
+};
+SomeTournament.prototype.verify = function (id, score) {
+  // TODO: check for extra conditions here if needed
+  return null;
+};
+SomeTournament.prototype.limbo = function (playerId) {
+  // TODO: check if we can figure out roughly where the player is headed
+};
+SomeTournament.prototype.early = function () {
+  // TODO: return true here if tournament is done early
+  return false;
+};
 
 module.exports = SomeTournament;
 ```
@@ -205,7 +263,6 @@ Like in the outline, you MUST implement:
 
 - constructor that calls the `Base` class constructor with the matches
 - static `parse` that defers to `Base`
-- static `idString` that can stringify a matchId
 - static `invalid` that can give a string reason why tournament options are invalid
 - method `results` to compute statistics/progression
 
@@ -216,49 +273,26 @@ Note that the constructor MUST set `numPlayers` on `this` as `Base` class helper
 Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
 
 ### Shoulds
-It usually useful to implement some of the following methods
+It is usually useful to implement some of the following methods:
 
+- static `idString` that can stringify a matchId
 - method `verify` - if extra scoring restrictions are necessary
 - method `progress` - if player propagation is necessary (tournaments with stages)
-- method `isDone` - if a tournament can be done before all matches are played
+- method `limbo` - if a player can exist in limbo (waiting for a round to finish)
+- method `early` - if a tournament can be done before all matches are played
+
 
 #### verify
-This can be achieved in the following way:
-
-```js
-SomeTournament.prototype.verify = function (id, score, allowPast) {
-  if (score[0] === score[1]) {
-    return "cannot draw"; // NOT OK
-  }
-  return null; // OK
-};
-```
+Same as `verify` in the easier implementation, except it goes on the `prototype`.
 
 #### progress
-The Base implementation simply guards on `!unscorable` and returns a Boolean indicating whether or not this succeeded.
+Same as `progress` in the easier implementation, except it goes on the `prototype`.
 
+#### early
+Same as `early` in the easier implementation, except it goes on the `prototype`.
 
-```js
-SomeTournament.prototype.progress = function (match) {
-  var next = this.findMatch({ s: 1, r: match.id.r + 1, m: 1 });
-  if (next) {
-    next.p = Base.sorted(match).slice(0, 2); // top 2 advance
-  }
-};
-```
-
-#### upcoming
-If a tournament needs to wait for a round before propagating, you SHOULD implement a better `upcoming` that accounts for this.
-
-```js
-SomeTournament.prototype.upcoming = function (playerId) {
-  var id = Base.prototype.upcoming.call(this, playerId);
-  if (id) {
-    return id; // player not waiting for new rounds - match ready
-  }
-  // otherwise, COULD check if player is due to reach the next round and return a partial id
-};
-```
+#### limbo
+Same as `limbo` in the easier implementation, except it goes on the `prototype`.
 
 See the [FFA package](https://npmjs.org/package/ffa) for a full example of this.
 
