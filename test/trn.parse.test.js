@@ -7,8 +7,7 @@ var test = require('tap').test
   , Base = require('../');
 
 
-var create = function (Klass) {
-  var type = Klass.name;
+var create = function (Klass, type) {
   if (type === 'Duel') {
     return new Klass(8, Klass.LB, {short: true});
   }
@@ -31,8 +30,15 @@ var create = function (Klass) {
 };
 
 test("serialize/deserialize tournaments", function (t) {
-  [Duel, FFA, Masters, GroupStage].forEach(function (Klass) {
-    var inst = create(Klass);
+  var trns = {
+    Duel : Duel,
+    FFA: FFA,
+    Masters: Masters,
+    GroupStage: GroupStage
+  };
+  Object.keys(trns).forEach(function (name) {
+    var Klass = trns[name];
+    var inst = create(Klass, name);
     t.ok(inst instanceof Klass, "inst is a " + Klass.name + " instance");
     inst.data = { hi: true };
     t.ok(inst.matches.length, 'some matches must have been made');
