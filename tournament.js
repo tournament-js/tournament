@@ -77,37 +77,12 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     value: Klass.idString
   });
 
-  // TODO: rename to progress?
-  if (obj.score) {
-    var prevScore = Initial.prototype.score || Base.prototype.score;
-    Klass.prototype.score = function (id, score) {
-      if (prevScore.call(this, id, score)) {
-        obj.score.call(this, id, score);
-        return true;
-      }
-      return false;
-    };
-  }
-
-
-  // TODO: rename to something else?
-  if (obj.unscorable) {
-    var prevUnscorable = Initial.prototype.unscorable || Base.prototype.unscorable;
-    Klass.prototype.unscorable = function (id, score, allowPast) {
-      var invReason = prevUnscorable.call(this, id, score, allowPast);
-      if (invReason !== null) {
-        return invReason;
-      }
-      return obj.unscorable.call(this, id, score);
-    };
-  }
-  // TODO: rename to something else?
   if (obj.upcoming) {
     var prevUpcoming = Initial.prototype.upcoming || Base.prototype.upcoming;
     Klass.prototype.upcoming = function (playerId) {
       var id = prevUpcoming.call(this, playerId);
       return id || obj.upcoming.call(this, playerId);
-    }
+    };
   }
 
   if (obj.results) {
@@ -190,6 +165,9 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   if (!allowPast && Array.isArray(m.m)) {
     return "cannot re-score match";
   }
+  if (this.verify) {
+    return this.verify(m, score);
+  }
   return null;
 };
 
@@ -206,6 +184,10 @@ Base.prototype.score = function (id, score) {
   }
   var m = this.findMatch(id);
   m.m = score;
+
+  if (this.progress) {
+    this.progress(m);
+  }
   return true;
 };
 
@@ -324,7 +306,7 @@ Base.prototype.results = function (blanks) {
       seed: s + 1,
       wins: 0,
       pos: this.numPlayers
-    }
+    };
     for (var key in blanks) {
       res[s][key] = blanks[key];
     }

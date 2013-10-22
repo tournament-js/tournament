@@ -36,9 +36,8 @@ Base.sub('SomeTournament', ['numPlayers', 'opts'], {
     initParent(matches); // goes to Base's constructor
   },
 
-  score: function (id, score) {
-    // TODO: propagate players here if needed
-    return true;
+  progress: function (match) {
+    // TODO: propagate winners of match here if needed
   },
   unscorable: function (id, score) {
     // TODO: check for extra conditions here if needed
@@ -62,17 +61,17 @@ NB: For inheriting from another tournament, replace all references to `Base` wit
 It's often useful to supply the following methods
 
 - `unscorable` - if extra scoring restrictions are necessary
-- `score` - if player propagation is necessary (tournaments with stages)
+- `progress` - if player propagation is necessary (tournaments with stages)
 - `upcoming` - if a player exists in limbo before a round is done
 - `isDone` - if a tournament can be done before all matches are played
 
 
-#### unscorable
-Unlike the normal inheritance way, we simply check extra conditions are satisfied. If this function gets called, we already know `id` and `score` got through the `Base.prototype.unscorable` check.
+#### verify
+Whenever a tournament gets asked to `.score()` a match, this gets called after some basic properties of value sanity is checked by the Base class.
+If you implement this, verify only extra restrictions that you would like to put on scoring that is not already checked for by `Base.prototype.unscorable`.
 
 ```js
-  score : function (id, score) {
-    var m = this.findMatch(id);
+  verify: function (match, score) {
     if (score[0] === score[1]) {
       return "cannot draw"; // NOT OK
     }
@@ -80,14 +79,17 @@ Unlike the normal inheritance way, we simply check extra conditions are satisfie
   }
 ```
 
-#### score
-Unlike the normal inheritance way, we simply propagate players here if we are in a position to do so. If this function gets called we know that our implementation (if we have one) of `unscorable` (and all the ones below us in the chain) did not stop us, and the match with given `id` was successfully scored with `score`.
+NB: return a reason for the user, or NULL for OK.
+
+#### progress
+Whenever a match is scored successfully (all the `unscorable` methods in the inheritance chain allowed the scoring to happen), `progress` will be called with the newly scored match.
 
 ```js
-  score: function (id, score) {
-    var m = this.findMatch(id); // already scored
-    var next = this.findMatch({ s: 1, r: m.id.r + 1, m: 1 });
-    next.p = Base.sorted(m).slice(0, 2); // top 2 advance
+  progress: function (match) {
+    var next = this.findMatch({ s: 1, r: match.id.r + 1, m: 1 });
+    if (next) {
+      next.p = Base.sorted(match).slice(0, 2); // top 2 advance
+    }
   }
 ```
 
