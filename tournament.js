@@ -28,10 +28,21 @@ var construct = function (Ctor, args) {
 Base.sub = function (name, namedArgs, obj, Initial) {
   Initial = Initial || Base;
   var keys = Object.keys(obj);
+  // sanity for implementors
+  if (!obj.init) {
+    throw new Error("Must supply an init function to .sub");
+  }
+  if (!namedArgs) {
+    throw new Error("Must supply an array of arguments to .sub");
+  }
+
   var Klass = function () {
     var args = Array.prototype.slice.call(arguments);
     if (!(this instanceof Klass)) {
       return construct(Klass, args);
+    }
+    if (!Klass.invalid) {
+      throw new Error(name + " must have an Invalid function when constructing");
     }
     var invReason = Klass.invalid.apply(Klass, args);
     if (invReason !== null) {
@@ -55,6 +66,9 @@ Base.sub = function (name, namedArgs, obj, Initial) {
 
     // call given init method, and pass in next constructor as cb
     obj.init.call(this, Initial.bind(this));
+    if (!this.numPlayers) {
+      throw new Error("numPlayers must be set on instance or be a named arg");
+    }
   };
   Klass.prototype = Object.create(Initial.prototype);
 
