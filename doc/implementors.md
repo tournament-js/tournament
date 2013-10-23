@@ -209,7 +209,7 @@ function SomeTournament(numPlayers, opts) {
   var invReason = SomeTournament.invalid(numPlayers, opts);
   if (invReason !== null) {
     if (invReason !== null) {
-      console.error("Invalid %s configuration", name, args);
+      console.error("Invalid SomeTournament configuration", numPlayers, opts);
       console.error("  :", invReason);
       return;
     }

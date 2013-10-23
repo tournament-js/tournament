@@ -290,7 +290,7 @@ trn.data = {
 ```
 
 ## Ensuring Scorability & Consistency
-The `trn.score(id, scores)` method, whilst simple, has a couple of problems when used with the default behaviour:
+The `trn.score(id, scores)` method, is simple, but may exhibit surprising behaviour for the uninitiated:
 
 1. When invalid `trn.score()` parameters are given, tournament will by default just log the error and return `false`. This is not very helpful if the action was taken remotely through a UI who will not see the message.
 
@@ -298,7 +298,7 @@ The `trn.score(id, scores)` method, whilst simple, has a couple of problems when
 
 The `trn.unscorable()` method addresses both of these problems in kind:
 
-1. It reports the actual string logged by `.score()` if the scoring would be unsuccessful, allowing you to guarddd on it and report it back to the client instead of blindly trying.
+1. It reports the actual string logged by `.score()` if the scoring would be unsuccessful, allowing you to guard on it and report it back to the client instead of blindly trying.
 
 2. It also by default disallows rewriting history, unless you pass in an optional last parameter to explicitly allow this.
 
@@ -311,7 +311,7 @@ if (reason !== null) {
   console.log(reason); // either invalid parameters or complaining about rewriting history
 }
 else {
-  trn.score(id, score); // will work, and will not  rewrite history
+  trn.score(id, score); // will work, and will not rewrite history
 }
 
 // administrator access - can rewrite history
@@ -326,14 +326,12 @@ else {
 
  When guarding on `!trn.unscorable()` like this `tournament` will never log anything during a `trn.score()` call as they will always work.
 
- The reasons are currently hardcoded inside each tournament types dedicated file, under their internal `unscorable` function. Typical faults include:
+ The reasons are currently hardcoded inside the the Base class and implementations internal `verify` functions. Typical faults include:
 
  - parameters not integers, scores not an array of numbers
  - scores not the same length as the player array
  - scores cannot distinguish between the top X player that are advancing (if eliminating match)
  - players are not ready in the match (dependent match not played)
-
-But they do not cover the the stricter reasons listed in the NBs above!
 
 ## Ensuring Constructibility
 Certain parameter configurations to tournament constructors are logically impossible. Like group size > number of players etc. Whether or not a set of parameters will fail contruction can be tested for with a method taking the same parameters as its respective constructor.
@@ -367,7 +365,7 @@ FFA.idString({s: 1, r: 3, m: 2});
 GroupStage.idString({s: 5, r: 2, m: 1});
 "G5 R5 M1"
 
-KnockOut.idString({s: 1, r:2, m: 1});
+Masters.idString({s: 1, r:2, m: 1});
 "R2"
 ```
 

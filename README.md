@@ -68,7 +68,7 @@ For specific tournament usage, install the modules you want:
 $ npm install duel ffa groupstage --save
 ```
 
-To use these on in the browser, bundle it up with [browserify](https://npmjs.org/package/browserify:
+To use these on in the browser, bundle it up with [browserify](https://npmjs.org/package/browserify)
 
 ```bash
 $ npm dedupe
