@@ -100,13 +100,6 @@ Base.sub = function (name, namedArgs, obj, Initial) {
     value: Klass.idString
   });
 
-  if (obj.results) {
-    Klass.prototype.results = function () {
-      var res = Base.prototype.results.call(this, obj.resultDefaults || {});
-      return obj.results.call(this, res);
-    };
-  }
-
   Klass.sub = function (subName, subArgs, subObj) {
     return Initial.sub(subName, subArgs, subObj, Klass);
   };
@@ -243,34 +236,27 @@ Base.prototype.findMatchesRanged = function (lb, ub) {
   });
 };
 
-// partition matches into rounds (optionally fix section)
-Base.prototype.rounds = function (section) {
-  var rnds = [];
-  for (var i = 0; i < this.matches.length; i += 1) {
-    var m = this.matches[i];
-    if (section == null || m.id.s === section) {
-      if (!Array.isArray(rnds[m.id.r - 1])) {
-        rnds[m.id.r - 1] = [];
+var splitBy = function (ms, filterKey, splitKey, number) {
+  var res = [];
+  for (var i = 0; i < ms.length; i += 1) {
+    var m = ms[i];
+    if (number == null || m.id[filterKey] === number) {
+      if (!Array.isArray(res[m.id[splitKey] - 1])) {
+        res[m.id[splitKey] - 1] = [];
       }
-      rnds[m.id.r - 1].push(m);
+      res[m.id[splitKey] - 1].push(m);
     }
   }
-  return rnds;
+  return res;
+};
+// partition matches into rounds (optionally fix section)
+Base.prototype.rounds = function (section) {
+  return splitBy(this.matches, 's', 'r', section);
 };
 // partition matches into sections (optionally fix round)
 // i.e. get [WB, LB] in Duel, get [group 1, ..] in GroupStage
 Base.prototype.sections = function (round) {
-  var secs = [];
-  for (var i = 0; i < this.matches.length; i += 1) {
-    var m = this.matches[i];
-    if (round == null || m.id.r === round) {
-      if (!Array.isArray(secs[m.id.s - 1])) {
-        secs[m.id.s - 1] = [];
-      }
-      secs[m.id.s - 1].push(m);
-    }
-  }
-  return secs;
+  return splitBy(this.matches, 'r', 's', round);
 };
 
 var roundNotDone = function (rnd) {
@@ -278,6 +264,8 @@ var roundNotDone = function (rnd) {
     return !m.m;
   });
 };
+
+
 Base.prototype.currentRound = function (section) {
   return $.firstBy(roundNotDone, this.rounds(section));
 };
