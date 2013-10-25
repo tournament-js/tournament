@@ -4,7 +4,7 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
-0.17.0 / 2013-10-XX
+0.17.0 / 2013-10-25
 ==================
   * Added `Base.isInteger` while ES6 is not out
   * TOURNAMENTS MUST NO LONGER OVERRIDE `results` (straggler from 0.16):
