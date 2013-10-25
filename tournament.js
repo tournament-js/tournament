@@ -110,6 +110,10 @@ Base.idString = function (id) {
   return "S" + id.s + " R" + id.r + " M" + id.m;
 };
 
+Base.isInteger = function (n) { // until this gets on Number in ES6
+  return Math.ceil(n) === n;
+}
+
 // comparators that used to be in common
 // to ensure first matches first and (for most part) forEach scorability
 // score section desc, else round desc, else match number desc
@@ -181,7 +185,7 @@ Base.prototype.unscorable = function (id, score, allowPast) {
 };
 
 
-// A very basic score implementation that SHOULD be overridden
+// the only way to fly
 Base.prototype.score = function (id, score) {
   // we use the unscorable one highest up in the chain because by spec:
   // it must call Base.prototype.unscorable first if overridden
@@ -254,7 +258,6 @@ Base.prototype.rounds = function (section) {
   return splitBy(this.matches, 's', 'r', section);
 };
 // partition matches into sections (optionally fix round)
-// i.e. get [WB, LB] in Duel, get [group 1, ..] in GroupStage
 Base.prototype.sections = function (round) {
   return splitBy(this.matches, 'r', 's', round);
 };
@@ -300,20 +303,20 @@ Base.prototype.players = function (id) {
 
 
 // prepare a results array
-Base.prototype.results = function (blanks) {
-  blanks = blanks || {};
+// not always very helpful
+Base.prototype.results = function (arg) {
   var res = new Array(this.numPlayers);
   for (var s = 0; s < this.numPlayers; s += 1) {
     res[s] = {
       seed: s + 1,
       wins: 0,
+      for: 0,
+      //against: 0, TODO: extend this to FFA and Masters
       pos: this.numPlayers
     };
-    for (var key in blanks) {
-      res[s][key] = blanks[key];
-    }
+    $.extend(res[s], this.initResult(s+1));
   }
-  return res;
+  return this.stats(res, arg);
 };
 
 // shortcut for results
