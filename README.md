@@ -55,10 +55,10 @@ d.matches;
 
 // can view results at every stage of the tournament, here are the final ones
 d.results();
-[ { seed: 1, maps: 2, wins: 2, pos: 1 },
-  { seed: 3, maps: 1, wins: 1, pos: 2 },
-  { seed: 2, maps: 1, wins: 1, pos: 3 },
-  { seed: 4, maps: 0, wins: 0, pos: 4 } ]
+[ { seed: 1, for: 2, against: 0, wins: 2, pos: 1 },
+  { seed: 3, for: 1, against: 1, wins: 1, pos: 2 },
+  { seed: 2, for: 1, against: 1, wins: 1, pos: 3 },
+  { seed: 4, for: 0, against: 2, wins: 0, pos: 4 } ]
 ```
 
 ## Installation

@@ -48,6 +48,14 @@ var SomeTournament = Base.sub('SomeTournament', ['numPlayers', 'opts'], {
   early: function () {
     // TODO: return true here if tournament is done early
     return false;
+  },
+  initResult: function (seed) {
+    // TODO: initialize extra result properties here
+    return {}; 
+  },
+  stats: function (res) {
+    // TODO: fill in map based stats on res and sort res here
+    return res;
   }
 });
 
@@ -64,7 +72,8 @@ SomeTournament.invalid = function (numPlayers, opts) {
 - `numPlayers` MUST exists as a named argument
 - `invalid` MUST be defined on the class
 - `init` MUST be implemented
-- `results` MUST be implemented
+- `initResult` MUST be implemented
+- `stats` MUST be implemented
 - `init` MUST call the `initParent` cb with the arguments of `Base` (matches only)
 
 NB: For inheriting from another tournament, replace all references to `Base` with the tournament you are inheriting from.
@@ -89,9 +98,41 @@ SomeTournament.invalid = function (numPlayers, opts) {
 ```
 
 #### results
-The arguably most important feature of tournaments is the ability to figure out and to compute statistics and winners at the end. If you don't implement this, you only have a collection of matches.
+The arguably most important feature of tournaments is the ability to figure out and to compute statistics and winners at the end. If you don't implement the following, all you have a collection of matches.
 
-TODO: document HOW to do this well
+##### initResult
+Called early on after `results` is called and the result objects needs to be initialized. Most properties are already set in `Base.prototype.results`, but if you need custom statistical properties, initialize them here.
+
+```js
+  initResult: function (seed) {
+    return {
+      grp: this.groupFor(seed),
+      losses: 0,
+      draws: 0
+    };
+  }
+```
+
+##### stats
+Called after `initResult` have been called `numPlayers` times and the array of results are called in. Fill in the statistics for your tournament here.
+
+```js
+  stats: function (resAry) {
+    this.matches.forEach(function (m) {
+      var winner = m.s[1] > m.s[0] ? m.p[1] : m.p[0];
+      resAry[winner-1].wins += 1;
+      resAry[winner-1].pos += 1;
+    });
+    return res.sort(Base.compareRes);
+  }
+```
+
+Note that `resAry` is ONLY sorted by seeding number initially. Thus you can look up players by doing `resAry[seed-1]` and then modifying that object.
+
+At the end of the `stats` function, however, you should ensure the `resAry` is sorted by `pos` descending, then optionally by other properties such as group position, map wins or losses (`.for` and `.against`), and with least priority, by `.seed` ascending.
+
+Note Base helpers such as `Base.compareRes` and `Base.sorted` for computing statistics here.
+
 
 ### Useful Methods
 It's often useful to supply the following methods
@@ -161,7 +202,7 @@ Called when `isDone` is called and there are still matches remaining. If you imp
 ```
 
 #### NB: Inheritance
-If you implement one of the above, and inherit from another tournament that implements the same method, then you MUST call the the method you are inheriting from:
+If you implement one of the above, and inherit from another tournament that implements the same method, then you SHOULD call the method you are inheriting from:
 
 ```js
   verify: function (match, score) {
@@ -181,6 +222,14 @@ If you implement one of the above, and inherit from another tournament that impl
   early: function () {
     SuperClass.prototype.early.call(this);
     // specific check here
+  },
+  initResult: function (seed) {
+    var res = SuperClass.prototype.initResult.call(this, seed);
+    // specific extensions here
+  },
+  stats: function (res) {
+    var results = SuperClass.prototype.stats.call(this, res);
+    // specific modifications to results here
   }
 ```
 
@@ -254,6 +303,14 @@ SomeTournament.prototype.early = function () {
   // TODO: return true here if tournament is done early
   return false;
 };
+SomeTournament.prototype.initResult = function (seed) {
+  // TODO: initialize extra result properties here
+  return {}; 
+};
+SomeTournament.prototype.stats = function (res) {
+  // TODO: fill in map based stats on res and sort res here
+  return res;
+};
 
 module.exports = SomeTournament;
 ```
@@ -264,7 +321,8 @@ Like in the outline, you MUST implement:
 - constructor that calls the `Base` class constructor with the matches
 - static `parse` that defers to `Base`
 - static `invalid` that can give a string reason why tournament options are invalid
-- method `results` to compute statistics/progression
+- method `stats` to compute statistics/progression
+- method `initResult` to initialize result objects
 
 The latter is always the hard one.
 
@@ -295,6 +353,13 @@ Same as `early` in the easier implementation, except it goes on the `prototype`.
 Same as `limbo` in the easier implementation, except it goes on the `prototype`.
 
 See the [FFA package](https://npmjs.org/package/ffa) for a full example of this.
+
+#### stats
+Same as `stats` in the easier implementation, except it goes on the `prototype`.
+
+
+#### initResult
+Same as `initResult` in the easier implementation, except it goes on the `prototype`.
 
 
 ### Remaining

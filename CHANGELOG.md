@@ -1,10 +1,17 @@
 PLANNED (most stuff in issue form now)
 ==================
-  * move `ffa_cost` and `balancer` to own libraries?
-  * move `tieCompute` stuff from GroupStage and TieBreaker to groups algs
   * `FFA` should also have a `mapsBreak` option
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
+
+0.17.0 / 2013-10-XX
+==================
+  * Added `Base.isInteger` while ES6 is not out
+  * TOURNAMENTS MUST NO LONGER OVERRIDE `results` (straggler from 0.16):
+  * Instead implement `stats` and `initResult`
+  * Results consistency enforced:
+    - `maps` and `sum` keys removed across tournaments
+    - `for` and `against` keys have been added across tournaments - fixes #12
 
 0.16.0 / 2013-10-22
 ==================
