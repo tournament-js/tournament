@@ -72,7 +72,6 @@ SomeTournament.invalid = function (numPlayers, opts) {
 - `numPlayers` MUST exists as a named argument
 - `invalid` MUST be defined on the class
 - `init` MUST be implemented
-- `initResult` MUST be implemented
 - `stats` MUST be implemented
 - `init` MUST call the `initParent` cb with the arguments of `Base` (matches only)
 
@@ -99,19 +98,6 @@ SomeTournament.invalid = function (numPlayers, opts) {
 
 #### results
 The arguably most important feature of tournaments is the ability to figure out and to compute statistics and winners at the end. If you don't implement the following, all you have a collection of matches.
-
-##### initResult
-Called early on after `results` is called and the result objects needs to be initialized. Most properties are already set in `Base.prototype.results`, but if you need custom statistical properties, initialize them here.
-
-```js
-  initResult: function (seed) {
-    return {
-      grp: this.groupFor(seed),
-      losses: 0,
-      draws: 0
-    };
-  }
-```
 
 ##### stats
 Called after `initResult` have been called `numPlayers` times and the array of results are called in. Fill in the statistics for your tournament here.
@@ -141,6 +127,7 @@ It's often useful to supply the following methods
 - `progress` - if player propagation is necessary (tournaments with stages)
 - `limbo` - if a player can exist in limbo (waiting for a round to finish)
 - `early` - if a tournament can be done before all matches are played
+- `initResult` - if extra properties for `stats` needs to be initialized
 
 
 #### verify
@@ -200,6 +187,21 @@ Called when `isDone` is called and there are still matches remaining. If you imp
     return this.isLong && this.last === LB && gf1.m && gf1.m[0] > gf1.m[1];
   }
 ```
+
+##### initResult
+Called early on after `results` is called and the result objects needs to be initialized. Most properties are already set in `Base.prototype.results`, but if you need custom statistical properties, initialize them here.
+
+```js
+  initResult: function (seed) {
+    return {
+      grp: this.groupFor(seed),
+      losses: 0,
+      draws: 0
+    };
+  }
+```
+
+NB: This can be a constant function, as all properties are copied onto the results array.
 
 #### NB: Inheritance
 If you implement one of the above, and inherit from another tournament that implements the same method, then you SHOULD call the method you are inheriting from:
@@ -322,7 +324,6 @@ Like in the outline, you MUST implement:
 - static `parse` that defers to `Base`
 - static `invalid` that can give a string reason why tournament options are invalid
 - method `stats` to compute statistics/progression
-- method `initResult` to initialize result objects
 
 The latter is always the hard one.
 
@@ -338,7 +339,7 @@ It is usually useful to implement some of the following methods:
 - method `progress` - if player propagation is necessary (tournaments with stages)
 - method `limbo` - if a player can exist in limbo (waiting for a round to finish)
 - method `early` - if a tournament can be done before all matches are played
-
+- `initResult` - if extra properties for `stats` needs to be initialized
 
 #### verify
 Same as `verify` in the easier implementation, except it goes on the `prototype`.
@@ -356,7 +357,6 @@ See the [FFA package](https://npmjs.org/package/ffa) for a full example of this.
 
 #### stats
 Same as `stats` in the easier implementation, except it goes on the `prototype`.
-
 
 #### initResult
 Same as `initResult` in the easier implementation, except it goes on the `prototype`.

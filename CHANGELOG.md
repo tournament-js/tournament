@@ -4,6 +4,10 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
+0.17.1 / 2013-10-27
+==================
+  * `initResult` now optional when no extra properties are computed
+
 0.17.0 / 2013-10-25
 ==================
   * Added `Base.isInteger` while ES6 is not out
