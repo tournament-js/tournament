@@ -82,8 +82,8 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   }
   // ensure deeper sub classes preserve chains whenever they are set up
   // this way any deeper sub classes can always just call the previous method
-  var returns = { verify: null, early: false };
-  ['verify', 'progress', 'limbo', 'early'].forEach(function (spec) {
+  var returns = { verify: null, early: false, initResult: {} };
+  ['verify', 'progress', 'limbo', 'early', 'initResult'].forEach(function (spec) {
     if (!obj[spec] && Initial.prototype[spec]) {
       Klass.prototype[spec] = Initial.prototype[spec];
     }
@@ -112,7 +112,7 @@ Base.idString = function (id) {
 
 Base.isInteger = function (n) { // until this gets on Number in ES6
   return Math.ceil(n) === n;
-}
+};
 
 // comparators that used to be in common
 // to ensure first matches first and (for most part) forEach scorability
