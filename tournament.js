@@ -27,6 +27,7 @@ var construct = function (Ctor, args) {
 // a crazy implementors helper that eliminates almost all boilerplate code
 Base.sub = function (name, namedArgs, obj, Initial) {
   Initial = Initial || Base;
+  obj.name = name; // so that is will exist on this
   var keys = Object.keys(obj);
   // sanity for implementors
   if (!obj.init) {
@@ -35,7 +36,6 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   if (!namedArgs) {
     throw new Error("Must supply an array of arguments to .sub");
   }
-  obj.name = name; // so that is will exist on this
 
   var Klass = function () {
     var args = Array.prototype.slice.call(arguments);
