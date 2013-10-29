@@ -35,6 +35,7 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   if (!namedArgs) {
     throw new Error("Must supply an array of arguments to .sub");
   }
+  obj.name = name; // so that is will exist on this
 
   var Klass = function () {
     var args = Array.prototype.slice.call(arguments);
@@ -42,13 +43,12 @@ Base.sub = function (name, namedArgs, obj, Initial) {
       return construct(Klass, args);
     }
     if (!Klass.invalid) {
-      throw new Error(name + " must have an Invalid function when constructing");
+      throw new Error(name + " must implement an Invalid function");
     }
     var invReason = Klass.invalid.apply(Klass, args);
     if (invReason !== null) {
       console.error("Invalid %s configuration", name, args);
-      console.error("  :", invReason);
-      return;
+      throw new Error(name + " cannot construct: " + invReason);
     }
 
     // attach properties to this from obj
@@ -70,7 +70,7 @@ Base.sub = function (name, namedArgs, obj, Initial) {
       throw new Error("numPlayers must be set on instance or be a named arg");
     }
   };
-  Klass.prototype = Object.create(Initial.prototype);
+  Base.inherit(Klass, Initial);
 
   // attach prototype methods from obj
   // TODO: maybe pass in parent as a cb?
@@ -80,14 +80,21 @@ Base.sub = function (name, namedArgs, obj, Initial) {
       Klass.prototype[key] = obj[key];
     }
   }
+  return Klass;
+};
+
+Base.inherit = function (Klass, Initial) {
+  Initial = Initial || Base;
+  Klass.prototype = Object.create(Initial.prototype);
+
   // ensure deeper sub classes preserve chains whenever they are set up
   // this way any deeper sub classes can always just call the previous method
   var returns = { verify: null, early: false, initResult: {} };
   ['verify', 'progress', 'limbo', 'early', 'initResult'].forEach(function (spec) {
-    if (!obj[spec] && Initial.prototype[spec]) {
+    if (Initial.prototype[spec]) {
       Klass.prototype[spec] = Initial.prototype[spec];
     }
-    if (!obj[spec] && !Initial.prototype[spec]) {
+    if (!Initial.prototype[spec]) {
       Klass.prototype[spec] = $.constant(returns[spec]); // usually undefined
     }
   });
@@ -99,11 +106,12 @@ Base.sub = function (name, namedArgs, obj, Initial) {
   Object.defineProperty(Klass.prototype, 'rep', {
     value: Klass.idString
   });
-
+  Klass.inherit = function (SubKlass) {
+    return Initial.inherit(SubKlass, Klass);
+  };
   Klass.sub = function (subName, subArgs, subObj) {
     return Initial.sub(subName, subArgs, subObj, Klass);
   };
-  return Klass;
 };
 
 Base.idString = function (id) {
@@ -315,6 +323,9 @@ Base.prototype.results = function (arg) {
       pos: this.numPlayers
     };
     $.extend(res[s], this.initResult(s+1));
+  }
+  if (typeof this.stats !== 'function') {
+    throw new Error(this.name + " has not implemented stats");
   }
   return this.stats(res, arg);
 };
