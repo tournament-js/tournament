@@ -2,26 +2,29 @@ var tap = require('tap')
   , test = tap.test
   , Base = require('../'); // main interface
 
-var SomeT = Base.sub('SomeT', ['numPlayers', 'opts'], {
-  init: function (initParent) {
-    this.opts = this.opts || {};
-    var ms = [
-      { id: { s: 1, r: 1, m: 1 }, p: [1,2] },
-      { id: { s: 1, r: 1, m: 2 }, p: [3,4] },
-    ];
-    initParent(ms);
-  },
-  verify: function (match) {
-    if (match.id.m === 2) {
-      return "Cannot score match 2"; // for the lulz
-    }
-    return null;
-  },
-
-  progress: function (match) {
-    this.opts.progressCalled && this.opts.progressCalled(match);
-  }
+var SomeT = Base.sub('SomeT', function (opts, initParent) {
+  this.opts = opts;
+  var ms = [
+    { id: { s: 1, r: 1, m: 1 }, p: [1,2] },
+    { id: { s: 1, r: 1, m: 2 }, p: [3,4] },
+  ];
+  initParent(ms);
 });
+SomeT.prototype.verify = function (match) {
+  if (match.id.m === 2) {
+    return "Cannot score match 2"; // for the lulz
+  }
+  return null;
+};
+
+SomeT.prototype.progress = function (match) {
+  this.opts.progressCalled(match);
+};
+SomeT.defaults = function (np, opts) {
+  opts = opts || {};
+  opts.progressCalled = opts.progressCalled || function () {};
+  return opts;
+};
 
 var attachInvalid = function () {
   SomeT.invalid = function (numPlayers) {
@@ -46,7 +49,7 @@ test("sub invalid", function (t) {
     attachInvalid();
     try { new SomeT(); }
     catch (e) {
-      t.equal(e.message, 'SomeT cannot construct: Need at least 2 players', 'inv');
+      t.equal(e.message, 'Cannot construct SomeT: Need at least 2 players', 'inv');
       t.end();
     }
   });

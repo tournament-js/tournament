@@ -2,6 +2,7 @@ var $ = require('interlude');
 
 function Base(ms) {
   this.matches = ms;
+  this.locked = false;
 }
 
 // no player propagated marker - seeds 1-indexed
@@ -16,70 +17,36 @@ Base.parse = function (SubClass, str) {
   return $.extend(Object.create(SubClass.prototype), obj);
 };
 
-// for .sub
-var construct = function (Ctor, args) {
-  var F = function () {
-    return Ctor.apply(this, args);
-  };
-  F.prototype = Ctor.prototype;
-  return new F();
-};
-// a crazy implementors helper that eliminates almost all boilerplate code
-Base.sub = function (name, namedArgs, obj, Initial) {
+// a helper that creates a safe constructor and does all the sanity checks
+Base.sub = function (name, init, Initial) {
   Initial = Initial || Base;
-  obj.name = name; // so that is will exist on this
-  var keys = Object.keys(obj);
-  // sanity for implementors
-  if (!obj.init) {
-    throw new Error("Must supply an init function to .sub");
-  }
-  if (!namedArgs) {
-    throw new Error("Must supply an array of arguments to .sub");
-  }
 
-  var Klass = function () {
-    var args = Array.prototype.slice.call(arguments);
+  var Klass = function (numPlayers, opts) {
     if (!(this instanceof Klass)) {
-      return construct(Klass, args);
+      return new Klass(numPlayers, opts);
     }
+
     if (!Klass.invalid) {
       throw new Error(name + " must implement an Invalid function");
     }
-    var invReason = Klass.invalid.apply(Klass, args);
+    if (Klass.defaults) {
+      opts = Klass.defaults(numPlayers, opts);
+    }
+
+    var invReason = Klass.invalid(numPlayers, opts);
     if (invReason !== null) {
-      console.error("Invalid %s configuration", name, args);
-      throw new Error(name + " cannot construct: " + invReason);
+      console.error("Invalid %d player %s with opts=%j rejected",
+        numPlayers, name, opts
+      );
+      throw new Error("Cannot construct " + name + ": " + invReason);
     }
 
-    // attach properties to this from obj
-    for (var i = 0; i < keys.length; i += 1) {
-      var key = keys[i];
-      if (key !== 'init' && obj[key] !== 'function') {
-        this[key] = obj[key];
-      }
-    }
-
-    // attach properties to this from namedArgs
-    for (var k = 0; k < namedArgs.length; k += 1) {
-      this[namedArgs[k]] = args[k];
-    }
-
+    this.numPlayers = numPlayers;
+    this.name = name;
     // call given init method, and pass in next constructor as cb
-    obj.init.call(this, Initial.bind(this));
-    if (!this.numPlayers) {
-      throw new Error("numPlayers must be set on instance or be a named arg");
-    }
+    init.call(this, opts, Initial.bind(this));
   };
   Base.inherit(Klass, Initial);
-
-  // attach prototype methods from obj
-  // TODO: maybe pass in parent as a cb?
-  for (var i = 0; i < keys.length; i += 1) {
-    var key = keys[i];
-    if (key !== 'init' && typeof obj[key] === 'function') {
-      Klass.prototype[key] = obj[key];
-    }
-  }
   return Klass;
 };
 
@@ -106,12 +73,39 @@ Base.inherit = function (Klass, Initial) {
   Object.defineProperty(Klass.prototype, 'rep', {
     value: Klass.idString
   });
+  // TODO: REALLY have to force this through now
+  //Klass.inv = function (np, opts) {
+  //  if (!Base.isInteger(np)) {
+  //    return "numPlayers must be a finite integer";
+  //  }
+  //  opts = Klass.defaults(np, opts);
+  //  return Klass.invalid(np, opts);
+  //}
   Klass.inherit = function (SubKlass) {
     return Initial.inherit(SubKlass, Klass);
   };
   Klass.sub = function (subName, subArgs, subObj) {
     return Initial.sub(subName, subArgs, subObj, Klass);
   };
+  Klass.pipe = function (numPlayers, OtherKlass, opts) {
+    // ?
+  };
+};
+
+Base.prototype.replace = function (resAry) {
+  if (this.matches.any($.get('m'))) {
+    throw new Error("Cannot replace players for a tournament in progress");
+  }
+  // because resAry is always sorted by .pos, we can use this to replace seeds
+  this.matches.forEach(function (m) {
+    m.p = m.p.map(function (oldSeed) {
+      return resAry[oldSeed-1].seed;
+    });
+  });
+};
+
+Base.prototype.lock = function () {
+  this.locked = true;
 };
 
 Base.idString = function (id) {
@@ -185,6 +179,9 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   }
   if (score.length !== m.p.length) {
     return "scores must have length " + m.p.length;
+  }
+  if (this.locked) {
+    return "multi stage tournaments can only score the current stage";
   }
   if (!allowPast && Array.isArray(m.m)) {
     return "cannot re-score match";
