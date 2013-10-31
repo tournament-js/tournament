@@ -11,13 +11,24 @@ Object.defineProperty(Base, 'NONE', {
   value: 0
 });
 
+//------------------------------------------------------------------
+// Serialization/deserialization
+//------------------------------------------------------------------
+
 Base.parse = function (SubClass, str) {
   var obj = JSON.parse(str);
   obj.rep = SubClass.idString || $.constant('UNKNOWN');
   return $.extend(Object.create(SubClass.prototype), obj);
 };
 
-// a helper that creates a safe constructor and does all the sanity checks
+Base.prototype.toString = function () {
+  return JSON.stringify(this);
+};
+
+//------------------------------------------------------------------
+// Inheritance helpers
+//------------------------------------------------------------------
+
 Base.sub = function (name, init, Initial) {
   Initial = Initial || Base;
 
@@ -50,6 +61,41 @@ Base.sub = function (name, init, Initial) {
   return Klass;
 };
 
+// two statics that can be overridden with configure
+Base.invalid = function (np/*, opts*/) {
+  if (!Base.isInteger(np)) {
+    return "numPlayers must be a finite integer";
+  }
+  return null;
+};
+Base.defaults = function (np, opts) {
+  return (opts || {});
+};
+
+var configure = function (Klass, obj, Initial) {
+  if (obj.defaults) {
+    Klass.defaults = function (np, opts) {
+      return obj.defaults(np, Initial.defaults(np, opts));
+    };
+  }
+  else {
+    Klass.defaults = Initial.defaults;
+  }
+  if (obj.invalid) {
+    Klass.invalid = function (np, opts) {
+      var invReason = Initial.invalid(np, opts);
+      if (invReason !== null) {
+        return invReason;
+      }
+      opts = Klass.defaults(np, opts);
+      return obj.invalid(np, opts);
+    };
+  }
+  else {
+    Klass.invalid = Initial.invalid;
+  }
+};
+
 Base.inherit = function (Klass, Initial) {
   Initial = Initial || Base;
   Klass.prototype = Object.create(Initial.prototype);
@@ -69,28 +115,32 @@ Base.inherit = function (Klass, Initial) {
   Klass.parse = function (str) {
     return Base.parse(Klass, str);
   };
-  Klass.idString = Initial.idString; // default
+
+  Klass.idString = Initial.idString; // default TODO necessary now?
   Object.defineProperty(Klass.prototype, 'rep', {
     value: Klass.idString
   });
-  // TODO: REALLY have to force this through now
-  //Klass.inv = function (np, opts) {
-  //  if (!Base.isInteger(np)) {
-  //    return "numPlayers must be a finite integer";
-  //  }
-  //  opts = Klass.defaults(np, opts);
-  //  return Klass.invalid(np, opts);
-  //}
+
+  Klass.configure = function (obj) {
+    return configure(Klass, obj, Initial);
+  };
+
   Klass.inherit = function (SubKlass) {
     return Initial.inherit(SubKlass, Klass);
   };
+
   Klass.sub = function (subName, subArgs, subObj) {
     return Initial.sub(subName, subArgs, subObj, Klass);
   };
-  Klass.pipe = function (numPlayers, OtherKlass, opts) {
-    // ?
-  };
+
+  //Klass.pipe = function (numPlayers, OtherKlass, opts) {
+  // ?
+  //};
 };
+
+//------------------------------------------------------------------
+// Multi stage helpers
+//------------------------------------------------------------------
 
 Base.prototype.replace = function (resAry) {
   if (this.matches.any($.get('m'))) {
@@ -108,6 +158,10 @@ Base.prototype.lock = function () {
   this.locked = true;
 };
 
+//------------------------------------------------------------------
+// Misc helpers
+//------------------------------------------------------------------
+
 Base.idString = function (id) {
   return "S" + id.s + " R" + id.r + " M" + id.m;
 };
@@ -116,10 +170,12 @@ Base.isInteger = function (n) { // until this gets on Number in ES6
   return Math.ceil(n) === n;
 };
 
-// comparators that used to be in common
-// to ensure first matches first and (for most part) forEach scorability
-// score section desc, else round desc, else match number desc
-// similarly how it's read in many cases: WB R2 G3
+//------------------------------------------------------------------
+// Comparators and sorters
+//------------------------------------------------------------------
+
+// ensures first matches first and (for most part) forEach scorability
+// similarly how it's read in many cases: WB R2 G3, G1 R1 M1
 Base.compareMatches = function (g1, g2) {
   return (g1.id.s - g2.id.s) || (g1.id.r - g2.id.r) || (g1.id.m - g2.id.m);
 };
@@ -141,6 +197,10 @@ Base.sorted = function (match) {
   return $.zip(match.p, match.m).sort(Base.compareZip).map($.get('0'));
 };
 
+
+//------------------------------------------------------------------
+// Prototype interface that expects certain implementations
+//------------------------------------------------------------------
 
 // stuff that individual implementations can override
 // Used by FFA, GroupStage, TieBreaker
@@ -205,6 +265,41 @@ Base.prototype.score = function (id, score) {
   this.progress(m);
 
   return true;
+};
+
+// prepare a results array
+// not always very helpful
+Base.prototype.results = function (arg) {
+  var res = new Array(this.numPlayers);
+  for (var s = 0; s < this.numPlayers; s += 1) {
+    res[s] = {
+      seed: s + 1,
+      wins: 0,
+      for: 0,
+      //against: 0, TODO: extend this to FFA and Masters
+      pos: this.numPlayers
+    };
+    $.extend(res[s], this.initResult(s+1));
+  }
+  if (typeof this.stats !== 'function') {
+    throw new Error(this.name + " has not implemented stats");
+  }
+  return this.stats(res, arg);
+};
+
+//------------------------------------------------------------------
+// Prototype convenience methods
+//------------------------------------------------------------------
+
+// shortcut for results
+Base.prototype.resultsFor = function (seed) {
+  var res = this.results();
+  for (var i = 0; i < res.length; i += 1) {
+    var r = res[i];
+    if (r.seed === seed) {
+      return r;
+    }
+  }
 };
 
 Base.prototype.isPlayable = function (match) {
@@ -306,40 +401,5 @@ Base.prototype.players = function (id) {
   }, [])).filter($.neq(Base.NONE)).sort($.compare()); // ascending order
 };
 
-
-// prepare a results array
-// not always very helpful
-Base.prototype.results = function (arg) {
-  var res = new Array(this.numPlayers);
-  for (var s = 0; s < this.numPlayers; s += 1) {
-    res[s] = {
-      seed: s + 1,
-      wins: 0,
-      for: 0,
-      //against: 0, TODO: extend this to FFA and Masters
-      pos: this.numPlayers
-    };
-    $.extend(res[s], this.initResult(s+1));
-  }
-  if (typeof this.stats !== 'function') {
-    throw new Error(this.name + " has not implemented stats");
-  }
-  return this.stats(res, arg);
-};
-
-// shortcut for results
-Base.prototype.resultsFor = function (seed) {
-  var res = this.results();
-  for (var i = 0; i < res.length; i += 1) {
-    var r = res[i];
-    if (r.seed === seed) {
-      return r;
-    }
-  }
-};
-
-Base.prototype.toString = function () {
-  return JSON.stringify(this);
-};
 
 module.exports = Base;
