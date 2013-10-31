@@ -30,71 +30,102 @@ With the following requirements:
 var Base = require('tournament');
 
 // Specify tournament names and the named arguments for its constructor
-var SomeTournament = Base.sub('SomeTournament', ['numPlayers', 'opts'], {
-  init: function (initParent) {
-    var matches = makeMatches(this.numPlayers, this.opts);
-    initParent(matches); // goes to Base's constructor
-  },
-  progress: function (match) {
-    // TODO: propagate winners of match here if needed
-  },
-  verify: function (id, score) {
-    // TODO: check for extra conditions here if needed
-    return null;
-  },
-  limbo: function (playerId) {
-    // TODO: check if we can figure out roughly where the player is headed
-  },
-  early: function () {
-    // TODO: return true here if tournament is done early
-    return false;
-  },
-  initResult: function (seed) {
-    // TODO: initialize extra result properties here
-    return {}; 
-  },
-  stats: function (res) {
-    // TODO: fill in map based stats on res and sort res here
-    return res;
-  }
+var SomeTournament = Base.sub('SomeTournament', function (opts, initParent) {
+  var matches = makeMatches(this.numPlayers, opts);
+  initParent(matches); // goes to Base's constructor
 });
 
-SomeTournament.invalid = function (numPlayers, opts) {
-  if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
-    return "number of players must be at least 2";
-  }
+SomeTournament.prototype.progress = function (match) {
+  // TODO: propagate winners of match here if needed
+};
+
+SomeTournament.prototype.verify = function (id, score) {
+  // TODO: check for extra conditions here if needed
   return null;
 };
+
+SomeTournament.prototype.limbo = function (playerId) {
+  // TODO: check if we can figure out roughly where the player is headed
+};
+
+SomeTournament.prototype.early = function () {
+  // TODO: return true here if tournament is done early
+  return false;
+};
+
+SomeTournament.prototype.initResult = function (seed) {
+  // TODO: initialize extra result properties here
+  return {};
+};
+
+SomeTournament.prototype.stats = function (res) {
+  // TODO: fill in map based stats on res and sort res here
+  return res;
+};
+
+SomeTournament.configure({
+  defaults: function (numPlayers, opts) {
+    opts.someOption = !!opts.someOption;
+    return opts;
+  },
+  invalid: function (numPlayers, opts) {
+    if (numPlayers > 128) {
+      return "128 players maximum"
+    }
+    return null;
+  }
+});
 ```
 
 ### Requirements
 
-- `numPlayers` MUST exists as a named argument
-- `invalid` MUST be defined on the class
-- `init` MUST be implemented
+- `.sub` MUST be called with your init fn (constructor replacement)
+- init function MUST call the `initParent` cb with the matches created
+- `.configure` MUST be called with `invalid` and MAYBE also `defaults`
 - `stats` MUST be implemented
-- `init` MUST call the `initParent` cb with the arguments of `Base` (matches only)
+
 
 NB: For inheriting from another tournament, replace all references to `Base` with the tournament you are inheriting from.
 
 Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
 
-#### invalid
-Invalid is a function that MUST have the same parameters as your constructor (i.e. the same as the named arguments passed to `Base.sub`), and must return a reason why the current parameters can not produce a valid tournament, if this is the case. If the parameters are valid, return null.
-
-This way you can produce sensible user feedback, ensured constructibility of tournaments, and set your own size limits.
+#### configure
+Configure needs to be called with the rules and defaults for the options object.
+It takes two functions; `defaults` and `invalid`, the last of which MUST exist.
+Both functions take the same arguments as the tournament constructor; `(numPlayers, opts)`.
 
 ```js
-SomeTournament.invalid = function (numPlayers, opts) {
-  if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
-    return "number of players must be at least 2";
+SomeTournament.configure({
+  defaults: function (numPlayers, opts) {
+    opts.someOption = Array.isArray(opts.someOption) ? opts.someOption : [];
+    return opts;
+  },
+
+  invalid: function (numPlayers, opts) {
+    if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
+      return "number of players must be at least 2";
+    }
+    if (np > 64) {
+      return "number of players cannot exceed 64"; // arbitrary limit
+    }
+    return null; // OK
   }
-  if (np > 64) {
-    return "number of players cannot exceed 64"; // arbitrary limit
-  }
-  return null;
-};
+});
 ```
+
+`invalid` ensures that tournament rules are upheld. If you have specific rules, these will be guarded on for construction along with whatever invalid rules specified by the tournament or base class you are inheriting from.
+
+`defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect.
+
+##### default examples
+You should try to set the default options in a sensible enough way so that you can construct a tournament without actually specifying the second argument at all. All currently compliant tournaments have sensible defaults:
+
+- `new Duel(n)` -> single elimination tournament with bronze final
+- `new GroupStage(n)` -> one group (league) tournament
+- `new FFA(n)` -> one match FFA tournament with everyone in one match
+- `new Masters(n)` -> musical chairs style knockout eliminating one per round
+
+Check out the code for these tournaments for inspiration.
 
 #### results
 The arguably most important feature of tournaments is the ability to figure out and to compute statistics and winners at the end. If you don't implement the following, all you have a collection of matches.
@@ -259,23 +290,18 @@ function SomeTournament(numPlayers, opts) {
   this.numPlayers = numPlayers; // always store this
   var invReason = SomeTournament.invalid(numPlayers, opts);
   if (invReason !== null) {
-    if (invReason !== null) {
-      console.error("Invalid SomeTournament configuration", numPlayers, opts);
-      console.error("  :", invReason);
-      return;
-    }
+    console.error("Invalid SomeTournament configuration", numPlayers, opts);
+    throw new Error("SomeTournament cannot construct: " + invReason);
+    return;
   }
   var matches = []; // TODO: create your own matches
   Base.call(this, SomeTournament, matches);
 }
 
-// inherit from Base
-SomeTournament.prototype = Object.create(Base.prototype);
+// inherit from Base (important to call)
+Base.inherit(SomeTournament);
 
 // statics
-SomeTournament.parse = function (str) {
-  return Base.parse(SomeTournament, str);
-};
 SomeTournament.invalid = function (np, opts) {
   if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
     return "SomeTournament must contain at least 2 players";
@@ -307,7 +333,7 @@ SomeTournament.prototype.early = function () {
 };
 SomeTournament.prototype.initResult = function (seed) {
   // TODO: initialize extra result properties here
-  return {}; 
+  return {};
 };
 SomeTournament.prototype.stats = function (res) {
   // TODO: fill in map based stats on res and sort res here
@@ -318,18 +344,23 @@ module.exports = SomeTournament;
 ```
 
 ### Requirements
-Like in the outline, you MUST implement:
+Like in the outline, you:
 
-- constructor that calls the `Base` class constructor with the matches
-- static `parse` that defers to `Base`
-- static `invalid` that can give a string reason why tournament options are invalid
-- method `stats` to compute statistics/progression
+- MUST implement the constructor fully (see below)
+- MUST implement a static `invalid` that can give a string reason why tournament options are invalid || null
+- MUST implement a method `stats` to compute statistics/progression
+- MUST call `(Base || MiddleKlass).inherit(SomeTournament)`
 
 The latter is always the hard one.
 
-Note that the constructor MUST set `numPlayers` on `this` as `Base` class helpers expects this variable.
-
 Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
+
+Since you are implementing the constructor manually, you:
+
+- MUST throw in the constructor if Klass.invalid fails or does not exist
+- MUST do a `Base.call(this, matches)` in the constructor
+- MUST set `numPlayers` on `this` in the constructor
+- SHOULD implement missing `new` protection for the constructor
 
 ### Shoulds
 It is usually useful to implement some of the following methods:

@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "lint": "jshint lib test *.js",
-    "test": "tap test/*.js"
+    "test": "tap test/*.js --timeout 7"
   },
   "dependencies": {
     "interlude": "~1.0.2"

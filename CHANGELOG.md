@@ -4,6 +4,12 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
+0.18.0 / 2013-11-XX
+==================
+  * `.sub` made much easier to use for implementors
+  * `.configure` MUST be called with static `defaults` and `invalid`
+  * `defaults` will be used to fill in parameter defaults
+
 0.17.1 / 2013-10-27
 ==================
   * `initResult` now optional when no extra properties are computed
