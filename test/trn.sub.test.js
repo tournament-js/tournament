@@ -27,7 +27,7 @@ SomeT.defaults = function (np, opts) {
 };
 
 var attachInvalid = function () {
-  SomeT.invalid = function (numPlayers) {
+  SomeT.invalid = function (numPlayers, opts) {
     if (!Base.isInteger(numPlayers) || numPlayers < 2) {
       return "Need at least 2 players";
     }

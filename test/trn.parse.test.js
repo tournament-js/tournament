@@ -9,16 +9,16 @@ var test = require('tap').test
 
 var create = function (Klass, type) {
   if (type === 'Duel') {
-    return new Klass(8, Klass.LB, {short: true});
+    return new Klass(8, { last: Klass.LB, short: true });
   }
   if (type === 'FFA') {
-    return new Klass(16, [4,4,4], [2,2]);
+    return new Klass(16, { sizes: [4,4,4], advancers: [2,2] });
   }
   if (type === 'Masters') {
-    return new Klass(10, [2,4,2]);
+    return new Klass(10, { knockouts: [2,4,2] });
   }
   if (type === 'GroupStage') {
-    return new Klass(16, 4);
+    return new Klass(16, { groupSize: 4 });
   }
   //if (type === 'TieBreaker') {
   //  var gs = new GroupStage(16, 4);

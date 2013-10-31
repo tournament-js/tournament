@@ -14,13 +14,13 @@ var mains = {
 var makeInstance = function (name) {
   switch (name) {
   case 'Duel':
-    return new mains.Duel(4, 1);
+    return new mains.Duel(4);
   case 'FFA':
-    return new mains.FFA(4, [4], []);
+    return new mains.FFA(4);
   case 'Masters':
-    return new mains.Masters(5, [2]);
+    return new mains.Masters(5);
   case 'GroupStage':
-    return new mains.GroupStage(8, 4);
+    return new mains.GroupStage(8);
   default:
     throw new Error("invalid class: " + name);
   }
