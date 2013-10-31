@@ -21,7 +21,7 @@ Create a new tournament instance from one of the separate implementations, then 
 
 ```js
 var Duel = require('duel');
-var d = new Duel(4, Duel.WB); // 4 players - single elimination
+var d = new Duel(4); // 4 players - single elimination
 
 d.matches; // in playable order
 [ { id: { s: 1, r: 1, m: 1 }, // semi 1

@@ -35,6 +35,26 @@ var SomeTournament = Base.sub('SomeTournament', function (opts, initParent) {
   initParent(matches); // goes to Base's constructor
 });
 
+SomeTournament.prototype.stats = function (res) {
+  // TODO: fill in map based stats on res and sort res here
+  return res;
+};
+
+SomeTournament.configure({
+  invalid: function (numPlayers, opts) {
+    if (numPlayers > 128) {
+      return "128 players maximum"
+    }
+    return null;
+  },
+  // optional:
+  defaults: function (numPlayers, opts) {
+    opts.someOption = !!opts.someOption;
+    return opts;
+  },
+});
+
+// optional
 SomeTournament.prototype.progress = function (match) {
   // TODO: propagate winners of match here if needed
 };
@@ -58,36 +78,19 @@ SomeTournament.prototype.initResult = function (seed) {
   return {};
 };
 
-SomeTournament.prototype.stats = function (res) {
-  // TODO: fill in map based stats on res and sort res here
-  return res;
-};
-
-SomeTournament.configure({
-  defaults: function (numPlayers, opts) {
-    opts.someOption = !!opts.someOption;
-    return opts;
-  },
-  invalid: function (numPlayers, opts) {
-    if (numPlayers > 128) {
-      return "128 players maximum"
-    }
-    return null;
-  }
-});
 ```
 
 ### Requirements
 
 - `.sub` MUST be called with your init fn (constructor replacement)
 - init function MUST call the `initParent` cb with the matches created
-- `.configure` MUST be called with `invalid` and MAYBE also `defaults`
+- `.configure` MUST be called with `invalid` and MAYBE also `defaults` function(s)
 - `stats` MUST be implemented
-
+- `Base` methods MUST NOT be overridden to maintain expected behaviour
 
 NB: For inheriting from another tournament, replace all references to `Base` with the tournament you are inheriting from.
 
-Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
+To ensure you are not overriding anything, it is quick to just create a blank `Base` instance and check what methods exist.
 
 #### configure
 Configure needs to be called with the rules and defaults for the options object.
@@ -96,24 +99,23 @@ Both functions take the same arguments as the tournament constructor; `(numPlaye
 
 ```js
 SomeTournament.configure({
-  defaults: function (numPlayers, opts) {
-    opts.someOption = Array.isArray(opts.someOption) ? opts.someOption : [];
-    return opts;
-  },
-
   invalid: function (numPlayers, opts) {
-    if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
+    if (!np < 2) {
       return "number of players must be at least 2";
     }
     if (np > 64) {
       return "number of players cannot exceed 64"; // arbitrary limit
     }
     return null; // OK
+  },
+  defaults: function (numPlayers, opts) {
+    opts.someOption = Array.isArray(opts.someOption) ? opts.someOption : [];
+    return opts;
   }
 });
 ```
 
-`invalid` ensures that tournament rules are upheld. If you have specific rules, these will be guarded on for construction along with whatever invalid rules specified by the tournament or base class you are inheriting from.
+`invalid` ensures that tournament rules are upheld. If you have specific rules, these will be guarded on for construction along with whatever invalid rules specified by the tournament or base class you are inheriting from. Note that we already verify that `numPlayers` is an integer for you.
 
 `defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect.
 
@@ -149,6 +151,8 @@ Note that `resAry` is ONLY sorted by seeding number initially. Thus you can look
 At the end of the `stats` function, however, you should ensure the `resAry` is sorted by `pos` descending, then optionally by other properties such as group position, map wins or losses (`.for` and `.against`), and with least priority, by `.seed` ascending.
 
 Note Base helpers such as `Base.compareRes` and `Base.sorted` for computing statistics here.
+
+It is important to not set `.pos` higher than `numPlayers` before you can guarantee that the player will minimally attain this position from the current state.
 
 
 ### Useful Methods
@@ -207,6 +211,8 @@ Called when `upcoming` is called with a `playerId` that was not found in any uns
     }
   }
 ```
+
+This example was taken from the [FFA package](https://npmjs.org/package/ffa).
 
 #### early
 Called when `isDone` is called and there are still matches remaining. If you implement this, you can decide if the tournament is done early, even if there are more matches to be played.
@@ -270,128 +276,4 @@ Note that if you are inheriting from another tournament, overriding these method
 
 ### Useful extras
 #### idString
-If you need to get the string of a tournament id and what `Base.prototype.idString` returns doesn't feel right, you should add your own `idString` function to `SomeTournament.idString` directly. Most tournaments do this.
-#### roundNames
-TODO: talk about these?
-
-
-## NB: OUTDATED DOCS BELOW USE EASY METHOD
-
-## Tournament outline - manual inheritance
-If you prefer to have full control of your prototypes, you may inherit manually from the `Base` class. Note that as per expectations of implementations behaviour, you should follow this outline as closely as possible.
-
-```js
-var Base = require('tournament');
-
-function SomeTournament(numPlayers, opts) {
-  if (!(this instanceof SomeTournament)) {
-    return new someTournament(numPlayers, opts); // new protection
-  }
-  this.numPlayers = numPlayers; // always store this
-  var invReason = SomeTournament.invalid(numPlayers, opts);
-  if (invReason !== null) {
-    console.error("Invalid SomeTournament configuration", numPlayers, opts);
-    throw new Error("SomeTournament cannot construct: " + invReason);
-    return;
-  }
-  var matches = []; // TODO: create your own matches
-  Base.call(this, SomeTournament, matches);
-}
-
-// inherit from Base (important to call)
-Base.inherit(SomeTournament);
-
-// statics
-SomeTournament.invalid = function (np, opts) {
-  if (!Number.isFinite(np) || Math.ceil(np) !== np || np < 2) {
-    return "SomeTournament must contain at least 2 players";
-  }
-  return null;
-};
-SomeTournament.idString = function (id) {
-  return "R" + id.r + " M" + id.m;
-};
-
-// methods
-SomeTournament.prototype.results = function () {
-  var res = []; // fill this in by analysing the matches
-  return res;
-};
-SomeTournament.prototype.progress = function (match) {
-  // TODO: propagate winners of match here if needed
-};
-SomeTournament.prototype.verify = function (id, score) {
-  // TODO: check for extra conditions here if needed
-  return null;
-};
-SomeTournament.prototype.limbo = function (playerId) {
-  // TODO: check if we can figure out roughly where the player is headed
-};
-SomeTournament.prototype.early = function () {
-  // TODO: return true here if tournament is done early
-  return false;
-};
-SomeTournament.prototype.initResult = function (seed) {
-  // TODO: initialize extra result properties here
-  return {};
-};
-SomeTournament.prototype.stats = function (res) {
-  // TODO: fill in map based stats on res and sort res here
-  return res;
-};
-
-module.exports = SomeTournament;
-```
-
-### Requirements
-Like in the outline, you:
-
-- MUST implement the constructor fully (see below)
-- MUST implement a static `invalid` that can give a string reason why tournament options are invalid || null
-- MUST implement a method `stats` to compute statistics/progression
-- MUST call `(Base || MiddleKlass).inherit(SomeTournament)`
-
-The latter is always the hard one.
-
-Finally, you must leave the `data` key on the instance (`this`) untouched for user data.
-
-Since you are implementing the constructor manually, you:
-
-- MUST throw in the constructor if Klass.invalid fails or does not exist
-- MUST do a `Base.call(this, matches)` in the constructor
-- MUST set `numPlayers` on `this` in the constructor
-- SHOULD implement missing `new` protection for the constructor
-
-### Shoulds
-It is usually useful to implement some of the following methods:
-
-- static `idString` that can stringify a matchId
-- method `verify` - if extra scoring restrictions are necessary
-- method `progress` - if player propagation is necessary (tournaments with stages)
-- method `limbo` - if a player can exist in limbo (waiting for a round to finish)
-- method `early` - if a tournament can be done before all matches are played
-- `initResult` - if extra properties for `stats` needs to be initialized
-
-#### verify
-Same as `verify` in the easier implementation, except it goes on the `prototype`.
-
-#### progress
-Same as `progress` in the easier implementation, except it goes on the `prototype`.
-
-#### early
-Same as `early` in the easier implementation, except it goes on the `prototype`.
-
-#### limbo
-Same as `limbo` in the easier implementation, except it goes on the `prototype`.
-
-See the [FFA package](https://npmjs.org/package/ffa) for a full example of this.
-
-#### stats
-Same as `stats` in the easier implementation, except it goes on the `prototype`.
-
-#### initResult
-Same as `initResult` in the easier implementation, except it goes on the `prototype`.
-
-
-### Remaining
-Other `Base` methods MUST NOT be overridden to maintain expected behaviour.
+If you need to get the string of a tournament id and what `Base.idString` returns doesn't feel right, you should add your own `idString` function to `SomeTournament.idString` directly. Most tournaments do this.

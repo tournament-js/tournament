@@ -4,7 +4,7 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
-0.18.0 / 2013-11-XX
+0.18.0 / 2013-10-31
 ==================
   * `.sub` made much easier to use for implementors
   * `.configure` MUST be called with static `defaults` and `invalid`
