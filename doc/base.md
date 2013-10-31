@@ -3,8 +3,7 @@ All tournament types follow a very simple principle. There is always only:
 
  - One tournament creation mechanism
  - One tournament mutator - `.score`
- - One common way of storing state
- - One common way of doing statistics/tracking progress
+  - One common way of doing statistics/tracking progress
 
 Each tournament implementation inherits from a common base class. A large amount of logic can be shared because only rules are different. This `Base` class is exported for other tournament implementors, and is documented herein.
 
@@ -47,7 +46,7 @@ The full `.matches` array is sorted in by comparing first `s` then `r` if same s
 The normal helper to get a match from the matches array if it exists. Returns either a single match, or undefined.
 
 ```js
-var d = new Duel(4, Duel.WB);
+var d = new Duel(4);
 
 d.findMatch({s:1, r:1, m:1});
 { id: { s: 1, r: 1, m: 1 }, p: [ 1, 4 ] }
@@ -60,7 +59,7 @@ undefined
 If all the players have been propagated into the players (`.p`) array, then the match is playable:
 
 ```js
-var d = new Duel(4, Duel.WB);
+var d = new Duel(4);
 d.isPlayable(d.matches[0]); // first match gets prepared in immediately
 true
 
@@ -72,7 +71,7 @@ false
 Find all matches for which the set properties of a partial id match.
 
 ```js
-var d = new Duel(4, Duel.LB);
+var d = new Duel(4);
 d.findMatches({s: 1, r:1}); // all WB matches in round 1
 [ { id: { s: 1, r: 1, m: 1 },
     p: [ 1, 4 ] },
@@ -80,7 +79,7 @@ d.findMatches({s: 1, r:1}); // all WB matches in round 1
     p: [ 3, 2 ] } ]
 
 
-var gs = new GroupStage(9, 3) // 9 players in groups of 3
+var gs = new GroupStage(9, { groupSize: 3 });
 gs.findMatches({s:1}) // group 1
 [ { id: { s: 1, r: 1, m: 1 },
     p: [ 4, 9 ] },
@@ -94,7 +93,7 @@ gs.findMatches({s:1}) // group 1
 Find all matches for which the set lower and upper properties of two partial ids match.
 
 ```js
-var d = new Duel(8, Duel.WB);
+var d = new Duel(8);
 d.findMatchesRanged({r: 2}, {r: 3}) // get everything where  2 <= id.r <= 3
 [ { id: { s: 1, r: 2, m: 1 },
     p: [ 0, 0 ] },
@@ -107,7 +106,7 @@ d.findMatchesRanged({r: 2}, {r: 3}) // get everything where  2 <= id.r <= 3
 Incidentally this is the same as `trn.findMatchesRanged({s:2})` as there are only 3 WB rounds in this tournament. Note you have to supply at least an object for the lower bounds (though it may be blank), but you can leave out the second argument altogether for a `>=` check on all lower bound properties.
 
 ```
-var gs = new GroupStage(9, 3)
+var gs = new GroupStage(9, { groupSize: 3 });
 gs.findMatchesRanged({}, {s:2, r:1}); // round <=1 matches in group <=2
 [ { id: { s: 1, r: 1, m: 1 },
     p: [ 4, 9 ] },
@@ -135,10 +134,10 @@ Returns all the matches that currently contain the player with given `seed`.
 Can be used to track progress of a player.
 
 ```js
-var d = new Duel(4, Duel.LB)
-d.score({s:1, r:1, m:1}, [1, 0]); // 1 >> 4
-d.score({s:1, r:1, m:2}, [0, 1]); // 3 << 2
-d.score({s:1, r:2, m:1}, [1, 0]); // 1 >> 2
+var d = new Duel(4, { last: Duel.LB }); // double elimination
+d.score({s:1, r:1, m:1}, [1, 0]); // 1 beat 4
+d.score({s:1, r:1, m:2}, [0, 1]); // 3 beat 2
+d.score({s:1, r:2, m:1}, [1, 0]); // 1 beat 2
 
 d.matchesFor(2);
 [ { id: { s: 1, r: 1, m: 2 }, p: [ 3, 2 ], m: [ 0, 1 ] },
@@ -154,14 +153,14 @@ The following two are advanced methods to partition the matches into an array of
 Partition the internal matches array into an array of rounds, optionally fixing `section`.
 
 ```js
-var d = new Duel(4, Duel.LB);
+var d = new Duel(4, { last: Duel.LB });
 d.rounds(Duel.WB); // all rounds in the winners bracket
 [ [ { id: { s: 1, r: 1, m: 1 }, p: [ 1, 4 ] },
     { id: { s: 1, r: 1, m: 2 }, p: [ 3, 2 ] } ],
   [ { id: { s: 1, r: 1, m: 2 }, p: [ 0, 0 ] } ] ]
 
 
-var gs = new GroupStage(16, 4);
+var gs = new GroupStage(16, { groupSize: 4 });
 gs.rounds(2)[0]; // first round in group 2
 [ { id: { s: 2, r: 1, m: 1 }, p: [ 2, 15 ] },
   { id: { s: 2, r: 1, m: 2 }, p: [ 6, 11 ] } ]
@@ -171,12 +170,12 @@ gs.rounds(2)[0]; // first round in group 2
 Partition the internal matches array into an array of sections, optionally fixing `round`.
 
 ```js
-var d = new Duel(4, Duel.LB);
+var d = new Duel(4, { last: Duel.LB });
 var brackets = d.sections();
 deepEqual(brackets[0], d.findMatches({s:1}));
 deepEqual(brackets[1], d.findMatches({s:2}));
 
-var gs = new GroupStage(9, 3);
+var gs = new GroupStage(9, { groupSize: 3 });
 gs.sections(1); // all round one matches partitioned by group
 [ [ { id: { s: 1, r: 1, m: 1 }, p: [4, 9] } ],
   [ { id: { s: 2, r: 1, m: 1 }, p: [5, 8] } ],
@@ -190,7 +189,7 @@ Returns all the unique players seed numbers found in the slice of the tournament
 Equivalent to flattened, unique'd array of players plucked from `this.findMatches(idPartial)`.
 
 ```
-var gs = new GroupStage(16, 4);
+var gs = new GroupStage(16, { groupSize: 4 });
 gs.players({s:1}); // players in group 1
 [1, 5, 12, 16]
 ```
@@ -215,7 +214,7 @@ But most tournament types will contain a good number of extra statistical proper
 
 #### Example
 ```js
-var duel = new Duel(8, Duel.WB);
+var duel = new Duel(8);
 duel.matches.forEach(function (m) {
   duel.score(m.id, [2, 1]); // upper player always proceeds and gets 2 to 1 map points
 });
@@ -233,7 +232,7 @@ Get the results for just a single player in the tournament.
 Return the upcoming match for the next player if it exists.
 
 ```js
-var duel = new Duel(4, 1, {short: true}); // 4 player single elim without bronze final
+var duel = new Duel(4, { short: true }); // single elimination without bronze final
 duel.score({ s: 1, r: 1, m: 1}, [1, 0]); // this match is player 1 vs. player 4
 
 duel.upcoming(1); // 1 advanced to semi
