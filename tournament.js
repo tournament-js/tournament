@@ -26,6 +26,48 @@ Base.prototype.toString = function () {
 };
 
 //------------------------------------------------------------------
+// Multi stage helpers
+//------------------------------------------------------------------
+
+var createReceiver = function (Klass) {
+  return function (inst, numPlayers, opts) {
+    var err = "Cannot forward from " + inst.name + ": ";
+    if (!inst.isDone()) {
+      throw new Error(err + "tournament not done");
+    }
+    var res = inst.results();
+    if (res.length < numPlayers) {
+      throw new Error(err + "not enough players");
+    }
+    var luckies = res.filter(function (r) {
+      return r.pos <= numPlayers;
+    });
+    if (luckies.length > numPlayers) {
+      throw new Error(err + "too many players tied to pick out top " + numPlayers);
+    }
+    var forwarded = new Klass(numPlayers, opts);
+    forwarded.replace(res); // correct when class is of standard format
+    return forwarded;
+  };
+};
+
+Base.prototype.replace = function (resAry) {
+  if (this.matches.any($.get('m'))) {
+    throw new Error("Cannot replace players for a tournament in progress");
+  }
+  // because resAry is always sorted by .pos, we can use this to replace seeds
+  this.matches.forEach(function (m) {
+    m.p = m.p.map(function (oldSeed) {
+      return resAry[oldSeed-1].seed;
+    });
+  });
+};
+
+Base.prototype.lock = function () {
+  this.locked = true;
+};
+
+//------------------------------------------------------------------
 // Inheritance helpers
 //------------------------------------------------------------------
 
@@ -133,29 +175,7 @@ Base.inherit = function (Klass, Initial) {
     return Initial.sub(subName, subArgs, subObj, Klass);
   };
 
-  //Klass.pipe = function (numPlayers, OtherKlass, opts) {
-  // ?
-  //};
-};
-
-//------------------------------------------------------------------
-// Multi stage helpers
-//------------------------------------------------------------------
-
-Base.prototype.replace = function (resAry) {
-  if (this.matches.any($.get('m'))) {
-    throw new Error("Cannot replace players for a tournament in progress");
-  }
-  // because resAry is always sorted by .pos, we can use this to replace seeds
-  this.matches.forEach(function (m) {
-    m.p = m.p.map(function (oldSeed) {
-      return resAry[oldSeed-1].seed;
-    });
-  });
-};
-
-Base.prototype.lock = function () {
-  this.locked = true;
+  Klass.from = createReceiver(Klass);
 };
 
 //------------------------------------------------------------------
@@ -269,7 +289,7 @@ Base.prototype.score = function (id, score) {
 
 // prepare a results array
 // not always very helpful
-Base.prototype.results = function (arg) {
+Base.prototype.results = function () {
   var res = new Array(this.numPlayers);
   for (var s = 0; s < this.numPlayers; s += 1) {
     res[s] = {
@@ -284,7 +304,7 @@ Base.prototype.results = function (arg) {
   if (typeof this.stats !== 'function') {
     throw new Error(this.name + " has not implemented stats");
   }
-  return this.stats(res, arg);
+  return this.stats(res);
 };
 
 //------------------------------------------------------------------
