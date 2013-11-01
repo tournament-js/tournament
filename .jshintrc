@@ -24,7 +24,6 @@
     // relaxing opts
     "esnext"        : true,  // allow harmony syntax (const in partic.)
     "eqnull"        : true,  // allow == null to check for undef or null
-    "es5"           : true,  // allow reserved words as keywords
     "laxcomma"      : true,  // allow comma-first style
     "validthis"     : true,  // allow using this in non-constructor function
 

@@ -23,7 +23,7 @@
     "robin"
   ],
   "scripts": {
-    "lint": "jshint lib test *.js",
+    "lint": "jshint test *.js",
     "test": "tap test/*.js --timeout 7"
   },
   "dependencies": {
@@ -31,10 +31,10 @@
   },
   "devDependencies": {
     "tap": "~0.4.4",
-    "duel": "~0.2",
-    "ffa": "~0.2",
-    "groupstage": "~0.2",
-    "masters": "~0.2"
+    "duel": "~0.4",
+    "ffa": "~0.4",
+    "groupstage": "~0.4",
+    "masters": "~0.4"
   },
   "bugs": {
     "url": "http://github.com/clux/tournament/issues"

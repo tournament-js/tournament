@@ -2,9 +2,9 @@ var test = require('tap').test
   , Duel = require('duel')
   , FFA = require('ffa')
   , GroupStage = require('groupstage')
-  , Masters = require('masters')
+  , Masters = require('masters');
   //, TieBreaker = require('../lib/tiebreak_groups')
-  , Base = require('../');
+  //, Base = require('../');
 
 
 var create = function (Klass, type) {
