@@ -303,7 +303,7 @@ Base.prototype.results = function () {
   var players = this.players();
   if (this.numPlayers !== players.length) {
     var why = players.length + " !== " + this.numPlayers;
-    throw new Error(this.name + "initialized numPlayers incorrectly: " + why);
+    throw new Error(this.name + " initialized numPlayers incorrectly: " + why);
   }
   var res = new Array(this.numPlayers);
   for (var s = 0; s < this.numPlayers; s += 1) {
@@ -436,7 +436,7 @@ Base.prototype.matchesFor = function (playerId) {
 Base.prototype.players = function (id) {
   return $.nub(this.findMatches(id || {}).reduce(function (acc, m) {
     return acc.concat(m.p);
-  }, [])).filter($.neq(Base.NONE)).sort($.compare()); // ascending order
+  }, [])).filter($.gt(Base.NONE)).sort($.compare()); // ascending order
 };
 
 
