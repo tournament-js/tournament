@@ -52,9 +52,9 @@ var createReceiver = function (Klass) {
 };
 
 Base.prototype.replace = function (resAry) {
-  var hasStarted = this.matches.filter(function (m) {
+  var hasStarted = this.matches.some(function (m) {
     return m.p.every($.gt(Base.NONE)) && m.m;
-  }).length > 0;
+  });
   if (hasStarted) {
     throw new Error("Cannot replace players for a tournament in progress");
   }
