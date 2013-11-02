@@ -12,7 +12,7 @@ Object.defineProperty(Base, 'NONE', {
 });
 
 //------------------------------------------------------------------
-// Serialization/deserialization
+// Serialization/deserialization (NOT FOR DATABASE USAGE)
 //------------------------------------------------------------------
 
 Base.parse = function (SubClass, str) {
@@ -52,13 +52,14 @@ var createReceiver = function (Klass) {
 };
 
 Base.prototype.replace = function (resAry) {
-  if (this.matches.any($.get('m'))) {
+  if (this.matches.some($.get('m'))) {
     throw new Error("Cannot replace players for a tournament in progress");
   }
   // because resAry is always sorted by .pos, we can use this to replace seeds
   this.matches.forEach(function (m) {
     m.p = m.p.map(function (oldSeed) {
-      return resAry[oldSeed-1].seed;
+      // as long as they are actual players
+      return (oldSeed === Base.NONE) ? Base.NONE : resAry[oldSeed-1].seed;
     });
   });
 };
@@ -320,6 +321,8 @@ Base.prototype.resultsFor = function (seed) {
       return r;
     }
   }
+  // TODO: sensible to throw here?
+  throw new Error("Seed " + seed + " not found in tournament");
 };
 
 Base.prototype.isPlayable = function (match) {
