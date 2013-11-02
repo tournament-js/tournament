@@ -52,14 +52,17 @@ var createReceiver = function (Klass) {
 };
 
 Base.prototype.replace = function (resAry) {
-  if (this.matches.some($.get('m'))) {
+  var hasStarted = this.matches.filter(function (m) {
+    return m.p.every($.gt(Base.NONE)) && m.m;
+  }).length > 0;
+  if (hasStarted) {
     throw new Error("Cannot replace players for a tournament in progress");
   }
   // because resAry is always sorted by .pos, we can use this to replace seeds
   this.matches.forEach(function (m) {
     m.p = m.p.map(function (oldSeed) {
       // as long as they are actual players
-      return (oldSeed === Base.NONE) ? Base.NONE : resAry[oldSeed-1].seed;
+      return (oldSeed > 0) ? resAry[oldSeed-1].seed : oldSeed;
     });
   });
 };
