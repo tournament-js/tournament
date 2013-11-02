@@ -68,6 +68,15 @@ Base.prototype.lock = function () {
   this.locked = true;
 };
 
+Base.resultEntry = function (resAry, seed) {
+  for (var i = 0; i < resAry.length; i += 1) {
+    if (resAry[i].seed === seed) {
+      return resAry[i];
+    }
+  }
+  throw new Error("Internal result lookup error for " + seed);
+};
+
 //------------------------------------------------------------------
 // Inheritance helpers
 //------------------------------------------------------------------
@@ -291,16 +300,22 @@ Base.prototype.score = function (id, score) {
 // prepare a results array
 // not always very helpful
 Base.prototype.results = function () {
+  var players = this.players();
+  if (this.numPlayers !== players.length) {
+    var why = players.length + " !== " + this.numPlayers;
+    throw new Error(this.name + "initialized numPlayers incorrectly: " + why);
+  }
   var res = new Array(this.numPlayers);
   for (var s = 0; s < this.numPlayers; s += 1) {
+    // res is no longer sorted by seed initially
     res[s] = {
-      seed: s + 1,
+      seed: players[s],
       wins: 0,
       for: 0,
       //against: 0, TODO: extend this to FFA and Masters
       pos: this.numPlayers
     };
-    $.extend(res[s], this.initResult(s+1));
+    $.extend(res[s], this.initResult(players[s]));
   }
   if (typeof this.stats !== 'function') {
     throw new Error(this.name + " has not implemented stats");
