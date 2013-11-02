@@ -4,10 +4,11 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
-0.19.0 / 2013-11-XX
+0.19.0 / 2013-11-02
 ==================
   * fixed bug in Base::players that caused WO markes to be included
   * Base.from allows overridable implementation of multistage (but default implementation works for all but TieBreaker)
+  * `stats` implementations must not use results as a lookup map anymore - use `Base.resultEntry`
 
 0.18.0 / 2013-10-31
 ==================

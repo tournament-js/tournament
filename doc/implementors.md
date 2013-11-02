@@ -139,16 +139,15 @@ Called after `initResult` have been called `numPlayers` times and the array of r
   stats: function (resAry) {
     this.matches.forEach(function (m) {
       var winner = m.s[1] > m.s[0] ? m.p[1] : m.p[0];
-      resAry[winner-1].wins += 1;
-      resAry[winner-1].pos += 1;
+      var resEl = Base.resultEntry(winner);
+      resEl.wins += 1;
+      resEl.pos += 1;
     });
     return res.sort(Base.compareRes);
   }
 ```
 
-Note that `resAry` is ONLY sorted by seeding number initially. Thus you can look up players by doing `resAry[seed-1]` and then modifying that object.
-
-At the end of the `stats` function, however, you should ensure the `resAry` is sorted by `pos` descending, then optionally by other properties such as group position, map wins or losses (`.for` and `.against`), and with least priority, by `.seed` ascending.
+At the end of the stats function, you should ensure the `resAry` gets sorted by `pos` descending, then optionally by other properties such as group position, score sums wins or losses (`.for` and `.against`), and finally, with least priority, by `.seed` ascending.
 
 Note Base helpers such as `Base.compareRes` and `Base.sorted` for computing statistics here.
 
