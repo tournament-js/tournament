@@ -2,7 +2,6 @@ var $ = require('interlude');
 
 function Base(ms) {
   this.matches = ms;
-  this.locked = false;
 }
 
 // no player propagated marker - seeds 1-indexed
@@ -65,10 +64,6 @@ Base.prototype.replace = function (resAry) {
       return (oldSeed > 0) ? resAry[oldSeed-1].seed : oldSeed;
     });
   });
-};
-
-Base.prototype.lock = function () {
-  this.locked = true;
 };
 
 Base.resultEntry = function (resAry, seed) {
@@ -273,9 +268,6 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   if (score.length !== m.p.length) {
     return "scores must have length " + m.p.length;
   }
-  if (this.locked) {
-    return "multi stage tournaments can only score the current stage";
-  }
   if (!allowPast && Array.isArray(m.m)) {
     return "cannot re-score match";
   }
@@ -432,10 +424,6 @@ Base.prototype.matchesFor = function (playerId) {
 };
 
 // returns all players that exists in a partial slice of the tournament
-// 1. Duel: all players in round 5 WB    -> this.players({r: 5, b: t.WB})
-// 2. GroupStage: all players in group 3 -> this.players({s: 3})
-// similarly for FFA and TieBreaker.
-// NB: KnockOut structure is simple enough to use this.matches[r+1] instead of {r: r}
 Base.prototype.players = function (id) {
   return $.nub(this.findMatches(id || {}).reduce(function (acc, m) {
     return acc.concat(m.p);
