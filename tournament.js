@@ -45,19 +45,19 @@ var createReceiver = function (Klass) {
       throw new Error(err + "too many players tied to pick out top " + numPlayers);
     }
     var forwarded = new Klass(numPlayers, opts);
-    forwarded.replace(res); // correct when class is of standard format
+    forwarded._replace(res); // correct when class is of standard format
     return forwarded;
   };
 };
 
-Base.prototype.replace = function (resAry) {
+Base.prototype._replace = function (resAry) {
   var hasStarted = this.matches.some(function (m) {
     return m.p.every($.gt(Base.NONE)) && m.m;
   });
   if (hasStarted) {
     throw new Error("Cannot replace players for a tournament in progress");
   }
-  // because resAry is always sorted by .pos, we can use this to replace seeds
+  // because resAry is always sorted by .pos, we simply use this to replace seeds
   this.matches.forEach(function (m) {
     m.p = m.p.map(function (oldSeed) {
       // as long as they are actual players
@@ -66,6 +66,7 @@ Base.prototype.replace = function (resAry) {
   });
 };
 
+// TODO: eventually turn resAry into a ES6 Map
 Base.resultEntry = function (resAry, seed) {
   for (var i = 0; i < resAry.length; i += 1) {
     if (resAry[i].seed === seed) {
@@ -152,13 +153,19 @@ Base.inherit = function (Klass, Initial) {
 
   // ensure deeper sub classes preserve chains whenever they are set up
   // this way any deeper sub classes can always just call the previous method
-  var returns = { verify: null, early: false, initResult: {} };
-  ['verify', 'progress', 'limbo', 'early', 'initResult'].forEach(function (spec) {
-    if (Initial.prototype[spec]) {
-      Klass.prototype[spec] = Initial.prototype[spec];
+  var methods = {
+    '_verify': null,
+    '_progress': undefined,
+    '_limbo': undefined,
+    '_early': false,
+    '_initResult': {}
+  };
+  Object.keys(methods).forEach(function (fn) {
+    if (Initial.prototype[fn]) {
+      Klass.prototype[fn] = Initial.prototype[fn];
     }
-    if (!Initial.prototype[spec]) {
-      Klass.prototype[spec] = $.constant(returns[spec]); // usually undefined
+    if (!Initial.prototype[fn]) {
+      Klass.prototype[fn] = $.constant(methods[fn]);
     }
   });
 
@@ -237,7 +244,7 @@ Base.prototype.isDone = function () {
   if (this.matches.every($.get('m'))) {
     return true;
   }
-  return this.early();
+  return this._early();
 };
 
 // Default used by Duel, KnockOut, GroupStage, TieBreaker
@@ -251,7 +258,7 @@ Base.prototype.upcoming = function (playerId) {
       return m.id;
     }
   }
-  return this.limbo(playerId);
+  return this._limbo(playerId);
 };
 
 Base.prototype.unscorable = function (id, score, allowPast) {
@@ -271,7 +278,7 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   if (!allowPast && Array.isArray(m.m)) {
     return "cannot re-score match";
   }
-  return this.verify(m, score);
+  return this._verify(m, score);
 };
 
 
@@ -287,7 +294,7 @@ Base.prototype.score = function (id, score) {
   }
   var m = this.findMatch(id);
   m.m = score;
-  this.progress(m);
+  this._progress(m);
 
   return true;
 };
@@ -300,6 +307,7 @@ Base.prototype.results = function () {
     var why = players.length + " !== " + this.numPlayers;
     throw new Error(this.name + " initialized numPlayers incorrectly: " + why);
   }
+
   var res = new Array(this.numPlayers);
   for (var s = 0; s < this.numPlayers; s += 1) {
     // res is no longer sorted by seed initially
@@ -310,12 +318,14 @@ Base.prototype.results = function () {
       //against: 0, TODO: extend this to FFA and Masters
       pos: this.numPlayers
     };
-    $.extend(res[s], this.initResult(players[s]));
+    $.extend(res[s], this._initResult(players[s]));
   }
-  if (typeof this.stats !== 'function') {
-    throw new Error(this.name + " has not implemented stats");
+  if (typeof this._stats === 'function') {
+    this.matches.reduce(this._stats.bind(this), res);
   }
-  return this.stats(res);
+  return (typeof this._sort === 'function') ?
+    this._sort(res) :
+    res.sort(Base.compareRes); // sensible default
 };
 
 //------------------------------------------------------------------
