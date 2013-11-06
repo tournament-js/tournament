@@ -24,7 +24,7 @@ With the following requirements:
  - Every match `id` MUST be unique
  - If we sort the match id by `s` difference, then `r` difference, then `m` difference, we can score all the matches in this order
 
-## Tournament outline - easy way
+## Tournament outline
 
 ```js
 var Base = require('tournament');
@@ -55,44 +55,55 @@ SomeTournament.configure({
 });
 
 // optional
-SomeTournament.prototype.progress = function (match) {
+SomeTournament.prototype._progress = function (match) {
   // TODO: propagate winners of match here if needed
 };
 
-SomeTournament.prototype.verify = function (id, score) {
+SomeTournament.prototype._verify = function (id, score) {
   // TODO: check for extra conditions here if needed
   return null;
 };
 
-SomeTournament.prototype.limbo = function (playerId) {
+SomeTournament.prototype._limbo = function (playerId) {
   // TODO: check if we can figure out roughly where the player is headed
 };
 
-SomeTournament.prototype.early = function () {
+SomeTournament.prototype._early = function () {
   // TODO: return true here if tournament is done early
   return false;
 };
 
-SomeTournament.prototype.initResult = function (seed) {
+SomeTournament.prototype._initResult = function (seed) {
   // TODO: initialize extra result properties here
   return {};
 };
 
+SomeTournament.prototype._stats = function (res, match) {
+  // TODO: update results array of stats based on match here
+  return res;
+};
+
+SomeTournament.prototype._sort = function (res) {
+  // TODO: implement any extra sorting, positioning of res
+  // that needs to happen after all the _stats calls have finished
+  return res;
+};
+
 ```
 
-### Requirements
+## Requirements
 
 - `.sub` MUST be called with your init fn (constructor replacement)
 - init function MUST call the `initParent` cb with the matches created
 - `.configure` MUST be called with `invalid` and MAYBE also `defaults` function(s)
-- `stats` MUST be implemented
+- Either `_stats` MUST be implemented OR `results` MUST be overridden
 - `Base` methods MUST NOT be overridden to maintain expected behaviour
 
 NB: For inheriting from another tournament, replace all references to `Base` with the tournament you are inheriting from.
 
 To ensure you are not overriding anything, it is quick to just create a blank `Base` instance and check what methods exist.
 
-#### configure
+### configure
 Configure needs to be called with the rules and defaults for the options object.
 It takes two functions; `defaults` and `invalid`, the last of which MUST exist.
 Both functions take the same arguments as the tournament constructor; `(numPlayers, opts)`.
@@ -119,7 +130,7 @@ SomeTournament.configure({
 
 `defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect.
 
-##### default examples
+#### default examples
 You should try to set the default options in a sensible enough way so that you can construct a tournament without actually specifying the second argument at all. All currently compliant tournaments have sensible defaults:
 
 - `new Duel(n)` -> single elimination tournament with bronze final
@@ -129,150 +140,168 @@ You should try to set the default options in a sensible enough way so that you c
 
 Check out the code for these tournaments for inspiration.
 
-#### results
-The arguably most important feature of tournaments is the ability to figure out and to compute statistics and winners at the end. If you don't implement the following, all you have a collection of matches.
+### results
+The arguably most important feature of tournaments is the ability to figure out and to compute statistics and winners at the end. If you don't override it completely, you can implement up to three callbacks that help you structure this (usually) complicated function.
 
-##### stats
-Called after `initResult` have been called `numPlayers` times and the array of results are called in. Fill in the statistics for your tournament here.
+#### Overriding results
+If you do this, you still need to make sure the results method follows the typical tournament conventions. Read the source of `tournament` and see how it expects results to be calculated, and read the following below to see what we expect from the different stages.
+
+#### Implementing results via _stats, _sort and _initResult
+The easiest way, which should work for most tournaments.
+
+##### _initResult
+Called in the beginning of when `results` is initializing the result objects. Most properties are already set in automatically in `Base.prototype.results`, but if you need custom statistical properties, initialize them here.
 
 ```js
-  stats: function (resAry) {
-    this.matches.forEach(function (m) {
-      var winner = m.s[1] > m.s[0] ? m.p[1] : m.p[0];
-      var resEl = Base.resultEntry(winner);
-      resEl.wins += 1;
-      resEl.pos += 1;
-    });
-    return res.sort(Base.compareRes);
-  }
+SomeTournament.prototype._initResult = function (seed) {
+  return {
+    grp: this.groupFor(seed),
+    losses: 0,
+    draws: 0
+  };
+};
 ```
 
-At the end of the stats function, you should ensure the `resAry` gets sorted by `pos` descending, then optionally by other properties such as group position, score sums wins or losses (`.for` and `.against`), and finally, with least priority, by `.seed` ascending.
+NB: This can be a constant function, as all properties are copied onto the results array.
 
-Note Base helpers such as `Base.compareRes` and `Base.sorted` for computing statistics here.
+##### _stats
+Called after `_initResult` have been called `numPlayers` times and the array of results are called in. Fill in the statistics for your tournament here, and return the modified `resAry`
+
+```js
+SomeTournament.prototype._stats = function (resAry, m) {
+  var winner = m.s[1] > m.s[0] ? m.p[1] : m.p[0];
+  var w = Base.resultEntry(resAry, winner);
+  w.wins += 1;
+  w.pos += 1;
+  return resAry
+};
+```
+
+Modify any of the standard results properties (and extra one if you implemented `_initResult`). Note that if you manage to set the position `.pos` property perfectly based on this, you are done.
 
 It is important to not set `.pos` higher than `numPlayers` before you can guarantee that the player will minimally attain this position from the current state.
 
+##### _sort
+If any positioning needs to be done after having computed all the `_stats`, you may do so here.
 
-### Useful Methods
+```js
+SomeTournament.prototype._sort = function (resAry) {
+  // see FFA._sort for an example of this
+  return res.sort(comparisonFn);
+};
+```
+
+At the end of the _stats function, you should ensure the `resAry` gets sorted by `pos` descending, then optionally by other properties such as group position, score sums wins or losses (`.for` and `.against`), and finally, with least priority, by `.seed` ascending.
+
+Note Base helpers such as `Base.compareRes` and `Base.sorted` for computing statistics here. If your `_sort` implementation simply sorts res by `Base.compareRes` you do not need to implement it.
+
+## Optional methods
 It's often useful to supply the following methods
 
-- `verify` - if extra scoring restrictions are necessary
-- `progress` - if player propagation is necessary (tournaments with stages)
-- `limbo` - if a player can exist in limbo (waiting for a round to finish)
-- `early` - if a tournament can be done before all matches are played
-- `initResult` - if extra properties for `stats` needs to be initialized
+- `_verify` - if extra scoring restrictions are necessary
+- `_progress` - if player propagation is necessary (tournaments with stages)
+- `_limbo` - if a player can exist in limbo (waiting for a round to finish)
+- `_early` - if a tournament can be done before all matches are played
 
 
-#### verify
+### _verify
 Whenever a tournament gets asked to `.score()` a match, this gets called after some basic properties of value sanity is checked by the Base class.
 If you implement this, verify only extra restrictions that you would like to put on scoring that is not already checked for by `Base.prototype.unscorable`.
 
 ```js
-  verify: function (match, score) {
-    if (score[0] === score[1]) {
-      return "cannot draw"; // NOT OK
-    }
-    return null; // OK
+SomeTournament.prototype._verify = function (match, score) {
+  if (score[0] === score[1]) {
+    return "cannot draw"; // NOT OK
   }
+  return null; // OK
+};
 ```
 
-The return value MUST be a reason for the user, or NULL for OK.
+The return value MUST be a failiure reason for the user, or NULL for OK.
 
-#### progress
-Whenever a match is scored successfully (all the `unscorable` - and, if exists, `verify` - methods in the inheritance chain allowed the scoring to happen), `progress` will be called with the newly scored match.
+### _progress
+Whenever a match is scored successfully (all the `unscorable` - and, if exists, `_verify` - methods in the inheritance chain allowed the scoring to happen), `_progress` will be called with the newly scored match.
 
 ```js
-  progress: function (match) {
-    var next = this.findMatch({ s: 1, r: match.id.r + 1, m: 1 });
-    if (next) {
-      next.p = Base.sorted(match).slice(0, 2); // top 2 advance
-    }
+SomeTournament.prototype._progress: function (match) {
+  var next = this.findMatch({ s: 1, r: match.id.r + 1, m: 1 });
+  if (next) {
+    next.p = Base.sorted(match).slice(0, 2); // top 2 advance
   }
+};
 ```
 
 If something goes wrong in this method, throw an error.
 
-#### limbo
+### _limbo
 Called when `upcoming` is called with a `playerId` that was not found in any unscored matches. If your tournament type can keep players in "limbo" until a round or new stage is ready, you should do a best effort search here to see if you can figure out *PARTLY* where the player is going to end up.
 
 ```js
-  limbo: function (playerId) {
-    // player may be waiting for generation of next round
-    var m = $.firstBy(function (m) {
-      return m.p.indexOf(playerId) >= 0 && m.m;
-    }, this.currentRound() || []);
+SomeTournament.prototype._limbo = function (playerId) {
+  // player may be waiting for generation of next round
+  var m = $.firstBy(function (m) {
+    return m.p.indexOf(playerId) >= 0 && m.m;
+  }, this.currentRound() || []);
 
-    // if he played this round, check if he will advance
-    if (m && Base.sorted(m).slice(0, 2).indexOf(playerId) >= 0) {
-      // yes, was in top 2, return a partial id for next round (match number unknown)
-      return {s: 1, r: m.id.r + 1};
-    }
+  // if he played this round, check if he will advance
+  if (m && Base.sorted(m).slice(0, 2).indexOf(playerId) >= 0) {
+    // yes, was in top 2, return a partial id for next round (match number unknown)
+    return {s: 1, r: m.id.r + 1};
   }
+};
 ```
 
 This example was taken from the [FFA package](https://npmjs.org/package/ffa).
 
-#### early
+### _early
 Called when `isDone` is called and there are still matches remaining. If you implement this, you can decide if the tournament is done early, even if there are more matches to be played.
 
 ```js
-  early: function () {
-    // Double elimination Duel can be done early if GF game 1 is won by WB player
-    var gf1 = this.matches[this.matches.length - 2];
-    return this.isLong && this.last === LB && gf1.m && gf1.m[0] > gf1.m[1];
-  }
+SomeTournament.prototype._early = function () {
+  // Double elimination Duel can be done early if GF game 1 is won by WB player
+  var gf1 = this.matches[this.matches.length - 2];
+  return this.isLong && this.last === LB && gf1.m && gf1.m[0] > gf1.m[1];
+};
 ```
-
-##### initResult
-Called early on after `results` is called and the result objects needs to be initialized. Most properties are already set in `Base.prototype.results`, but if you need custom statistical properties, initialize them here.
-
-```js
-  initResult: function (seed) {
-    return {
-      grp: this.groupFor(seed),
-      losses: 0,
-      draws: 0
-    };
-  }
-```
-
-NB: This can be a constant function, as all properties are copied onto the results array.
 
 #### NB: Inheritance
 If you implement one of the above, and inherit from another tournament that implements the same method, then you SHOULD call the method you are inheriting from:
 
 ```js
-  verify: function (match, score) {
-    var reason = SuperClass.verify.call(this, match, score);
-    if (reason) return reason;
-    // verify other conditions here as usual
-    return null;
-  },
-  progress: function (match) {
-    SuperClass.prototype.progress.call(this, match);
-    // specific progression here as usual
-  },
-  limbo: function (playerId) {
-    SuperClass.prototype.limbo.call(this, playerId);
-    // specific search strategy here as usual
-  },
-  early: function () {
-    SuperClass.prototype.early.call(this);
-    // specific check here
-  },
-  initResult: function (seed) {
-    var res = SuperClass.prototype.initResult.call(this, seed);
-    // specific extensions here
-  },
-  stats: function (res) {
-    var results = SuperClass.prototype.stats.call(this, res);
-    // specific modifications to results here
-  }
+Inherited.prototype._verify = function (match, score) {
+  var reason = SuperClass.verify.call(this, match, score);
+  if (reason) return reason;
+  // verify other conditions here as usual
+  return null;
+};
+Inherited.prototype._progress = function (match) {
+  SuperClass.prototype._progress.call(this, match);
+  // specific progression here as usual
+};
+Inherited.prototype._limbo = function (playerId) {
+  SuperClass.prototype._limbo.call(this, playerId);
+  // specific search strategy here as usual
+};
+Inherited.prototype._early = function () {
+  SuperClass.prototype._early.call(this);
+  // specific check here
+};
+Inherited.prototype._initResult = function (seed) {
+  var res = SuperClass.prototype._initResult.call(this, seed);
+  // specific extensions here
+};
+Inherited.prototype._stats = function (res, m) {
+  var results = SuperClass.prototype._stats.call(this, res, m);
+  // specific modifications to results here
+};
+Inherited.prototype._sort = function (res) {
+  var results = SuperClass.prototype._sort.call(this, res);
+  // specific calculations and sorting here
+};
 ```
 
 Note that if you are inheriting from another tournament, overriding these methods should only in rare cases be necessary.
 
-### Useful extras
-#### idString
+## Useful extras
+### idString
 If you need to get the string of a tournament id and what `Base.idString` returns doesn't feel right, you should add your own `idString` function to `SomeTournament.idString` directly. Most tournaments do this.

@@ -4,6 +4,13 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
+0.20.0 / 2013-11-06
+==================
+  * Clearly distinguish what is implementors functions and user facing interface
+  * all expected prototype implementations are now prefixed with a _
+  * `_stats` split up into `_stats` and `_sort`
+  * replace is now _replace (internal, but perhaps useful for subs)
+
 0.19.0 / 2013-11-02
 ==================
   * fixed bug in Base::players that caused WO markes to be included
