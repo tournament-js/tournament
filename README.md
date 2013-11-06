@@ -1,7 +1,6 @@
 # Tournament
 [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
 [![Dependency Status](https://david-dm.org/clux/tournament.png)](https://david-dm.org/clux/tournament)
-[![Code Climate](https://codeclimate.com/github/clux/tournament.png)](https://codeclimate.com/github/clux/tournament)
 
 Tournament provides a base class for stateful tournament types that used to be implemented in this repository.
 
