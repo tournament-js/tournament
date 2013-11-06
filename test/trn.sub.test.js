@@ -10,14 +10,14 @@ var SomeT = Base.sub('SomeT', function (opts, initParent) {
   ];
   initParent(ms);
 });
-SomeT.prototype.verify = function (match) {
+SomeT.prototype._verify = function (match) {
   if (match.id.m === 2) {
     return "Cannot score match 2"; // for the lulz
   }
   return null;
 };
 
-SomeT.prototype.progress = function (match) {
+SomeT.prototype._progress = function (match) {
   this.opts.progressCalled(match);
 };
 SomeT.defaults = function (np, opts) {
@@ -54,7 +54,6 @@ test("sub invalid", function (t) {
     }
   });
 
-
   t.test("check verify score and unscorable", function (t) {
     t.plan(3 + 3*1); // call in only happens once
     var o = {
@@ -75,6 +74,7 @@ test("sub invalid", function (t) {
       t.ok(!inst.score(inst.matches[1].id, [2,1]), "and thus score returns false");
       t.end();
     });
+
     t.test('verify helpers', function (t) {
       // isPlayable does not check verify obviously
       t.ok(inst.isPlayable(inst.matches[0]), "can play first match");
@@ -83,12 +83,17 @@ test("sub invalid", function (t) {
       t.deepEqual(inst.players(), [1,2,3,4], "4 players in tournament");
       t.end();
     });
+
     t.test('verify stats', function (t) {
-      try { inst.results(); }
-      catch (e) {
-        t.equal(e.message, "SomeT has not implemented stats");
-        t.end();
-      }
+      var res = inst.results();
+      t.deepEqual(res, [
+          { seed: 1, wins: 0, for: 0, pos: 4 },
+          { seed: 2, wins: 0, for: 0, pos: 4 },
+          { seed: 3, wins: 0, for: 0, pos: 4 },
+          { seed: 4, wins: 0, for: 0, pos: 4 }
+        ], "default results"
+      );
+      t.end();
     });
   });
   t.end();
