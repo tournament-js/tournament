@@ -266,28 +266,6 @@ Returns whether or not the tournament is finished.
 Usually this means all the matches have been played (not always necessary).
 
 # Common conventions
-## Custom data
-### Match data
-If you want custom data stored on a match, the `data` keys is forever left free for you to set any data you want.
-
-```js
-// ex: want to store the names and profile ids associated with the seeds on the match itself
-trn.matches[0].data = {
-  names: {1 : 'clux', 4: 'pibbz'},
-  ids: {1: 3454354, 4: 123123}
-};
-```
-
-### Tournament data
-More global custom data can be stored on the tournament instance directly under the reserved `data` key.
-
-```js
-var trn = new Duel(4, Duel.WB);
-trn.data = {
-  players: { 'clux': 1, 'Thhethssmuz': 2, 'e114': 3, 'pibbz': 4 }
-};
-// when serializing the tournament this is now saved
-```
 
 ## Ensuring Scorability & Consistency
 The `trn.score(id, scores)` method, is simple, but may exhibit surprising behaviour for the uninitiated:
@@ -379,7 +357,7 @@ var serialized = trn.toString();
 var trn2 = FFA.parse(serialized);
 ```
 
-Here trn2 and trn are identical. Match progression and custom data is preserved.
+NB: Not intended for database serialization, tournament's API is too volatile for that yet.
 
 
 ## Multi-Stage Tournaments
