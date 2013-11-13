@@ -3,6 +3,12 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
+0.20.3 / 2013-11-13
+===================
+  * **TL;DR** `invalid` behaviour was wrong:
+    - Fixed a bug that caused the invalid inheritance chain to cause `(n)+(n-1)+...+1` calls to various invalid functions when constructing (should just be `n`)
+    - `configured invalid` now checks that `numPlayers` is an integer then calls its the specified invalid. If inheritance exists, the lower `invalid` will trigger whel you call the super class.
+
 0.20.2 / 2013-11-13
 ===================
   * Fixed a bug that screwed up inheriting from implementation

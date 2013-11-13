@@ -114,12 +114,7 @@ Base.sub = function (name, init, Initial) {
 };
 
 // two statics that can be overridden with configure
-Base.invalid = function (np/*, opts*/) {
-  if (!Base.isInteger(np)) {
-    return "numPlayers must be a finite integer";
-  }
-  return null;
-};
+Base.invalid = $.constant(null);
 Base.defaults = function (np, opts) {
   return (opts || {});
 };
@@ -135,12 +130,15 @@ var configure = function (Klass, obj, Initial) {
   }
   if (obj.invalid) {
     Klass.invalid = function (np, opts) {
-      var invReason = Initial.invalid(np, opts);
+      if (!Base.isInteger(np)) {
+        return "numPlayers must be a finite integer";
+      }
+      opts = Klass.defaults(np, opts);
+      var invReason = obj.invalid(np, opts);
       if (invReason !== null) {
         return invReason;
       }
-      opts = Klass.defaults(np, opts);
-      return obj.invalid(np, opts);
+      return null;
     };
   }
   else {
