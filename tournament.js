@@ -1,6 +1,6 @@
 var $ = require('interlude');
 
-function Base(ms) {
+function Base(np, ms) {
   this.matches = ms;
 }
 
@@ -105,8 +105,9 @@ Base.sub = function (name, init, Initial) {
 
     this.numPlayers = numPlayers;
     this.name = name;
+
     // call given init method, and pass in next constructor as cb
-    init.call(this, opts, Initial.bind(this));
+    init.call(this, opts, Initial.bind(this, numPlayers));
   };
   Base.inherit(Klass, Initial);
   return Klass;
@@ -187,8 +188,8 @@ Base.inherit = function (Klass, Initial) {
     return Initial.inherit(SubKlass, Klass);
   };
 
-  Klass.sub = function (subName, subArgs, subObj) {
-    return Initial.sub(subName, subArgs, subObj, Klass);
+  Klass.sub = function (subName, init) {
+    return Initial.sub(subName, init, Klass);
   };
 
   Klass.from = createReceiver(Klass);
