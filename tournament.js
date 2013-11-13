@@ -153,6 +153,7 @@ Base.inherit = function (Klass, Initial) {
 
   // ensure deeper sub classes preserve chains whenever they are set up
   // this way any deeper sub classes can always just call the previous method
+  // also, if any are implemented, it just replaces the default one here
   var methods = {
     '_verify': null,
     '_progress': undefined,
@@ -289,9 +290,6 @@ Base.matchTieCompute = function (zipSlice, startIdx, cb) {
 // Prototype interface that expects certain implementations
 //------------------------------------------------------------------
 
-// stuff that individual implementations can override
-// Used by FFA, GroupStage, TieBreaker
-// KnockOut + Duel implement slightly different versions
 Base.prototype.isDone = function () {
   if (this.matches.every($.get('m'))) {
     return true;
@@ -299,11 +297,7 @@ Base.prototype.isDone = function () {
   return this._early();
 };
 
-// Default used by Duel, KnockOut, GroupStage, TieBreaker
-// FFA adds extra logic as tournament is in limbo until currentRound all scored
-// NB: can't be extended to non-playerId version because Duel can have unused matches
 Base.prototype.upcoming = function (playerId) {
-  // find first unplayed, pick by round asc [matches are sorted, can pick first]
   for (var i = 0; i < this.matches.length; i += 1) {
     var m = this.matches[i];
     if (m.p.indexOf(playerId) >= 0 && !m.m) {
@@ -333,11 +327,7 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   return this._verify(m, score);
 };
 
-
-// the only way to fly
 Base.prototype.score = function (id, score) {
-  // we use the unscorable one highest up in the chain because by spec:
-  // it must call Base.prototype.unscorable first if overridden
   var invReason = this.unscorable(id, score, true);
   if (invReason !== null) {
     console.error("failed scoring match %s with %j", this.rep(id), score);
@@ -347,12 +337,9 @@ Base.prototype.score = function (id, score) {
   var m = this.findMatch(id);
   m.m = score;
   this._progress(m);
-
   return true;
 };
 
-// prepare a results array
-// not always very helpful
 Base.prototype.results = function () {
   var players = this.players();
   if (this.numPlayers !== players.length) {
@@ -384,7 +371,6 @@ Base.prototype.results = function () {
 // Prototype convenience methods
 //------------------------------------------------------------------
 
-// shortcut for results
 Base.prototype.resultsFor = function (seed) {
   var res = this.results();
   for (var i = 0; i < res.length; i += 1) {
@@ -393,15 +379,13 @@ Base.prototype.resultsFor = function (seed) {
       return r;
     }
   }
-  // TODO: sensible to throw here?
-  throw new Error("Seed " + seed + " not found in tournament");
 };
 
 Base.prototype.isPlayable = function (match) {
   return !match.p.some($.eq(Base.NONE));
 };
 
-// Public API extensions
+
 // matches are stored in a sorted array rather than an ID -> Match map
 // This is because ordering is more important than being able to access any match
 // at any time. Looping to find the one is also quick because ms is generally short.
@@ -477,8 +461,6 @@ Base.prototype.nextRound = function (section) {
   }
 };
 
-
-// track a player's progress through a tournament
 Base.prototype.matchesFor = function (playerId) {
   return this.matches.filter(function (m) {
     return m.p.indexOf(playerId) >= 0;

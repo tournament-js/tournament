@@ -1,34 +1,38 @@
 PLANNED (most stuff in issue form now)
-==================
-  * `FFA` should also have a `mapsBreak` option
+===================
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
+0.20.1 / 2013-11-13
+===================
+  * `results[i].against` now expected everywhere
+  * `Base.matchTieCompute` and `Base.resTieCompute` added
+
 0.20.0 / 2013-11-06
-==================
+===================
   * Clearly distinguish what is implementors functions and user facing interface
   * all expected prototype implementations are now prefixed with a _
   * `_stats` split up into `_stats` and `_sort`
   * replace is now _replace (internal, but perhaps useful for subs)
 
 0.19.0 / 2013-11-02
-==================
+===================
   * fixed bug in Base::players that caused WO markes to be included
   * Base.from allows overridable implementation of multistage (but default implementation works for all but TieBreaker)
   * `stats` implementations must not use results as a lookup map anymore - use `Base.resultEntry`
 
 0.18.0 / 2013-10-31
-==================
+===================
   * `.sub` made much easier to use for implementors
   * `.configure` MUST be called with static `defaults` and `invalid`
   * `defaults` will be used to fill in parameter defaults
 
 0.17.1 / 2013-10-27
-==================
+===================
   * `initResult` now optional when no extra properties are computed
 
 0.17.0 / 2013-10-25
-==================
+===================
   * Added `Base.isInteger` while ES6 is not out
   * TOURNAMENTS MUST NO LONGER OVERRIDE `results` (straggler from 0.16):
   * Instead implement `stats` and `initResult`
@@ -37,7 +41,7 @@ PLANNED (most stuff in issue form now)
     - `for` and `against` keys have been added across tournaments - fixes #12
 
 0.16.0 / 2013-10-22
-==================
+===================
   * TOURNAMENTS MUST NO LONGER OVERRIDE `score`, `unscorable`, `upcoming` or `isDone`
   * Following documented in the [implementors guide](./doc/implementors.md)
     - `Base.parse` MUST NOT be bound anymore to avoid subclassing failing after the first
@@ -46,14 +50,14 @@ PLANNED (most stuff in issue form now)
     - Implement `early` and `limbo` for better isDone and upcoming additions
 
 0.15.1 / 2013-10-17
-==================
+===================
   * tests now remaining - now tests consistency of the 4 factored out modules
   * `isPlayable` now used in `unscorable` for consistency
   * `Base.sorted` gets the sorted player array of a match by `Base.compareZip`
 
 
 0.15.0 / 2013-10-15
-==================
+===================
   * tournament no longer exports any tournament types, but only the `Base` class
   * see modules:
    - [duel](https://npmjs.org/package/duel)
@@ -66,12 +70,12 @@ PLANNED (most stuff in issue form now)
 =======================================
 
 0.14.0 / 2013-10-15
-==================
+===================
   * `new` protection for all subclasses
   * `fromJSON` remoted, use version "0.13.0" to migrate to the full string
 
 0.13.0 / 2013-10-15
-==================
+===================
   * Exposed `Base` class for external implementors (with extra entry point for just this)
   * Base class implements a default `score` - now used by `GroupStage`
   * Serialization now uses `inst.toString()` and `Klass.parse(str)`
@@ -81,7 +85,7 @@ PLANNED (most stuff in issue form now)
 
 
 0.12.0 / 2013-10-02
-==================
+===================
   * Added a bunch of helper methods on a common base class
   * helper `t.findMatch(d.matches, id)` changed to be avilable on instance `d.findMatch(id)`
   * Instance method `d.findMatches(partialId)` added to find a set of "similar" matches
@@ -89,12 +93,12 @@ PLANNED (most stuff in issue form now)
   * Bunch of default helper methods added on the base class see `base.md` in the doc dir
 
 0.11.1 / 2013-02-04
-==================
+===================
   * removed spurious console.log in `TieBreaker`
   * added a doc/ for this `TieBreaker` class
 
 0.11.0 / 2013-02-04
-==================
+===================
   * removed `logule` dependency - error messages can be provided by helpers completely now
   so it's unnecessary to break browserification
   * `TieBreaker` module included for (currently only `GroupStage`) `limit` like functionality (docs to come) for tiebreaking all the possible ties possible in GroupStage
@@ -104,25 +108,25 @@ PLANNED (most stuff in issue form now)
   * (2 player `GroupStage` is equivalent to a 2 player `FFA` so further reduction unnecessary)
 
 0.10.3 / 2012-12-24
-==================
+===================
   * `FFA` restrictions on `limit` removed (apart from multiple of last rounds numMatches)
   * publically exported helpers now include `findMatch` :: matches -> id -> match
   * `KnockOut` now also contain a `numPlayers` instance variable for consistency
 
 0.10.2 / 2012-12-22
-==================
+===================
   * `FFA` now able to create single match tournaments internally (for tiebreaking)
   * `FFA` positioning only really worked for the one special case we tested for with `limit` set - now fixed (and more tests)
 
 0.10.1 / 2012-12-20
-==================
+===================
   * `GroupStage` results fixed up `pos` positioning was inconsistent and wrong, now robust
   * `GroupStage` results now allow an options object to set the amount of points to be rewarded for winning/tieing and whether or not maps should break positions.
   * `GroupStage` results expose `grp` as the group number the player was/is in
   * Note: `GroupStage` can still not be used multistage with `limit` options yet, see issue #7
 
 0.10.0 / 2012-12-15
-==================
+===================
   * added alternate entry points for people who just want one tournament type
     can be used with `require('tournament/duel')` or `/knockout` or `/ffa` or `/groupstage`
   * `groups` and `robin` factored into own helper file
