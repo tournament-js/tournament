@@ -2,7 +2,7 @@
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "tournament",
   "description": "Tournament interface",
-  "version": "0.20.1",
+  "version": "0.20.2",
   "repository": {
     "type": "git",
     "url": "clux/tournament"
