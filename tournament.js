@@ -232,6 +232,58 @@ Base.sorted = function (match) {
   return $.zip(match.p, match.m).sort(Base.compareZip).map($.get('0'));
 };
 
+//------------------------------------------------------------------
+// TieComputers
+//------------------------------------------------------------------
+
+// tie position an assumed sorted resAry using a metric fn
+// the metric fn must be sufficiently linked to the sorting fn used
+Base.resTieCompute = function (resAry, startPos, cb, metric) {
+  var pos = startPos
+    , ties = 0
+    , points = -Infinity;
+
+  for (var i = 0; i < resAry.length; i += 1) {
+    var r = resAry[i];
+    var metr = metric(r);
+
+    if (metr === points) {
+      ties += 1;
+    }
+    else {
+      pos += ties + 1;
+      ties = 0;
+    }
+    points = metr;
+    cb(r, pos);
+  }
+};
+
+// tie position an individual match by passing in a slice of the
+// zipped players and scores array, sorted by compareZip
+Base.matchTieCompute = function (zipSlice, startIdx, cb) {
+  var pos = startIdx
+    , ties = 0
+    , scr = -Infinity;
+
+  // loop over players in order of their score
+  for (var k = 0; k < zipSlice.length; k += 1) {
+    var pair = zipSlice[k]
+      , p = pair[0]
+      , s = pair[1];
+
+    // if this is a tie, pos is previous one, and next real pos must be incremented
+    if (scr === s) {
+      ties += 1;
+    }
+    else {
+      pos += 1 + ties; // if we tied, must also + that
+      ties = 0;
+    }
+    scr = s;
+    cb(p, pos); // user have to find resultEntry himself from seed
+  }
+};
 
 //------------------------------------------------------------------
 // Prototype interface that expects certain implementations
