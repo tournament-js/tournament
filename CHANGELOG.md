@@ -3,6 +3,10 @@ PLANNED (most stuff in issue form now)
   * undo affected history when changing past
   * move issues and this stuff over to correct libraries
 
+0.20.2 / 2013-11-13
+===================
+  * Fixed a bug that screwed up inheriting from implementation
+
 0.20.1 / 2013-11-13
 ===================
   * `results[i].against` now expected everywhere
