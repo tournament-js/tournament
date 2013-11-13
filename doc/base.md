@@ -206,7 +206,8 @@ Every result entry will minimally contain:
   pos: Number
   seed: Number,
   wins: Number,
-  for: Number
+  for: Number,
+  against: Number
 }
 ```
 

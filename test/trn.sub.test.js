@@ -87,10 +87,10 @@ test("sub invalid", function (t) {
     t.test('verify stats', function (t) {
       var res = inst.results();
       t.deepEqual(res, [
-          { seed: 1, wins: 0, for: 0, pos: 4 },
-          { seed: 2, wins: 0, for: 0, pos: 4 },
-          { seed: 3, wins: 0, for: 0, pos: 4 },
-          { seed: 4, wins: 0, for: 0, pos: 4 }
+          { seed: 1, wins: 0, for: 0, against: 0, pos: 4 },
+          { seed: 2, wins: 0, for: 0, against: 0, pos: 4 },
+          { seed: 3, wins: 0, for: 0, against: 0, pos: 4 },
+          { seed: 4, wins: 0, for: 0, against: 0, pos: 4 }
         ], "default results"
       );
       t.end();

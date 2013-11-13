@@ -367,7 +367,7 @@ Base.prototype.results = function () {
       seed: players[s],
       wins: 0,
       for: 0,
-      //against: 0, TODO: extend this to FFA and Masters
+      against: 0,
       pos: this.numPlayers
     };
     $.extend(res[s], this._initResult(players[s]));
