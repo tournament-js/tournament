@@ -31,10 +31,10 @@
   },
   "devDependencies": {
     "tap": "~0.4.4",
-    "duel": "~0.4.3",
-    "ffa": "~0.4.3",
-    "groupstage": "~0.5",
-    "masters": "~0.4.2"
+    "duel": "~0.4.4",
+    "ffa": "~0.5",
+    "groupstage": "~0.6",
+    "masters": "~0.4.3"
   },
   "bugs": {
     "url": "http://github.com/clux/tournament/issues"
