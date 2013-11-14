@@ -418,11 +418,11 @@ Base.prototype.findMatchesRanged = function (lb, ub) {
   });
 };
 
-var splitBy = function (ms, filterKey, splitKey, number) {
+var splitBy = function (ms, splitKey, filterKey, filterVal) {
   var res = [];
   for (var i = 0; i < ms.length; i += 1) {
     var m = ms[i];
-    if (number == null || m.id[filterKey] === number) {
+    if (filterVal == null || m.id[filterKey] === filterVal) {
       if (!Array.isArray(res[m.id[splitKey] - 1])) {
         res[m.id[splitKey] - 1] = [];
       }
@@ -433,11 +433,11 @@ var splitBy = function (ms, filterKey, splitKey, number) {
 };
 // partition matches into rounds (optionally fix section)
 Base.prototype.rounds = function (section) {
-  return splitBy(this.matches, 's', 'r', section);
+  return splitBy(this.matches, 'r', 's', section);
 };
 // partition matches into sections (optionally fix round)
 Base.prototype.sections = function (round) {
-  return splitBy(this.matches, 'r', 's', round);
+  return splitBy(this.matches, 's', 'r', round);
 };
 
 var roundNotDone = function (rnd) {
@@ -445,12 +445,9 @@ var roundNotDone = function (rnd) {
     return !m.m;
   });
 };
-
-
 Base.prototype.currentRound = function (section) {
   return $.firstBy(roundNotDone, this.rounds(section));
 };
-
 Base.prototype.nextRound = function (section) {
   var rounds = this.rounds(section);
   for (var i = 0; i < rounds.length; i += 1) {
