@@ -33,7 +33,7 @@
     "tap": "~0.4.4",
     "duel": "~0.4.4",
     "ffa": "~0.5",
-    "groupstage": "~0.6",
+    "groupstage": "~0.6.1",
     "masters": "~0.4.3"
   },
   "bugs": {
