@@ -116,7 +116,7 @@ Base.sub = function (name, init, Initial) {
 // two statics that can be overridden with configure
 Base.invalid = $.constant(null);
 Base.defaults = function (np, opts) {
-  return (opts || {});
+  return $.extend({}, opts || {});
 };
 
 var configure = function (Klass, obj, Initial) {
@@ -174,6 +174,7 @@ Base.inherit = function (Klass, Initial) {
   };
 
   Klass.idString = Initial.idString; // default TODO necessary now?
+  // TODO: this is bad, rep always uses innitial now..
   Object.defineProperty(Klass.prototype, 'rep', {
     value: Klass.idString
   });

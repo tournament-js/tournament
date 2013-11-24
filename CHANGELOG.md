@@ -1,7 +1,7 @@
-PLANNED (most stuff in issue form now)
+0.20.4 / 2013-11-24
 ===================
-  * undo affected history when changing past
-  * move issues and this stuff over to correct libraries
+  * Fixed an issue that caused .sub constructors to modify input options
+    (could cause complications when reusing the same input options)
 
 0.20.3 / 2013-11-13
 ===================
