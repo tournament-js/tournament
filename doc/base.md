@@ -317,10 +317,10 @@ This is particularly valuable for the `FFA` elimination type where the possibili
 
 ```js
 // construct if valid:
-var reason = FFA.invalid(numPlayers, grsAry, advAry, opts);
+var reason = FFA.invalid(numPlayers, opts);
 if (!reason) {
   // tournament valid - and can be constructed with the parameters just passed in
-  return new FFA(numPlayers, grsAry, advAry, opts);
+  return new FFA(numPlayers, opts);
 }
 else {
   console.log(reason); // will tell you what went wrong
@@ -350,13 +350,13 @@ Masters.idString({s: 1, r:2, m: 1});
 Every tournament instance can be coerced into a string:
 
 ```js
-var trn = new FFA(16, [4, 4, 4], [2, 2]);
+var trn = new FFA(16, opts);
 var serialized = trn.toString();
 
 var trn2 = FFA.parse(serialized);
 ```
 
-NB: Not intended for database serialization, tournament's API is too volatile for that yet.
+NB: Not intended for database serialization, tournament's API is too volatile for that.
 
 
 ## Multi-Stage Tournaments
