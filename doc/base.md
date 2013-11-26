@@ -5,7 +5,7 @@ All tournament types follow a very simple principle. There is always only:
  - One tournament mutator - `.score`
   - One common way of doing statistics/tracking progress
 
-Each tournament implementation inherits from a common base class. A large amount of logic can be shared because only rules are different. This `Base` class is exported for other tournament implementors, and is documented herein.
+Each tournament implementation inherits from a common base class. A large amount of logic can be shared because only rules are different. This base class is exported for other tournament implementors, and is documented herein.
 
 In this document:
 
@@ -13,8 +13,6 @@ In this document:
 - The variable `trn` refers to an instance of one such implementation
 
 # Base class
-
-    Stability: 2 - Unstable
 
 ## Match methods
 The entire matches array is available on `trn.matches`:
@@ -305,7 +303,7 @@ else {
 
  When guarding on `!trn.unscorable()` like this `tournament` will never log anything during a `trn.score()` call as they will always work.
 
- The reasons are currently hardcoded inside the the Base class and implementations internal `verify` functions. Typical faults include:
+ The reasons are currently hardcoded inside the the base class and implementations internal `verify` functions. Typical faults include:
 
  - parameters not integers, scores not an array of numbers
  - scores not the same length as the player array

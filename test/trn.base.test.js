@@ -1,10 +1,10 @@
 var tap = require('tap')
   , $ = require('interlude')
   , test = tap.test
-  , Base = require('../') // main interface
+  , Tournament = require('../') // main interface
   , Duel = require('duel')
   , GroupStage = require('groupstage')
-  , comp = Base.compareMatches;
+  , comp = Tournament.compareMatches;
 
 const WB = Duel.WB;
 const LB = Duel.LB;

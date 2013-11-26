@@ -9,7 +9,7 @@ You can create your own matches, but they MUST have the following format:
 {
   id: { s: Number, r: Number, m: Number},
   p: [Number],
-  m: [Number]
+  m: [Number] || undefined
 }
 ```
 
@@ -27,12 +27,12 @@ With the following requirements:
 ## Tournament outline
 
 ```js
-var Base = require('tournament');
+var Tournament = require('tournament');
 
 // Specify tournament names and the named arguments for its constructor
-var SomeTournament = Base.sub('SomeTournament', function (opts, initParent) {
+var SomeTournament = Tournament.sub('SomeTournament', function (opts, initParent) {
   var matches = makeMatches(this.numPlayers, opts);
-  initParent(matches); // goes to Base's constructor
+  initParent(matches); // goes to Tournament's constructor
 });
 
 SomeTournament.prototype.stats = function (res) {
@@ -97,11 +97,11 @@ SomeTournament.prototype._sort = function (res) {
 - init function MUST call the `initParent` cb with the matches created
 - `.configure` MUST be called with `invalid` and MAYBE also `defaults` function(s)
 - Either `_stats` MUST be implemented OR `results` MUST be overridden
-- `Base` methods MUST NOT be overridden to maintain expected behaviour
+- `Tournament` methods MUST NOT be overridden to maintain expected behaviour
 
-NB: For inheriting from another tournament, replace all references to `Base` with the tournament you are inheriting from.
+NB: For inheriting from another tournament, replace all references to `Tournament` with the tournament you are inheriting from.
 
-To ensure you are not overriding anything, it is quick to just create a blank `Base` instance and check what methods exist.
+To ensure you are not overriding anything, it is quick to just create a blank `Tournament` instance and check what methods exist.
 
 ### configure
 Configure needs to be called with the rules and defaults for the options object.
@@ -126,7 +126,7 @@ SomeTournament.configure({
 });
 ```
 
-`invalid` ensures that tournament rules are upheld. If you have specific rules, these will be guarded on for construction along with whatever invalid rules specified by the tournament or base class you are inheriting from. Note that we already verify that `numPlayers` is an integer for you.
+`invalid` ensures that tournament rules are upheld. If you have specific rules, these will be guarded on for construction along with whatever invalid rules specified by the tournament class you are inheriting from. Note that we already verify that `numPlayers` is an integer for you.
 
 `defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect.
 
@@ -150,7 +150,7 @@ If you do this, you still need to make sure the results method follows the typic
 The easiest way, which should work for most tournaments.
 
 ##### _initResult
-Called in the beginning of when `results` is initializing the result objects. Most properties are already set in automatically in `Base.prototype.results`, but if you need custom statistical properties, initialize them here.
+Called in the beginning of when `results` is initializing the result objects. Most properties are already set in automatically in `Tournament.prototype.results`, but if you need custom statistical properties, initialize them here.
 
 ```js
 SomeTournament.prototype._initResult = function (seed) {
@@ -170,7 +170,7 @@ Called after `_initResult` have been called `numPlayers` times and the array of 
 ```js
 SomeTournament.prototype._stats = function (resAry, m) {
   var winner = m.s[1] > m.s[0] ? m.p[1] : m.p[0];
-  var w = Base.resultEntry(resAry, winner);
+  var w = Tournament.resultEntry(resAry, winner);
   w.wins += 1;
   w.pos += 1;
   return resAry
@@ -193,7 +193,7 @@ SomeTournament.prototype._sort = function (resAry) {
 
 At the end of the _stats function, you should ensure the `resAry` gets sorted by `pos` descending, then optionally by other properties such as group position, score sums wins or losses (`.for` and `.against`), and finally, with least priority, by `.seed` ascending.
 
-Note Base helpers such as `Base.compareRes` and `Base.sorted` for computing statistics here. If your `_sort` implementation simply sorts res by `Base.compareRes` you do not need to implement it.
+Note Tournament helpers such as `Tournament.compareRes` and `Tournament.sorted` for computing statistics here. If your `_sort` implementation simply sorts res by `Tournament.compareRes` you do not need to implement it.
 
 ## Optional methods
 It's often useful to supply the following methods
@@ -205,8 +205,8 @@ It's often useful to supply the following methods
 
 
 ### _verify
-Whenever a tournament gets asked to `.score()` a match, this gets called after some basic properties of value sanity is checked by the Base class.
-If you implement this, verify only extra restrictions that you would like to put on scoring that is not already checked for by `Base.prototype.unscorable`.
+Whenever a tournament gets asked to `.score()` a match, this gets called after some basic properties of value sanity is checked by the Tournament class.
+If you implement this, verify only extra restrictions that you would like to put on scoring that is not already checked for by `Tournament.prototype.unscorable`.
 
 ```js
 SomeTournament.prototype._verify = function (match, score) {
@@ -226,7 +226,7 @@ Whenever a match is scored successfully (all the `unscorable` - and, if exists, 
 SomeTournament.prototype._progress: function (match) {
   var next = this.findMatch({ s: 1, r: match.id.r + 1, m: 1 });
   if (next) {
-    next.p = Base.sorted(match).slice(0, 2); // top 2 advance
+    next.p = Tournament.sorted(match).slice(0, 2); // top 2 advance
   }
 };
 ```
@@ -244,7 +244,7 @@ SomeTournament.prototype._limbo = function (playerId) {
   }, this.currentRound() || []);
 
   // if he played this round, check if he will advance
-  if (m && Base.sorted(m).slice(0, 2).indexOf(playerId) >= 0) {
+  if (m && Tournament.sorted(m).slice(0, 2).indexOf(playerId) >= 0) {
     // yes, was in top 2, return a partial id for next round (match number unknown)
     return {s: 1, r: m.id.r + 1};
   }
@@ -304,4 +304,4 @@ Note that if you are inheriting from another tournament, overriding these method
 
 ## Useful extras
 ### idString
-If you need to get the string of a tournament id and what `Base.idString` returns doesn't feel right, you should add your own `idString` function to `SomeTournament.idString` directly. Most tournaments do this.
+If you need to get the string of a tournament id and what `Tournament.idString` returns doesn't feel right, you should add your own `idString` function to `SomeTournament.idString` directly. Most tournaments do this.

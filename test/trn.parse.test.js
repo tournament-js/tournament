@@ -3,9 +3,6 @@ var test = require('tap').test
   , FFA = require('ffa')
   , GroupStage = require('groupstage')
   , Masters = require('masters');
-  //, TieBreaker = require('../lib/tiebreak_groups')
-  //, Base = require('../');
-
 
 var create = function (Klass, type) {
   if (type === 'Duel') {
@@ -20,13 +17,6 @@ var create = function (Klass, type) {
   if (type === 'GroupStage') {
     return new Klass(16, { groupSize: 4 });
   }
-  //if (type === 'TieBreaker') {
-  //  var gs = new GroupStage(16, 4);
-  //  gs.matches.forEach(function (m) {
-  //    gs.score(m.id, [1,0]);
-  //  });
-  //  return new Klass(gs.results(), 3);
-  //}
 };
 
 test("serialize/deserialize tournaments", function (t) {
@@ -53,10 +43,6 @@ test("serialize/deserialize tournaments", function (t) {
     t.ok(parsed instanceof Klass, "parsed is a " + Klass.name + " instance");
 
     t.equal(str, parsed + '', "serialize the same way");
-
-    // TODO: fails atm because each sub pulls in a different tournament
-    //t.ok(inst instanceof Base, "inst is a Base class instance");
-    //t.ok(parsed instanceof Base, "parsed is a Base class instance");
   });
 
   t.end();

@@ -1,11 +1,11 @@
 var $ = require('interlude');
 
-function Base(np, ms) {
+function Tournament(np, ms) {
   this.matches = ms;
 }
 
 // no player propagated marker - seeds 1-indexed
-Object.defineProperty(Base, 'NONE', {
+Object.defineProperty(Tournament, 'NONE', {
   enumerable: true,
   value: 0
 });
@@ -14,13 +14,13 @@ Object.defineProperty(Base, 'NONE', {
 // Serialization/deserialization (NOT FOR DATABASE USAGE)
 //------------------------------------------------------------------
 
-Base.parse = function (SubClass, str) {
+Tournament.parse = function (SubClass, str) {
   var obj = JSON.parse(str);
   obj.rep = SubClass.idString || $.constant('UNKNOWN');
   return $.extend(Object.create(SubClass.prototype), obj);
 };
 
-Base.prototype.toString = function () {
+Tournament.prototype.toString = function () {
   return JSON.stringify(this);
 };
 
@@ -50,9 +50,9 @@ var createReceiver = function (Klass) {
   };
 };
 
-Base.prototype._replace = function (resAry) {
+Tournament.prototype._replace = function (resAry) {
   var hasStarted = this.matches.some(function (m) {
-    return m.p.every($.gt(Base.NONE)) && m.m;
+    return m.p.every($.gt(Tournament.NONE)) && m.m;
   });
   if (hasStarted) {
     throw new Error("Cannot replace players for a tournament in progress");
@@ -67,7 +67,7 @@ Base.prototype._replace = function (resAry) {
 };
 
 // TODO: eventually turn resAry into a ES6 Map
-Base.resultEntry = function (resAry, seed) {
+Tournament.resultEntry = function (resAry, seed) {
   for (var i = 0; i < resAry.length; i += 1) {
     if (resAry[i].seed === seed) {
       return resAry[i];
@@ -80,8 +80,8 @@ Base.resultEntry = function (resAry, seed) {
 // Inheritance helpers
 //------------------------------------------------------------------
 
-Base.sub = function (name, init, Initial) {
-  Initial = Initial || Base;
+Tournament.sub = function (name, init, Initial) {
+  Initial = Initial || Tournament;
 
   var Klass = function (numPlayers, opts) {
     if (!(this instanceof Klass)) {
@@ -109,13 +109,13 @@ Base.sub = function (name, init, Initial) {
     // call given init method, and pass in next constructor as cb
     init.call(this, opts, Initial.bind(this, numPlayers));
   };
-  Base.inherit(Klass, Initial);
+  Tournament.inherit(Klass, Initial);
   return Klass;
 };
 
 // two statics that can be overridden with configure
-Base.invalid = $.constant(null);
-Base.defaults = function (np, opts) {
+Tournament.invalid = $.constant(null);
+Tournament.defaults = function (np, opts) {
   return $.extend({}, opts || {});
 };
 
@@ -130,7 +130,7 @@ var configure = function (Klass, obj, Initial) {
   }
   if (obj.invalid) {
     Klass.invalid = function (np, opts) {
-      if (!Base.isInteger(np)) {
+      if (!Tournament.isInteger(np)) {
         return "numPlayers must be a finite integer";
       }
       opts = Klass.defaults(np, opts);
@@ -146,8 +146,8 @@ var configure = function (Klass, obj, Initial) {
   }
 };
 
-Base.inherit = function (Klass, Initial) {
-  Initial = Initial || Base;
+Tournament.inherit = function (Klass, Initial) {
+  Initial = Initial || Tournament;
   Klass.prototype = Object.create(Initial.prototype);
 
   // ensure deeper sub classes preserve chains whenever they are set up
@@ -170,7 +170,7 @@ Base.inherit = function (Klass, Initial) {
   });
 
   Klass.parse = function (str) {
-    return Base.parse(Klass, str);
+    return Tournament.parse(Klass, str);
   };
 
   Klass.idString = Initial.idString; // default TODO necessary now?
@@ -198,11 +198,11 @@ Base.inherit = function (Klass, Initial) {
 // Misc helpers
 //------------------------------------------------------------------
 
-Base.idString = function (id) {
+Tournament.idString = function (id) {
   return "S" + id.s + " R" + id.r + " M" + id.m;
 };
 
-Base.isInteger = function (n) { // until this gets on Number in ES6
+Tournament.isInteger = function (n) { // until this gets on Number in ES6
   return Math.ceil(n) === n;
 };
 
@@ -212,34 +212,34 @@ Base.isInteger = function (n) { // until this gets on Number in ES6
 
 // ensures first matches first and (for most part) forEach scorability
 // similarly how it's read in many cases: WB R2 G3, G1 R1 M1
-Base.compareMatches = function (g1, g2) {
+Tournament.compareMatches = function (g1, g2) {
   return (g1.id.s - g2.id.s) || (g1.id.r - g2.id.r) || (g1.id.m - g2.id.m);
 };
 
 // how to sort results array (of objects) : by position desc (or seed asc for looks)
 // only for sorting (more advanced `pos` algorithms may be used separately)
-Base.compareRes = function (r1, r2) {
+Tournament.compareRes = function (r1, r2) {
   return (r1.pos - r2.pos) || (r1.seed - r2.seed);
 };
 
 // internal sorting of zipped player array with map score array : zip(g.p, g.m)
 // sorts by map score desc, then seed asc
-Base.compareZip = function (z1, z2) {
+Tournament.compareZip = function (z1, z2) {
   return (z2[1] - z1[1]) || (z1[0] - z2[0]);
 };
 
 // helper to get the player array in a match sorted by compareZip
-Base.sorted = function (match) {
-  return $.zip(match.p, match.m).sort(Base.compareZip).map($.get('0'));
+Tournament.sorted = function (match) {
+  return $.zip(match.p, match.m).sort(Tournament.compareZip).map($.get('0'));
 };
 
 //------------------------------------------------------------------
-// TieComputers
+// Tie computers
 //------------------------------------------------------------------
 
 // tie position an assumed sorted resAry using a metric fn
 // the metric fn must be sufficiently linked to the sorting fn used
-Base.resTieCompute = function (resAry, startPos, cb, metric) {
+Tournament.resTieCompute = function (resAry, startPos, cb, metric) {
   var pos = startPos
     , ties = 0
     , points = -Infinity;
@@ -262,7 +262,7 @@ Base.resTieCompute = function (resAry, startPos, cb, metric) {
 
 // tie position an individual match by passing in a slice of the
 // zipped players and scores array, sorted by compareZip
-Base.matchTieCompute = function (zipSlice, startIdx, cb) {
+Tournament.matchTieCompute = function (zipSlice, startIdx, cb) {
   var pos = startIdx
     , ties = 0
     , scr = -Infinity;
@@ -290,14 +290,14 @@ Base.matchTieCompute = function (zipSlice, startIdx, cb) {
 // Prototype interface that expects certain implementations
 //------------------------------------------------------------------
 
-Base.prototype.isDone = function () {
+Tournament.prototype.isDone = function () {
   if (this.matches.every($.get('m'))) {
     return true;
   }
   return this._early();
 };
 
-Base.prototype.upcoming = function (playerId) {
+Tournament.prototype.upcoming = function (playerId) {
   for (var i = 0; i < this.matches.length; i += 1) {
     var m = this.matches[i];
     if (m.p.indexOf(playerId) >= 0 && !m.m) {
@@ -307,7 +307,7 @@ Base.prototype.upcoming = function (playerId) {
   return this._limbo(playerId);
 };
 
-Base.prototype.unscorable = function (id, score, allowPast) {
+Tournament.prototype.unscorable = function (id, score, allowPast) {
   var m = this.findMatch(id);
   if (!m) {
     return "match not found in tournament"; // TODO: idString %s or, %j in id?
@@ -327,7 +327,7 @@ Base.prototype.unscorable = function (id, score, allowPast) {
   return this._verify(m, score);
 };
 
-Base.prototype.score = function (id, score) {
+Tournament.prototype.score = function (id, score) {
   var invReason = this.unscorable(id, score, true);
   if (invReason !== null) {
     console.error("failed scoring match %s with %j", this.rep(id), score);
@@ -340,7 +340,7 @@ Base.prototype.score = function (id, score) {
   return true;
 };
 
-Base.prototype.results = function () {
+Tournament.prototype.results = function () {
   var players = this.players();
   if (this.numPlayers !== players.length) {
     var why = players.length + " !== " + this.numPlayers;
@@ -359,19 +359,19 @@ Base.prototype.results = function () {
     };
     $.extend(res[s], this._initResult(players[s]));
   }
-  if (typeof this._stats === 'function') {
+  if (this._stats instanceof Function) {
     this.matches.reduce(this._stats.bind(this), res);
   }
-  return (typeof this._sort === 'function') ?
+  return (this._sort instanceof Function) ?
     this._sort(res) :
-    res.sort(Base.compareRes); // sensible default
+    res.sort(Tournament.compareRes); // sensible default
 };
 
 //------------------------------------------------------------------
 // Prototype convenience methods
 //------------------------------------------------------------------
 
-Base.prototype.resultsFor = function (seed) {
+Tournament.prototype.resultsFor = function (seed) {
   var res = this.results();
   for (var i = 0; i < res.length; i += 1) {
     var r = res[i];
@@ -381,15 +381,15 @@ Base.prototype.resultsFor = function (seed) {
   }
 };
 
-Base.prototype.isPlayable = function (match) {
-  return !match.p.some($.eq(Base.NONE));
+Tournament.prototype.isPlayable = function (match) {
+  return !match.p.some($.eq(Tournament.NONE));
 };
 
 
 // matches are stored in a sorted array rather than an ID -> Match map
 // This is because ordering is more important than being able to access any match
 // at any time. Looping to find the one is also quick because ms is generally short.
-Base.prototype.findMatch = function (id) {
+Tournament.prototype.findMatch = function (id) {
   for (var i = 0; i < this.matches.length; i += 1) {
     var m = this.matches[i];
     if (m.id.s === id.s && m.id.r === id.r && m.id.m === id.m) {
@@ -399,7 +399,7 @@ Base.prototype.findMatch = function (id) {
 };
 
 // filter from this.matches for everything matching a partial Id
-Base.prototype.findMatches = function (id) {
+Tournament.prototype.findMatches = function (id) {
   return this.matches.filter(function (m) {
     return (id.s == null || m.id.s === id.s) &&
            (id.r == null || m.id.r === id.r) &&
@@ -407,7 +407,7 @@ Base.prototype.findMatches = function (id) {
   });
 };
 
-Base.prototype.findMatchesRanged = function (lb, ub) {
+Tournament.prototype.findMatchesRanged = function (lb, ub) {
   ub = ub || {};
   return this.matches.filter(function (m) {
     return (lb.s == null || m.id.s >= lb.s) &&
@@ -433,11 +433,11 @@ var splitBy = function (ms, splitKey, filterKey, filterVal) {
   return res;
 };
 // partition matches into rounds (optionally fix section)
-Base.prototype.rounds = function (section) {
+Tournament.prototype.rounds = function (section) {
   return splitBy(this.matches, 'r', 's', section);
 };
 // partition matches into sections (optionally fix round)
-Base.prototype.sections = function (round) {
+Tournament.prototype.sections = function (round) {
   return splitBy(this.matches, 's', 'r', round);
 };
 
@@ -446,10 +446,10 @@ var roundNotDone = function (rnd) {
     return !m.m;
   });
 };
-Base.prototype.currentRound = function (section) {
+Tournament.prototype.currentRound = function (section) {
   return $.firstBy(roundNotDone, this.rounds(section));
 };
-Base.prototype.nextRound = function (section) {
+Tournament.prototype.nextRound = function (section) {
   var rounds = this.rounds(section);
   for (var i = 0; i < rounds.length; i += 1) {
     if (roundNotDone(rounds[i])) {
@@ -458,18 +458,18 @@ Base.prototype.nextRound = function (section) {
   }
 };
 
-Base.prototype.matchesFor = function (playerId) {
+Tournament.prototype.matchesFor = function (playerId) {
   return this.matches.filter(function (m) {
     return m.p.indexOf(playerId) >= 0;
   });
 };
 
 // returns all players that exists in a partial slice of the tournament
-Base.prototype.players = function (id) {
+Tournament.prototype.players = function (id) {
   return $.nub(this.findMatches(id || {}).reduce(function (acc, m) {
     return acc.concat(m.p);
-  }, [])).filter($.gt(Base.NONE)).sort($.compare()); // ascending order
+  }, [])).filter($.gt(Tournament.NONE)).sort($.compare()); // ascending order
 };
 
 
-module.exports = Base;
+module.exports = Tournament;

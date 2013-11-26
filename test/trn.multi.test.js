@@ -4,8 +4,7 @@ var tap = require('tap')
   , Duel = require('duel')
   , Masters = require('masters')
   , FFA = require('ffa')
-  , GroupStage = require('groupstage')
-  , Base = require('../'); // main interface
+  , GroupStage = require('groupstage');
 
 // test Masters and League as middle tournaments
 test("Duel -> Masters -> League", function (t) {
@@ -26,7 +25,6 @@ test("Duel -> Masters -> League", function (t) {
   masters.score(masters.matches[1].id, [3,2,1]);
   t.ok(masters.isDone(), 'masters done');
 
-  var mRes = masters.results();
   // NB: it is possible here that masters tied fully in the final
   // thus the GroupStage cannot be constructed
   var league = GroupStage.from(masters, 3);
@@ -77,8 +75,6 @@ test("Masters -> FFA -> Duel", function (t) {
   ffa.score(ffa.matches[0].id, [4,3,2,1]);
   ffa.score(ffa.matches[1].id, [4,3,2,1]);
   t.ok(ffa.isDone(), 'ffa done');
-
-  var mRes = ffa.results();
 
   var duel = Duel.from(ffa, 6, { short: true });
   t.ok(duel, 'constructed Duel from finished FFA tournament');

@@ -1,6 +1,6 @@
 var tap = require('tap')
   , test = tap.test
-  , Base = require('../'); // main interface
+  , Tournament = require('../'); // main interface
 
 // individual class entry proints
 var mains = {
@@ -63,11 +63,11 @@ test("base interface", function (t) {
   var comparators = ['compareMatches', 'compareRes', 'compareZip', 'sorted'];
   var rawHelpers = ['sub', 'idString', 'parse'];
   comparators.concat(rawHelpers).forEach(function (s) {
-    t.type(Base[s], 'function');
+    t.type(Tournament[s], 'function');
 
   });
-  t.type(Base.NONE, 'number', 'None exists on Base as a number');
-  t.equal(Base.NONE, 0, "Base.NONE === 0");
+  t.type(Tournament.NONE, 'number', 'None exists on Tournament as a number');
+  t.equal(Tournament.NONE, 0, "Tournament.NONE === 0");
 
   // methods
   var mainInterface = ['isDone', 'upcoming', 'unscorable', 'score', 'toString']
@@ -75,9 +75,9 @@ test("base interface", function (t) {
     , splitters = ['rounds', 'sections', 'currentRound', 'nextRound']
     , trackers = ['matchesFor', 'players']
     , methods = mainInterface.concat(finders, splitters, trackers);
-  var b = new Base([]); // will work, just doesn't do anything
+  var b = new Tournament([]); // will work, just doesn't do anything
   methods.forEach(function (m) {
-    t.type(Base.prototype[m], 'function', m + ' is on Base.prototype');
+    t.type(Tournament.prototype[m], 'function', m + ' is on Tournament.prototype');
     t.type(b[m], 'function', m + ' is on a base instance');
   });
 
