@@ -360,4 +360,15 @@ NB: Not intended for database serialization, tournament's API is too volatile fo
 
 
 ## Multi-Stage Tournaments
-Some manual support through `limit` and `GroupStage`-`TieBreaker` interaction. Follow the [multi-stage issue](https://github.com/clux/tournament/issues/1)
+Multi-staged tournaments can be created by using `Klass.from(instance, numProgressors)` that is built in on every `Tournament` subclass when using `Tournament.sub` or `Tournament.inherit`.
+
+```
+var ffa = new FFA(16, { sizes: [4], limit: 8 });
+ffa.matches.forEach(function (m) {
+  ffa.score(m.id, [4,3,2,1]);
+});
+
+var duel = Duel.from(ffa, 8); // duel is an 8 player tournament with top 8
+```
+
+Note that in this case we can safely pick top 8 because `FFA` implements limits. In many cases, [tiebreaking](https://npmjs.org/package/tiebreaker) may be required as an intermediate layer between tournaments.

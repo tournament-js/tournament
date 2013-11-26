@@ -17,6 +17,7 @@ Implementions:
 - [ffa](https://npmjs.org/package/ffa)
 - [groupstage](https://npmjs.org/package/groupstage)
 - [masters](https://npmjs.org/package/masters)
+- [tiebreaker](https://npmjs.org/package/tiebreaker)
 
 ## Example implementation usage
 Create a new tournament instance from one of the separate implementations, then interact with helper functions to score and calculate results.
@@ -67,14 +68,14 @@ d.results();
 For specific tournament usage, install the modules you want:
 
 ```bash
-$ npm install duel ffa groupstage --save
+$ npm install duel ffa groupstage tiebreaker --save
 ```
 
 To use these on in the browser, bundle it up with [browserify](https://npmjs.org/package/browserify)
 
 ```bash
 $ npm dedupe
-$ browserify -r duel -r ffa -r groupstage > bundle.js
+$ browserify -r duel -r ffa -r groupstage -r tiebreaker > bundle.js
 ```
 
 ## Running tests
