@@ -1,8 +1,9 @@
 # Tournament
 [![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
 [![Dependency Status](https://david-dm.org/clux/tournament.png)](https://david-dm.org/clux/tournament)
+[![unstable](http://hughsk.github.io/stability-badges/dist/unstable.svg)](http://nodejs.org/api/documentation.html#documentation_stability_index)
 
-Tournament provides a base class for stateful tournament types that used to be implemented in this repository.
+Tournament provides a base class for stateful tournament types of fixed size tournaments.
 
 All tournaments have a huge amount of common logic so the helper methods included on this base class is worth reading about even if you don't use this module directly.
 
@@ -13,11 +14,11 @@ You should read at least one of:
 
 Implementions:
 
-- [duel](https://npmjs.org/package/duel)
-- [ffa](https://npmjs.org/package/ffa)
-- [groupstage](https://npmjs.org/package/groupstage)
-- [masters](https://npmjs.org/package/masters)
-- [tiebreaker](https://npmjs.org/package/tiebreaker)
+- [duel](https://github.com/clux/duel)
+- [ffa](https://github.com/clux/ffa)
+- [groupstage](https://github.com/clux/groupstage)
+- [masters](https://github.com/clux/masters)
+- [tiebreaker](https://github.com/clux/tiebreaker)
 
 ## Example implementation usage
 Create a new tournament instance from one of the separate implementations, then interact with helper functions to score and calculate results.
