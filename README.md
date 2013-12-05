@@ -20,6 +20,10 @@ Implementions:
 - [masters](https://github.com/clux/masters)
 - [tiebreaker](https://github.com/clux/tiebreaker)
 
+For multi stage tournaments, or if you need to grab functionality from multiple implementations, there is also a module for that:
+
+- [tourney](https://github.com/clux/tourney)
+
 ## Example implementation usage
 Create a new tournament instance from one of the separate implementations, then interact with helper functions to score and calculate results.
 
