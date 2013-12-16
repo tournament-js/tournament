@@ -358,6 +358,12 @@ var trn2 = FFA.parse(serialized);
 
 NB: Not intended for database serialization, tournament's API is too volatile for that.
 
+## Database Storage
+Every tournament instance is a state machine with a single mutator; `score`.
+You can use the [preservative](https://github.com/clux/preservative) module to proxy calls through it to store every such operation, and thus obtaining an ordered list of serializable operations to recreate state from.
+
+This state is safe to store in a json store when a tournament implementation goes stable.
+
 
 ## Multi-Stage Tournaments
 Multi-staged tournaments can be created by using `Klass.from(instance, numProgressors)` that is built in on every `Tournament` subclass when using `Tournament.sub` or `Tournament.inherit`.
