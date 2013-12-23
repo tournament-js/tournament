@@ -154,11 +154,11 @@ Tournament.inherit = function (Klass, Initial) {
   // this way any deeper sub classes can always just call the previous method
   // also, if any are implemented, it just replaces the default one here
   var methods = {
-    '_verify': null,
-    '_progress': undefined,
-    '_limbo': undefined,
-    '_early': false,
-    '_initResult': {}
+    _verify: null,
+    _progress: undefined,
+    _limbo: undefined,
+    _early: false,
+    _initResult: {}
   };
   Object.keys(methods).forEach(function (fn) {
     if (Initial.prototype[fn]) {
@@ -175,9 +175,7 @@ Tournament.inherit = function (Klass, Initial) {
 
   Klass.idString = Initial.idString; // default TODO necessary now?
   // TODO: this is bad, rep always uses innitial now..
-  Object.defineProperty(Klass.prototype, 'rep', {
-    value: Klass.idString
-  });
+  Klass.prototype.rep = Klass.idString;
 
   Klass.configure = function (obj) {
     return configure(Klass, obj, Initial);
