@@ -1,3 +1,7 @@
+0.21.0 / 2013-12-23
+===================
+  * Every `Tournament` instance is now an `EventEmitter` that emits `score` events.
+
 0.20.4 / 2013-11-24
 ===================
   * Fixed an issue that caused .sub constructors to modify input options

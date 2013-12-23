@@ -3,6 +3,7 @@ var $ = require('interlude');
 function Tournament(np, ms) {
   this.matches = ms;
 }
+Tournament.prototype = Object.create(new (require('events').EventEmitter));
 
 // no player propagated marker - seeds 1-indexed
 Object.defineProperty(Tournament, 'NONE', {
@@ -335,6 +336,7 @@ Tournament.prototype.score = function (id, score) {
   var m = this.findMatch(id);
   m.m = score;
   this._progress(m);
+  this.emit('score', id, score);
   return true;
 };
 
