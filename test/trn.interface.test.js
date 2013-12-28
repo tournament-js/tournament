@@ -1,30 +1,7 @@
 var tap = require('tap')
   , test = tap.test
+  , Challenge = require('./challenge')
   , Tournament = require('../'); // main interface
-
-// individual class entry proints
-var mains = {
-  Masters : require('masters'),
-  FFA : require('ffa'),
-  GroupStage : require('groupstage'),
-  Duel : require('duel')
-};
-
-// TODO: test TieBreaker
-var makeInstance = function (name) {
-  switch (name) {
-  case 'Duel':
-    return new mains.Duel(4);
-  case 'FFA':
-    return new mains.FFA(4);
-  case 'Masters':
-    return new mains.Masters(5);
-  case 'GroupStage':
-    return new mains.GroupStage(8);
-  default:
-    throw new Error("invalid class: " + name);
-  }
-};
 
 test("interfaces", function (t) {
   var commonStatics = ['invalid', 'idString', 'parse']
@@ -33,27 +10,26 @@ test("interfaces", function (t) {
     , baseMethods = ['findMatch', 'findMatches', 'rounds']
     , commonMembers = ['matches', 'numPlayers'];
 
-  ['Duel', 'FFA', 'GroupStage', 'Masters'].forEach(function (type) {
-    var C = mains[type];
-    commonStatics.forEach(function (s) {
-      t.ok(C[s], s + " static exists on " + type);
-      t.type(C[s], 'function', s + ' static is a function on ' + type);
-    });
 
-    commonMethods.forEach(function (m) {
-      t.ok(C.prototype[m], m + " method exists on " + type);
-      t.type(C.prototype[m], 'function', m + ' method is a function on ' + type);
-    });
+  var C = Challenge;
+  commonStatics.forEach(function (s) {
+    t.ok(C[s], s + " static exists");
+    t.type(C[s], 'function', s + ' static is indeed a function type');
+  });
 
-    var inst = makeInstance(type);
-    commonMembers.concat(baseMethods).forEach(function (m) {
-      t.ok(inst[m], m + ' exists on ' + type + ' instance');
-    });
-    commonMethods.forEach(function (m) {
-      if (inst[m]) { // doesn't have to be implemented
-        t.type(inst[m], 'function', m + ' exists on ' + type + ' instance');
-      }
-    });
+  commonMethods.forEach(function (m) {
+    t.ok(C.prototype[m], m + " method exists");
+    t.type(C.prototype[m], 'function', m + ' method is indeed a function');
+  });
+
+  var inst = new Challenge(2);
+  commonMembers.concat(baseMethods).forEach(function (m) {
+    t.ok(inst[m], m + ' exists on instance');
+  });
+  commonMethods.forEach(function (m) {
+    if (inst[m]) { // doesn't have to be implemented
+      t.type(inst[m], 'function', m + ' exists on instance');
+    }
   });
   t.end();
 });
