@@ -211,7 +211,7 @@ test("GroupStage likes matches", function (t) {
 
     // this will update R1 everywhere though
     gs.findMatchesRanged({s:2, r:1}).forEach(scoreHacker);
-    t.deepEqual(gs.currentRound(1), gs.findMatches({s:1, r:2}), "current still G1R2");
+    t.deepEqual(gs.currentRound(1), gs.findMatches({s:1,r:2}), "current still G1R2");
     t.deepEqual(gs.currentRound(), gs.findMatches({r:2}), "currentAll R2");
     t.deepEqual(gs.nextRound(1), gs.findMatches({s:1, r:3}), "next still G1R3");
     t.deepEqual(gs.nextRound(), gs.findMatches({r:3}), "nextAll now R3");
