@@ -1,14 +1,17 @@
 var Tournament = require('../');
 
 var Challenge = Tournament.sub('Challenge', function (opts, initParent) {
-  var match = { id: { s: 1, r: 1, m: 1}, p: [1, 2] };
-  initParent([match]);
+  var ms = [];
+  for (var i = 0; i < this.numPlayers/2; i += 1) {
+    ms.push({ id: { s: 1, r: 1, m: i+1}, p: [2*i+1, 2*i+2] });
+  }
+  initParent(ms);
 });
 
 Challenge.configure({
   invalid: function (np) {
-    if (np !== 2) {
-      return "Challenge can only have two players";
+    if (np % 2 !== 0) {
+      return "Challenge can only have a multiple of two players";
     }
     return null;
   }
@@ -17,7 +20,9 @@ Challenge.configure({
 Challenge.prototype._stats = function (res, m) {
   if (m.m && m.m[0] !== m.m[1]) {
     var w = (m.m[0] > m.m[1]) ? m.p[0] : m.p[1];
-    Tournament.resultEntry(res, w).pos -= 1; // winner === winner of match
+    var l = (m.m[0] > m.m[1]) ? m.p[1] : m.p[0];
+    Tournament.resultEntry(res, w).pos = 1;
+    Tournament.resultEntry(res, l).pos = this.numPlayers/2 + 1;
   }
   return res;
 };

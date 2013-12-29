@@ -30,11 +30,7 @@
     "interlude": "~1.0.2"
   },
   "devDependencies": {
-    "tap": "~0.4.4",
-    "duel": "~0.4.4",
-    "ffa": "~0.5",
-    "groupstage": "~0.6.1",
-    "masters": "~0.4.3"
+    "tap": "~0.4.4"
   },
   "bugs": {
     "url": "http://github.com/clux/tournament/issues"
