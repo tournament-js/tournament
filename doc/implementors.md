@@ -56,7 +56,7 @@ SomeTournament.configure({
 
 // optional
 SomeTournament.prototype._progress = function (match) {
-  // TODO: propagate winners of match here if needed
+  // TODO: deterministically propagate winners of match here if needed
 };
 
 SomeTournament.prototype._verify = function (id, score) {
@@ -230,6 +230,8 @@ SomeTournament.prototype._progress: function (match) {
   }
 };
 ```
+
+Due to the way Tournaments are usually serialized (by recording successful score calls), this function must progress deterministically, i.e. two calls with the same parameters must always do the same thing.
 
 If something goes wrong in this method, throw an error.
 
