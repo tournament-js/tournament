@@ -1,5 +1,5 @@
 var Challenge = require('./challenge')
-  , Tournament = require('../'); // main interface
+  , Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../');
 
 exports.inheritance = function (t) {
   var commonStatics = ['invalid', 'idString', 'parse']

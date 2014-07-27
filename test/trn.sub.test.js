@@ -1,4 +1,4 @@
-var Tournament = require('../'); // main interface
+var Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../');
 
 var SomeT = Tournament.sub('SomeT', function (opts, initParent) {
   this.opts = opts;

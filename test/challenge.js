@@ -1,4 +1,4 @@
-var Tournament = require('../');
+var Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../');
 
 var Challenge = Tournament.sub('Challenge', function (opts, initParent) {
   var ms = [];

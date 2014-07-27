@@ -1,5 +1,5 @@
 var $ = require('interlude')
-  , Tournament = require('../') // main interface
+  , Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../')
   , comp = Tournament.compareMatches;
 
 var scoreHacker = function (m) {
