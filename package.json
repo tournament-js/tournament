@@ -3,6 +3,7 @@
   "name": "tournament",
   "description": "Tournament interface",
   "version": "0.21.0",
+  "stability": "unstable",
   "repository": {
     "type": "git",
     "url": "clux/tournament"

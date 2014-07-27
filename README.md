@@ -1,7 +1,9 @@
 # Tournament
-[![Build Status](https://secure.travis-ci.org/clux/tournament.png)](http://travis-ci.org/clux/tournament)
-[![Dependency Status](https://david-dm.org/clux/tournament.png)](https://david-dm.org/clux/tournament)
-[![unstable](http://hughsk.github.io/stability-badges/dist/unstable.svg)](http://nodejs.org/api/documentation.html#documentation_stability_index)
+[![npm status](http://img.shields.io/npm/v/tournament.svg)](https://www.npmjs.org/package/tournament)
+[![build status](https://secure.travis-ci.org/clux/tournament.svg)](http://travis-ci.org/clux/tournament)
+[![dependency status](https://david-dm.org/clux/tournament.svg)](https://david-dm.org/clux/tournament)
+[![coverage status](http://img.shields.io/coveralls/clux/tournament.svg)](https://coveralls.io/r/clux/tournament)
+[![unstable](http://img.shields.io/badge/stability-unstable-E5AE13.svg)](http://nodejs.org/api/documentation.html#documentation_stability_index)
 
 Tournament provides a base class for stateful tournament types of fixed size tournaments.
 
