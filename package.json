@@ -8,9 +8,6 @@
     "url": "clux/tournament"
   },
   "main": "tournament.js",
-  "engines": {
-    "node": ">=0.8.0"
-  },
   "keywords": [
     "tourney",
     "competition",
@@ -24,13 +21,13 @@
   ],
   "scripts": {
     "lint": "jshint test *.js",
-    "test": "tap test/*.js"
+    "test": "nodeunit test/*.test.js --reporter=verbose"
   },
   "dependencies": {
     "interlude": "~1.0.2"
   },
   "devDependencies": {
-    "tap": "~0.4.4"
+    "nodeunit": "^0.9.0"
   },
   "bugs": {
     "url": "http://github.com/clux/tournament/issues"

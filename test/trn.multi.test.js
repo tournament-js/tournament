@@ -1,10 +1,8 @@
-var tap = require('tap')
-  , test = tap.test
-  , $ = require('interlude')
+var $ = require('interlude')
   , Challenge = require('./challenge');
 
 // verify that .from works on the example implementation
-test("Challenge -> Challenge -> Challenge", function (t) {
+exports.ChallengeToChallenge = function (t) {
   var c1 = new Challenge(16);
   c1.matches.forEach(function (m) {
     c1.score(m.id, [1,0]);
@@ -29,5 +27,5 @@ test("Challenge -> Challenge -> Challenge", function (t) {
   var c3 = Challenge.from(c2, 4);
   t.deepEqual(c3.players(), [3,7,11,15], "top 4 progressed to c3");
 
-  t.end();
-});
+  t.done();
+};
