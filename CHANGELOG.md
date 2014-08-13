@@ -1,3 +1,7 @@
+0.21.1 / 2014-07-XX
+===================
+  * Added coverage
+
 0.21.0 / 2013-12-23
 ===================
   * Every `Tournament` instance is now an `EventEmitter` that emits `score` events.
