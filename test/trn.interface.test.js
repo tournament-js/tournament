@@ -2,7 +2,7 @@ var Challenge = require('./challenge')
   , Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../');
 
 exports.inheritance = function (t) {
-  var commonStatics = ['invalid', 'idString', 'parse']
+  var commonStatics = ['invalid', 'parse']
     //, commonMethods = ['progress', 'verify', 'early', 'limbo', 'results']
     , commonMethods = ['results']
     , baseMethods = ['findMatch', 'findMatches', 'rounds']
@@ -35,7 +35,7 @@ exports.inheritance = function (t) {
 exports.interface = function (t) {
   // statics
   var comparators = ['compareMatches', 'compareRes', 'compareZip', 'sorted'];
-  var rawHelpers = ['sub', 'idString', 'parse'];
+  var rawHelpers = ['sub', 'parse'];
   comparators.concat(rawHelpers).forEach(function (s) {
     t.equal(typeof Tournament[s], 'function', s + ' is a function');
   });

@@ -17,7 +17,6 @@ Object.defineProperty(Tournament, 'NONE', {
 
 Tournament.parse = function (SubClass, str) {
   var obj = JSON.parse(str);
-  obj.rep = SubClass.idString || $.constant('UNKNOWN');
   return $.extend(Object.create(SubClass.prototype), obj);
 };
 
@@ -74,7 +73,27 @@ Tournament.resultEntry = function (resAry, seed) {
       return resAry[i];
     }
   }
-  throw new Error("Internal result lookup error for " + seed);
+  throw new Error("No result found for seed " + seed + " in result array:" + resAry);
+};
+
+//------------------------------------------------------------------
+// Misc helpers
+//------------------------------------------------------------------
+
+// TODO: actually this is kind of bad...
+// if people are calling score explicitally with a correct looking id
+// then stringify won't work because it's not an instance if the specific Id
+//
+// on the OTHER hand if they checked if id exists by var m = trn.findMatch;
+// then can always trn.score(m.id, MATCHRESULT) and it will work..
+var idString = function (id) {
+  return (id + '' === '[object Object]') ?
+    "S" + id.s + " R" + id.r + " M" + id.m :
+    id + '';
+};
+
+Tournament.isInteger = function (n) { // until this gets on Number in ES6
+  return Math.ceil(n) === n;
 };
 
 //------------------------------------------------------------------
@@ -93,7 +112,7 @@ Tournament.sub = function (name, init, Initial) {
       throw new Error(name + " must implement an Invalid function");
     }
     if (Klass.defaults) {
-      opts = Klass.defaults(numPlayers, opts);
+      opts = Klass.defaults(numPlayers, opts); // TODO: modifies input..OK?
     }
 
     var invReason = Klass.invalid(numPlayers, opts);
@@ -174,10 +193,6 @@ Tournament.inherit = function (Klass, Initial) {
     return Tournament.parse(Klass, str);
   };
 
-  Klass.idString = Initial.idString; // default TODO necessary now?
-  // TODO: this is bad, rep always uses innitial now..
-  Klass.prototype.rep = Klass.idString;
-
   Klass.configure = function (obj) {
     return configure(Klass, obj, Initial);
   };
@@ -191,18 +206,6 @@ Tournament.inherit = function (Klass, Initial) {
   };
 
   Klass.from = createReceiver(Klass);
-};
-
-//------------------------------------------------------------------
-// Misc helpers
-//------------------------------------------------------------------
-
-Tournament.idString = function (id) {
-  return "S" + id.s + " R" + id.r + " M" + id.m;
-};
-
-Tournament.isInteger = function (n) { // until this gets on Number in ES6
-  return Math.ceil(n) === n;
 };
 
 //------------------------------------------------------------------
@@ -309,19 +312,19 @@ Tournament.prototype.upcoming = function (playerId) {
 Tournament.prototype.unscorable = function (id, score, allowPast) {
   var m = this.findMatch(id);
   if (!m) {
-    return "match not found in tournament"; // TODO: idString %s or, %j in id?
+    return idString(id) + " not found in tournament";
   }
   if (!this.isPlayable(m)) {
-    return "match not ready - missing players";
+    return idString(id) + " not ready - missing players";
   }
   if (!Array.isArray(score) || !score.every(Number.isFinite)) {
-    return "scores must be a numeric array";
+    return idString(id) + " scores must be a numeric array";
   }
   if (score.length !== m.p.length) {
-    return "scores must have length " + m.p.length;
+    return idString(id) + " scores must have length " + m.p.length;
   }
   if (!allowPast && Array.isArray(m.m)) {
-    return "cannot re-score match";
+    return idString(id) + " cannot be re-scored";
   }
   return this._verify(m, score);
 };
@@ -329,7 +332,7 @@ Tournament.prototype.unscorable = function (id, score, allowPast) {
 Tournament.prototype.score = function (id, score) {
   var invReason = this.unscorable(id, score, true);
   if (invReason !== null) {
-    console.error("failed scoring match %s with %j", this.rep(id), score);
+    console.error("failed scoring match %s with %j", idString(id), score);
     console.error("reason:", invReason);
     return false;
   }
@@ -386,9 +389,8 @@ Tournament.prototype.isPlayable = function (match) {
 };
 
 
-// matches are stored in a sorted array rather than an ID -> Match map
-// This is because ordering is more important than being able to access any match
-// at any time. Looping to find the one is also quick because ms is generally short.
+// matches are stored in a sorted array rather than an ID -> Match map because
+// ordering is more important than quick lookup for the generally short matches ary
 Tournament.prototype.findMatch = function (id) {
   for (var i = 0; i < this.matches.length; i += 1) {
     var m = this.matches[i];

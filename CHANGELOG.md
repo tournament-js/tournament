@@ -1,6 +1,10 @@
-0.21.1 / 2014-07-XX
+1.0.0 / 2014-08-XX
 ===================
   * Added coverage
+  * `Tournament.idString` static removed
+  * `Tournament::rep` member function removed (was always undocumented)
+  * Custom `idString` implementations CAN be attached to the Id's `toString` method
+  * Major bump for satisfaction
 
 0.21.0 / 2013-12-23
 ===================
@@ -15,7 +19,7 @@
 ===================
   * **TL;DR** `invalid` behaviour was wrong:
     - Fixed a bug that caused the invalid inheritance chain to cause `(n)+(n-1)+...+1` calls to various invalid functions when constructing (should just be `n`)
-    - `configured invalid` now checks that `numPlayers` is an integer then calls its the specified invalid. If inheritance exists, the lower `invalid` will trigger whel you call the super class.
+    - `configured invalid` now checks that `numPlayers` is an integer then calls its the specified invalid. If inheritance exists, the lower `invalid` will trigger when you call the super class.
 
 0.20.2 / 2013-11-13
 ===================

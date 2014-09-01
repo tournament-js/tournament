@@ -330,20 +330,20 @@ else {
 
 ## UI Helpers
 ### Match Representation
-Every tournament type has a static `.idString()` method that takes an `id` of any match in a tournament. This will create a unique string representation for that match differing slightly depending on tournament type.
+Most tournaments implement their own `toString()` for a match id. This will create a unique string representation for that match differing slightly depending on tournament type.
 
 ```js
-Duel.idString({s: 2, r: 2, m: 3});
-"LB R2 M3"
+duel.matches[0].id; // { s: 1, r: 1, m: 1 }
+duel.matches[0].id + '' // 'WB R1 M1'
 
-FFA.idString({s: 1, r: 3, m: 2});
-"R3 M2"
+ffa.matches[5].id; // { s: 1, r: 3, m: 2 }
+ffa.matches[5].id + ''; // 'R3 M2'
 
-GroupStage.idString({s: 5, r: 2, m: 1});
-"G5 R5 M1"
+gs.matches[10].id; // { s: 5, r: 2, m: 1 }
+gs.matches[10].id + ''; // 'G5 R5 M1'
 
-Masters.idString({s: 1, r:2, m: 1});
-"R2"
+masters.matches[2].id; // { s: 1, r:2, m: 1 }
+masters.matches[2].id + ''; // 'R2'
 ```
 
 ## Serialization

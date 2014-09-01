@@ -24,6 +24,8 @@ With the following requirements:
  - Every match `id` MUST be unique
  - If we sort the match id by `s` difference, then `r` difference, then `m` difference, we can score all the matches in this order
 
+Note that `match.id.toString()` **CAN** be overridden to customize how matches are represented in error messages.
+
 ## Tournament outline
 
 ```js
@@ -51,7 +53,7 @@ SomeTournament.configure({
   defaults: function (numPlayers, opts) {
     opts.someOption = !!opts.someOption;
     return opts;
-  },
+  }
 });
 
 // optional
@@ -95,7 +97,7 @@ SomeTournament.prototype._sort = function (res) {
 
 - `.sub` MUST be called with your init fn (constructor replacement)
 - init function MUST call the `initParent` cb with the matches created
-- `.configure` MUST be called with `invalid` and MAYBE also `defaults` function(s)
+- `.configure` MUST be called with `invalid`
 - Either `_stats` MUST be implemented OR `results` MUST be overridden
 - `Tournament` methods MUST NOT be overridden to maintain expected behaviour
 
@@ -303,7 +305,3 @@ Inherited.prototype._sort = function (res) {
 ```
 
 Note that if you are inheriting from another tournament, overriding these methods should only in rare cases be necessary.
-
-## Useful extras
-### idString
-If you need to get the string of a tournament id and what `Tournament.idString` returns doesn't feel right, you should add your own `idString` function to `SomeTournament.idString` directly. Most tournaments do this.
