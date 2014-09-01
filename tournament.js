@@ -112,7 +112,8 @@ Tournament.sub = function (name, init, Initial) {
       throw new Error(name + " must implement an Invalid function");
     }
     if (Klass.defaults) {
-      opts = Klass.defaults(numPlayers, opts); // TODO: modifies input..OK?
+      // NB: does not modify input unless Klass.defaults does
+      opts = Klass.defaults(numPlayers, opts);
     }
 
     var invReason = Klass.invalid(numPlayers, opts);
