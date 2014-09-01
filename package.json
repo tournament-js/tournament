@@ -2,7 +2,7 @@
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "tournament",
   "description": "Tournament interface",
-  "version": "0.21.0",
+  "version": "1.0.0",
   "stability": "unstable",
   "repository": {
     "type": "git",
