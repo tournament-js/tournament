@@ -80,12 +80,6 @@ Tournament.resultEntry = function (resAry, seed) {
 // Misc helpers
 //------------------------------------------------------------------
 
-// TODO: actually this is kind of bad...
-// if people are calling score explicitally with a correct looking id
-// then stringify won't work because it's not an instance if the specific Id
-//
-// on the OTHER hand if they checked if id exists by var m = trn.findMatch;
-// then can always trn.score(m.id, MATCHRESULT) and it will work..
 var idString = function (id) {
   return (id + '' === '[object Object]') ?
     "S" + id.s + " R" + id.r + " M" + id.m :
