@@ -51,8 +51,9 @@ SomeTournament.configure({
   },
   // optional:
   defaults: function (numPlayers, opts) {
-    opts.someOption = !!opts.someOption;
-    return opts;
+    var o = {};
+    o.someOption = Boolean(opts.someOption);
+    return o;
   }
 });
 
@@ -122,15 +123,16 @@ SomeTournament.configure({
     return null; // OK
   },
   defaults: function (numPlayers, opts) {
-    opts.someOption = Array.isArray(opts.someOption) ? opts.someOption : [];
-    return opts;
+    var o = {}; // don't modify input arguments
+    o.someOption = Array.isArray(opts.someOption) ? opts.someOption : [];
+    return o;
   }
 });
 ```
 
 `invalid` ensures that tournament rules are upheld. If you have specific rules, these will be guarded on for construction along with whatever invalid rules specified by the tournament class you are inheriting from. Note that we already verify that `numPlayers` is an integer for you.
 
-`defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect.
+`defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect. It should return a new object rather than modify the input one.
 
 #### default examples
 You should try to set the default options in a sensible enough way so that you can construct a tournament without actually specifying the second argument at all. All currently compliant tournaments have sensible defaults:

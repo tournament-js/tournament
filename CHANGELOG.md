@@ -1,4 +1,4 @@
-1.0.0 / 2014-08-XX
+1.0.0 / 2014-08-01
 ===================
   * Added coverage
   * `Tournament.idString` static removed
