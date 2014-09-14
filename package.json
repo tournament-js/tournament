@@ -8,7 +8,7 @@
     "type": "git",
     "url": "clux/tournament"
   },
-  "main": "tournament.js",
+  "main": "lib/tournament.js",
   "keywords": [
     "tourney",
     "competition",
@@ -23,7 +23,7 @@
   "scripts": {
     "lint": "jshint test *.js",
     "test": "nodeunit test/*.test.js --reporter=verbose",
-    "coverage": "jscoverage tournament.js && TOURNAMENT_COV=1 nodeunit --reporter=lcov test/*.test.js",
+    "coverage": "jscoverage lib && TOURNAMENT_COV=1 nodeunit --reporter=lcov test/*.test.js",
     "coveralls": "npm run coverage | coveralls"
   },
   "dependencies": {

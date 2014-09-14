@@ -1,5 +1,5 @@
 var Challenge = require('./challenge')
-  , Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../');
+  , Base = require(process.env.TOURNAMENT_COV ? '../lib-cov/tournament' : '../');
 
 exports.inheritance = function (t) {
   var commonStatics = ['invalid', 'parse']
@@ -37,10 +37,10 @@ exports.interface = function (t) {
   var comparators = ['compareMatches', 'compareRes', 'compareZip', 'sorted'];
   var rawHelpers = ['sub', 'parse'];
   comparators.concat(rawHelpers).forEach(function (s) {
-    t.equal(typeof Tournament[s], 'function', s + ' is a function');
+    t.equal(typeof Base[s], 'function', s + ' is a function');
   });
-  t.equal(typeof Tournament.NONE, 'number', 'None exists on Tournament as a number');
-  t.equal(Tournament.NONE, 0, "Tournament.NONE === 0");
+  t.equal(typeof Base.NONE, 'number', 'None exists on Base as a number');
+  t.equal(Base.NONE, 0, "Tournament.NONE === 0");
 
   // methods
   var mainInterface = ['isDone', 'upcoming', 'unscorable', 'score', 'toString']
@@ -48,9 +48,9 @@ exports.interface = function (t) {
     , splitters = ['rounds', 'sections', 'currentRound', 'nextRound']
     , trackers = ['matchesFor', 'players']
     , methods = mainInterface.concat(finders, splitters, trackers);
-  var b = new Tournament([]); // will work, just doesn't do anything
+  var b = new Base([]); // will work, just doesn't do anything
   methods.forEach(function (m) {
-    t.equal(typeof Tournament.prototype[m], 'function', m + ' is on Tournament.prototype');
+    t.equal(typeof Base.prototype[m], 'function', m + ' is on Tournament.prototype');
     t.equal(typeof b[m], 'function', m + ' is on a base instance');
   });
 

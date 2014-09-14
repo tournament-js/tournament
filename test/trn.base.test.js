@@ -1,13 +1,13 @@
 var $ = require('interlude')
-  , Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../')
-  , comp = Tournament.compareMatches;
+  , Base = require(process.env.TOURNAMENT_COV ? '../lib-cov/tournament' : '../')
+  , comp = Base.compareMatches;
 
 var scoreHacker = function (m) {
   m.m = m.p[0] < m.p[1] ? [1,0] : [0,1];
 };
 
 exports.mockDuel = function (t) {
-  var Duel = Tournament.sub('FakeDuel', function (opts, initParent) {
+  var Duel = Base.sub('FakeDuel', function (opts, initParent) {
     // to avoid deps, just give out some normal looking Duel matches
     // but pre-progressed, because we aren't testing that
     initParent([
@@ -101,7 +101,7 @@ exports.mockDuel = function (t) {
 
 
 exports.mockGroupStage = function (t) {
-  var GS = Tournament.sub('FakeGroupStage', function (opts, initParent) {
+  var GS = Base.sub('FakeGroupStage', function (opts, initParent) {
     // 16 players in groups of 4 like match list
     initParent([
       { id: { s: 1, r: 1, m: 1 }, p: [ 1, 16 ] },

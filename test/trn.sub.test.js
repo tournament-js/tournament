@@ -1,6 +1,6 @@
-var Tournament = require(process.env.TOURNAMENT_COV ? '../tournament-cov' : '../');
+var Base = require(process.env.TOURNAMENT_COV ? '../lib-cov/tournament' : '../');
 
-var SomeT = Tournament.sub('SomeT', function (opts, initParent) {
+var SomeT = Base.sub('SomeT', function (opts, initParent) {
   this.opts = opts;
   var ms = [
     { id: { s: 1, r: 1, m: 1 }, p: [1,2] },
@@ -26,7 +26,7 @@ SomeT.defaults = function (np, opts) {
 
 var attachInvalid = function () {
   SomeT.invalid = function (numPlayers/*, opts*/) {
-    if (!Tournament.isInteger(numPlayers) || numPlayers < 2) {
+    if (!Base.isInteger(numPlayers) || numPlayers < 2) {
       return "Need at least 2 players";
     }
     return null;
