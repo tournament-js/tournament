@@ -269,3 +269,8 @@ exports.mockGroupStage = function (t) {
   t.done();
 };
 
+exports.comparators = function (t) {
+  var m = { id : {}, p: [4,3,2,1], m: [1,2,4,3] };
+  t.deepEqual(Base.sorted(m), [2,1,3,4], 'players in order using T.sorted');
+  t.done();
+};
