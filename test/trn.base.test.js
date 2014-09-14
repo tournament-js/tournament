@@ -6,6 +6,22 @@ var scoreHacker = function (m) {
   m.m = m.p[0] < m.p[1] ? [1,0] : [0,1];
 };
 
+exports.defaultFlow = function (t) {
+  var Tmp = Base.sub('Fake', function (opts, initParent) {
+    t.equal(opts.hi, 'there', 'defaults gets called on opts');
+    initParent([]);
+    t.done();
+  });
+  Tmp.configure({
+    defaults: function (np, opts) {
+      return { hi: 'there' };
+    }
+  });
+  t.deepEqual(Tmp.defaults(5), { hi: 'there' }, 'specified defaults exists');
+
+  new Tmp(2); // calls t.done() - NB: no invalid implementation so passes that too
+};
+
 exports.mockDuel = function (t) {
   var Duel = Base.sub('FakeDuel', function (opts, initParent) {
     // to avoid deps, just give out some normal looking Duel matches
@@ -21,7 +37,12 @@ exports.mockDuel = function (t) {
       { id: { s: 2, r: 1, m: 1 }, p: [ 4, 3 ] }
     ]);
   });
+
+  t.equal(Duel.invalid, undefined, "Duel.invalid does not exist yet");
+  t.equal(Duel.defaults, undefined, "Duel.defaults does not exist yet");
   Duel.configure({ invalid: $.constant(null) });
+  t.equal(Duel.invalid(), "numPlayers must be a finite integer", "invalid flow");
+  t.deepEqual(Duel.defaults(), {}, "configure creates blank obj default fn");
 
   var d = new Duel(8);
   const WB = 1;
