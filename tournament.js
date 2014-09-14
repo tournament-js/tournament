@@ -1,15 +1,10 @@
 var $ = require('interlude');
+var helper = require('./match');
 
 function Tournament(np, ms) {
   this.matches = ms;
 }
-Tournament.prototype = Object.create(require('events').EventEmitter.prototype);
-
-// no player propagated marker - seeds 1-indexed
-Object.defineProperty(Tournament, 'NONE', {
-  enumerable: true,
-  value: 0
-});
+Object.defineProperty(Tournament, 'NONE', { enumerable: true, value: helper.NONE });
 
 //------------------------------------------------------------------
 // Serialization/deserialization (NOT FOR DATABASE USAGE)
@@ -51,10 +46,7 @@ var createReceiver = function (Klass) {
 };
 
 Tournament.prototype._replace = function (resAry) {
-  var hasStarted = this.matches.some(function (m) {
-    return m.p.every($.gt(Tournament.NONE)) && m.m;
-  });
-  if (hasStarted) {
+  if (helper.started(this.matches)) {
     throw new Error("Cannot replace players for a tournament in progress");
   }
   // because resAry is always sorted by .pos, we simply use this to replace seeds
@@ -219,15 +211,15 @@ Tournament.compareRes = function (r1, r2) {
   return (r1.pos - r2.pos) || (r1.seed - r2.seed);
 };
 
-// internal sorting of zipped player array with map score array : zip(g.p, g.m)
+// internal sorting of zipped player array with map score array : zip(m.p, m.m)
 // sorts by map score desc, then seed asc
 Tournament.compareZip = function (z1, z2) {
   return (z2[1] - z1[1]) || (z1[0] - z2[0]);
 };
 
 // helper to get the player array in a match sorted by compareZip
-Tournament.sorted = function (match) {
-  return $.zip(match.p, match.m).sort(Tournament.compareZip).map($.get('0'));
+Tournament.sorted = function (m) {
+  return $.zip(m.p, m.m).sort(Tournament.compareZip).map($.get('0'));
 };
 
 //------------------------------------------------------------------
@@ -288,10 +280,7 @@ Tournament.matchTieCompute = function (zipSlice, startIdx, cb) {
 //------------------------------------------------------------------
 
 Tournament.prototype.isDone = function () {
-  if (this.matches.every($.get('m'))) {
-    return true;
-  }
-  return this._early();
+  return this.matches.every($.get('m')) || this._early();
 };
 
 Tournament.prototype.upcoming = function (playerId) {
@@ -334,7 +323,6 @@ Tournament.prototype.score = function (id, score) {
   var m = this.findMatch(id);
   m.m = score;
   this._progress(m);
-  this.emit('score', id, score);
   return true;
 };
 
@@ -370,72 +358,33 @@ Tournament.prototype.results = function () {
 //------------------------------------------------------------------
 
 Tournament.prototype.resultsFor = function (seed) {
-  var res = this.results();
-  for (var i = 0; i < res.length; i += 1) {
-    var r = res[i];
-    if (r.seed === seed) {
-      return r;
-    }
-  }
+  return $.firstBy(function (r) {
+    return r.seed === seed;
+  }, this.results());
 };
 
-Tournament.prototype.isPlayable = function (match) {
-  return !match.p.some($.eq(Tournament.NONE));
-};
+Tournament.prototype.isPlayable = helper.playable;
 
-
-// matches are stored in a sorted array rather than an ID -> Match map because
-// ordering is more important than quick lookup for the generally short matches ary
 Tournament.prototype.findMatch = function (id) {
-  for (var i = 0; i < this.matches.length; i += 1) {
-    var m = this.matches[i];
-    if (m.id.s === id.s && m.id.r === id.r && m.id.m === id.m) {
-      return m;
-    }
-  }
+  return helper.findMatch(this.matches, id);
 };
 
-// filter from this.matches for everything matching a partial Id
 Tournament.prototype.findMatches = function (id) {
-  return this.matches.filter(function (m) {
-    return (id.s == null || m.id.s === id.s) &&
-           (id.r == null || m.id.r === id.r) &&
-           (id.m == null || m.id.m === id.m);
-  });
+  return helper.findMatches(this.matches, id);
 };
 
 Tournament.prototype.findMatchesRanged = function (lb, ub) {
-  ub = ub || {};
-  return this.matches.filter(function (m) {
-    return (lb.s == null || m.id.s >= lb.s) &&
-           (lb.r == null || m.id.r >= lb.r) &&
-           (lb.m == null || m.id.m >= lb.m) &&
-           (ub.s == null || m.id.s <= ub.s) &&
-           (ub.r == null || m.id.r <= ub.r) &&
-           (ub.m == null || m.id.m <= ub.m);
-  });
+  return helper.findMatchesRanged(this.matches, lb, ub);
 };
 
-var splitBy = function (ms, splitKey, filterKey, filterVal) {
-  var res = [];
-  for (var i = 0; i < ms.length; i += 1) {
-    var m = ms[i];
-    if (filterVal == null || m.id[filterKey] === filterVal) {
-      if (!Array.isArray(res[m.id[splitKey] - 1])) {
-        res[m.id[splitKey] - 1] = [];
-      }
-      res[m.id[splitKey] - 1].push(m);
-    }
-  }
-  return res;
-};
+
 // partition matches into rounds (optionally fix section)
 Tournament.prototype.rounds = function (section) {
-  return splitBy(this.matches, 'r', 's', section);
+  return helper.partitionMatches(this.matches, 'r', 's', section);
 };
 // partition matches into sections (optionally fix round)
 Tournament.prototype.sections = function (round) {
-  return splitBy(this.matches, 's', 'r', round);
+  return helper.partitionMatches(this.matches, 's', 'r', round);
 };
 
 var roundNotDone = function (rnd) {
@@ -456,16 +405,11 @@ Tournament.prototype.nextRound = function (section) {
 };
 
 Tournament.prototype.matchesFor = function (playerId) {
-  return this.matches.filter(function (m) {
-    return m.p.indexOf(playerId) >= 0;
-  });
+  return helper.matchesForPlayer(this.matches, playerId);
 };
 
-// returns all players that exists in a partial slice of the tournament
 Tournament.prototype.players = function (id) {
-  return $.nub(this.findMatches(id || {}).reduce(function (acc, m) {
-    return acc.concat(m.p);
-  }, [])).filter($.gt(Tournament.NONE)).sort($.compare()); // ascending order
+  return helper.players(this.findMatches(id || {}));
 };
 
 
