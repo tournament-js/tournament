@@ -40,9 +40,23 @@ exports.mockDuel = function (t) {
 
   t.equal(Duel.invalid, undefined, "Duel.invalid does not exist yet");
   t.equal(Duel.defaults, undefined, "Duel.defaults does not exist yet");
-  Duel.configure({ invalid: $.constant(null) });
+  Duel.configure({ invalid: function (np, opts) {
+      if (np !== 8) {
+        return "This is a stupid 8p implementation only";
+      }
+      return null;
+    }
+  });
   t.equal(Duel.invalid(), "numPlayers must be a finite integer", "invalid flow");
   t.deepEqual(Duel.defaults(), {}, "configure creates blank obj default fn");
+
+  try {
+    new Duel(5);
+  }
+  catch (e) {
+    var exp = "Cannot construct FakeDuel: "  + Duel.invalid(4);
+    t.equal(e.message, exp, "invalid throws with invReason using Klass.name");
+  }
 
   var d = new Duel(8);
   const WB = 1;
