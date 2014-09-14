@@ -1,8 +1,9 @@
-1.1.0 / 2014-09-14
+2.0.0 / 2014-09-14
 ===================
   * *BREAKING*: `upcoming` now returns all upcoming matches rather than the first id
   * Removed `_limbo` call-in
   * tourney can now use `tournament/lib/match` instead of manually copying this
+  * undocumented and private Tournament::_replace is now encapsulated away fully
 
 1.0.0 / 2014-09-01
 ===================
