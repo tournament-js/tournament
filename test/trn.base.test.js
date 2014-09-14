@@ -66,9 +66,16 @@ exports.mockDuel = function (t) {
   t.deepEqual(d.currentRound(), d.rounds()[0], "current === round 1");
   var lbMs = d.findMatches({s:LB});
   t.deepEqual(d.currentRound(LB), lbMs, "current LB round is the only one");
-
   t.deepEqual(d.nextRound(), d.rounds()[1], "next === round 2");
   t.equal(d.nextRound(LB), undefined, "no next LB round");
+
+  // check upcoming as well before we score
+  var p1ms = [
+    { id: { s: 1, r: 1, m: 1 }, p: [ 1, 8 ] },
+    { id: { s: 1, r: 2, m: 1 }, p: [ 1, 4 ] },
+    { id: { s: 1, r: 3, m: 1 }, p: [ 1, 2 ] } ]
+  t.deepEqual(d.upcoming(1), p1ms, "matches for p1 at start");
+
   d.findMatches({r:1}).forEach(scoreHacker);
   t.deepEqual(d.currentRound(), d.rounds()[1], "current === round 2");
   t.deepEqual(d.nextRound(), d.rounds()[2], "next === round 3");
@@ -82,6 +89,12 @@ exports.mockDuel = function (t) {
   d.findMatches({s:1, r:2, m:2}).forEach(scoreHacker);
   t.deepEqual(d.currentRound(), d.rounds()[2], "current === round 3");
   t.equal(d.nextRound(), undefined, "no next round");
+
+  // check that upcoming now filters played matches
+  t.deepEqual(d.upcoming(1), [p1ms[2]], "only one match left for p1");
+
+  d.findMatches({s:1, r:3}).forEach(scoreHacker);
+  t.deepEqual(d.upcoming(1), [], "no matches left for p1");
 
   t.done();
 };

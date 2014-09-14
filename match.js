@@ -65,9 +65,9 @@ o.players = function (ms) {
 };
 
 o.upcoming = function (ms, playerId) {
-  return $.firstBy(function (m) {
-    return m.p.indexOf(playerId) >= 0 && !m.m;
-  }, ms);
+  return ms.filter(function (m) {
+    return m.p.indexOf(playerId) >= 0 && !m.m
+  });
 };
 
 o.started = function (ms) {

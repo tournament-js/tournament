@@ -163,7 +163,6 @@ Tournament.inherit = function (Klass, Initial) {
   var methods = {
     _verify: null,
     _progress: undefined,
-    _limbo: undefined,
     _early: false,
     _initResult: {}
   };
@@ -284,13 +283,7 @@ Tournament.prototype.isDone = function () {
 };
 
 Tournament.prototype.upcoming = function (playerId) {
-  for (var i = 0; i < this.matches.length; i += 1) {
-    var m = this.matches[i];
-    if (m.p.indexOf(playerId) >= 0 && !m.m) {
-      return m.id;
-    }
-  }
-  return this._limbo(playerId);
+  return helper.upcoming(this.matches, playerId)
 };
 
 Tournament.prototype.unscorable = function (id, score, allowPast) {

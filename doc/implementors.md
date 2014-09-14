@@ -67,10 +67,6 @@ SomeTournament.prototype._verify = function (id, score) {
   return null;
 };
 
-SomeTournament.prototype._limbo = function (playerId) {
-  // TODO: check if we can figure out roughly where the player is headed
-};
-
 SomeTournament.prototype._early = function () {
   // TODO: return true here if tournament is done early
   return false;
@@ -204,7 +200,6 @@ It's often useful to supply the following methods
 
 - `_verify` - if extra scoring restrictions are necessary
 - `_progress` - if player propagation is necessary (tournaments with stages)
-- `_limbo` - if a player can exist in limbo (waiting for a round to finish)
 - `_early` - if a tournament can be done before all matches are played
 
 
@@ -239,26 +234,6 @@ Due to the way Tournaments are usually serialized (by recording successful score
 
 If something goes wrong in this method, throw an error.
 
-### _limbo
-Called when `upcoming` is called with a `playerId` that was not found in any unscored matches. If your tournament type can keep players in "limbo" until a round or new stage is ready, you should do a best effort search here to see if you can figure out *PARTLY* where the player is going to end up.
-
-```js
-SomeTournament.prototype._limbo = function (playerId) {
-  // player may be waiting for generation of next round
-  var m = $.firstBy(function (m) {
-    return m.p.indexOf(playerId) >= 0 && m.m;
-  }, this.currentRound() || []);
-
-  // if he played this round, check if he will advance
-  if (m && Tournament.sorted(m).slice(0, 2).indexOf(playerId) >= 0) {
-    // yes, was in top 2, return a partial id for next round (match number unknown)
-    return {s: 1, r: m.id.r + 1};
-  }
-};
-```
-
-This example was taken from the [FFA package](https://npmjs.org/package/ffa).
-
 ### _early
 Called when `isDone` is called and there are still matches remaining. If you implement this, you can decide if the tournament is done early, even if there are more matches to be played.
 
@@ -283,10 +258,6 @@ Inherited.prototype._verify = function (match, score) {
 Inherited.prototype._progress = function (match) {
   SuperClass.prototype._progress.call(this, match);
   // specific progression here as usual
-};
-Inherited.prototype._limbo = function (playerId) {
-  SuperClass.prototype._limbo.call(this, playerId);
-  // specific search strategy here as usual
 };
 Inherited.prototype._early = function () {
   SuperClass.prototype._early.call(this);

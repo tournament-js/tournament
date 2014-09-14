@@ -1,3 +1,8 @@
+1.1.0 / 2014-09-XX
+===================
+  * *BREAKING*: `upcoming` now returns all upcoming matches rather than the first id
+  * Removed `_limbo` call-in
+
 1.0.0 / 2014-09-01
 ===================
   * Added coverage

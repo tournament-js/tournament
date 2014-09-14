@@ -227,18 +227,18 @@ duel.results().slice(0, 4); // get top 4
 ### trn.resultsFor(seed) :: result entry
 Get the results for just a single player in the tournament.
 
-### trn.upcoming(playerId) :: Match
-Return the upcoming match for the next player if it exists.
+### trn.upcoming(playerId) :: [Match]
+Return the upcoming matches for a given player
 
 ```js
 var duel = new Duel(4, { short: true }); // single elimination without bronze final
 duel.score({ s: 1, r: 1, m: 1}, [1, 0]); // this match is player 1 vs. player 4
 
 duel.upcoming(1); // 1 advanced to semi
-{ s: 1, r: 2, m: 1}
+[ { id: { s: 1, r: 2, m: 1 }, p: [ 1, 0 ] } ]
 
 duel.upcoming(4); // 4 was knocked out
-undefined
+[]
 ```
 
 ## Progress methods
