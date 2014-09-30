@@ -1,3 +1,8 @@
+2.0.1 / 2014-09-30
+===================
+  * Bump interlude to 1.1.0
+  * Fix bug where `initResult` would give out references to previous objects
+
 2.0.0 / 2014-09-14
 ===================
   * *BREAKING*: `upcoming` now returns all upcoming matches rather than the first id
