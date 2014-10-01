@@ -1,3 +1,8 @@
+2.1.0 / 2014-10-01
+===================
+  * Expose `Tournament.configure` the underlying helper used to create `Klass.configure`
+  * `Tournament.sub` now correctly calls `Initial.inherit` rather than `Tournament.inherit`
+
 2.0.1 / 2014-09-30
 ===================
   * Bump interlude to 1.1.0
