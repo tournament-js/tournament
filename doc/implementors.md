@@ -72,6 +72,12 @@ SomeTournament.prototype._early = function () {
   return false;
 };
 
+SomeTournament.prototype._safe = function (match) {
+  // TODO: return true if here this match in particular is safe to modify
+  // without leaving the tournament in an inconsistent state
+  return false;
+};
+
 SomeTournament.prototype._initResult = function (seed) {
   // TODO: initialize extra result properties here
   return {};
@@ -200,6 +206,7 @@ It's often useful to supply the following methods
 
 - `_verify` - if extra scoring restrictions are necessary
 - `_progress` - if player propagation is necessary (tournaments with stages)
+- `_safe` - if a match is safe to re-score without corrupting the tournament
 - `_early` - if a tournament can be done before all matches are played
 
 
@@ -234,6 +241,20 @@ Due to the way Tournaments are usually serialized (by recording successful score
 
 If something goes wrong in this method, throw an error.
 
+### _safe
+Typically, `unscorable` without the extra `allowPast` parameter will not allow you to re-score any matches that already have a score associated with them. This is to ensure the tournament is never left in an inconsistent state.
+
+This could happen in, Duel style playoffs (say), where the finals have been scored, but one of the semis are re-scored to change the outcome. This would render the match history for the final as questionable as a different finalist could have been moved to the final after the final has been scored.
+
+If the scoring administrator knows what he is doing, then allowing re-scoring is fine, as long as the state is cleaned up afterwards. However, it is better to not `allowPast` rescoring and instead have `_safe` implemented so that re-scoring is only allowed when it does not affect the future.
+
+```js
+SomeTournament.prototype._safe = function (match) {
+  var next = this.findMatch({ s: 1, r: match.id.r + 1, m: 1 });
+  return next && !Array.isArray(next.m); // safe iff next NOT played
+};
+```
+
 ### _early
 Called when `isDone` is called and there are still matches remaining. If you implement this, you can decide if the tournament is done early, even if there are more matches to be played.
 
@@ -249,6 +270,14 @@ SomeTournament.prototype._early = function () {
 If you implement one of the above, and inherit from another tournament that implements the same method, then you SHOULD call the method you are inheriting from:
 
 ```js
+var Inherited = SuperClass.sub('Inherited', function (opts, initParent) {
+  // own configuration here
+  initParent(superClassOpts);
+});
+Inherited.configure({
+  defaults: ownDefaultsFn, // only if necessary - SuperClass.defaults used automatically
+  invalid: ownInvalidReasons, // only if necessary - SuperClass.invalid used automatically
+});
 Inherited.prototype._verify = function (match, score) {
   var reason = SuperClass.verify.call(this, match, score);
   if (reason) return reason;
@@ -261,6 +290,10 @@ Inherited.prototype._progress = function (match) {
 };
 Inherited.prototype._early = function () {
   SuperClass.prototype._early.call(this);
+  // specific check here
+};
+Inherited.prototype._safe = function (match) {
+  var superSafe = SuperClass.prototype._safe.call(this, match);
   // specific check here
 };
 Inherited.prototype._initResult = function (seed) {

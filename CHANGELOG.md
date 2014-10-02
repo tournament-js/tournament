@@ -1,3 +1,7 @@
+2.2.0 / 2014-10-02
+===================
+  * `SubClass.prototype._safe` will now be used to improve non-`allowPast` scoring
+
 2.1.0 / 2014-10-01
 ===================
   * Expose `Tournament.configure` the underlying helper used to create `Klass.configure`

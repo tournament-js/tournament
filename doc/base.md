@@ -303,12 +303,13 @@ else {
 
  When guarding on `!trn.unscorable()` like this `tournament` will never log anything during a `trn.score()` call as they will always work.
 
- The reasons are currently hardcoded inside the the base class and implementations internal `verify` functions. Typical faults include:
+ The unscorable reasons are hardcoded inside the the base class and implementations internal `_verify` functions. Typical faults include:
 
  - parameters not integers, scores not an array of numbers
  - scores not the same length as the player array
  - scores cannot distinguish between the top X player that are advancing (if eliminating match)
  - players are not ready in the match (dependent match not played)
+ - match so far back in the past it would change history (unless allowPast)
 
 ## Ensuring Constructibility
 Certain parameter configurations to tournament constructors are logically impossible. Like group size > number of players etc. Whether or not a set of parameters will fail contruction can be tested for with a method taking the same parameters as its respective constructor.
