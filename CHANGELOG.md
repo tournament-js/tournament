@@ -1,3 +1,7 @@
+2.3.0 / 2014-10-05
+===================
+  * `Tournament.from` is exposed for `Tourney` - the undelying helper for `Klass.from`
+
 2.2.0 / 2014-10-02
 ===================
   * `SubClass.prototype._safe` will now be used to improve non-`allowPast` scoring
