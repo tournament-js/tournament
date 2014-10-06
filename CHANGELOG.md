@@ -1,3 +1,12 @@
+FUTURE MAJOR / 2014-XX-XX
+===================
+  * `Tournament::resultsFor` removed in favour of `Tournament::resultEntry` ?
+  * Remove `.parse` and `.toString` ?
+
+2.4.0 / 2014-10-06
+===================
+  * `opts` now always stored on instance as `_opts`
+
 2.3.0 / 2014-10-05
 ===================
   * `Tournament.from` is exposed for `Tourney` - the undelying helper for `Klass.from`
