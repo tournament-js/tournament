@@ -1,7 +1,8 @@
 FUTURE MAJOR / 2014-XX-XX
 ===================
   * `Tournament::resultsFor` removed in favour of `Tournament::resultEntry` ?
-  * Remove `.parse` and `.toString` ?
+  * **BREAKING** Remove `.parse` and `.toString`
+  * Reinstate EventEmitter on `score`
 
 2.4.0 / 2014-10-06
 ===================
