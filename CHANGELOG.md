@@ -1,8 +1,12 @@
-FUTURE MAJOR / 2014-XX-XX
+3.0.0 / 2014-10-11
 ===================
-  * `Tournament::resultsFor` removed in favour of `Tournament::resultEntry` ?
-  * **BREAKING** Remove `.parse` and `.toString`
-  * Reinstate EventEmitter on `score`
+ * Remove `Klass.parse` and `toString` on all implementations
+
+3.0.0-0 / 2014-10-11
+===================
+  * Add public `.state` member on instance (doesn't clash with implementations on npm)
+  * Create `Klass.state` to allow implementation to replay from `.state`
+  * Migration release (the real breaking change comes in next) [so you can get `.state`]
 
 2.4.0 / 2014-10-06
 ===================
