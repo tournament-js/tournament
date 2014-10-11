@@ -100,7 +100,7 @@ SomeTournament.prototype._sort = function (res) {
 
 - `.sub` MUST be called with your init fn (constructor replacement)
 - init function MUST call the `initParent` cb with the matches created
-- `.configure` MUST be called with `invalid`
+- `.configure` MUST be called providing an `invalid` entry
 - Either `_stats` MUST be implemented OR `results` MUST be overridden
 - `Tournament` methods MUST NOT be overridden to maintain expected behaviour
 
@@ -110,7 +110,7 @@ To ensure you are not overriding anything, it is quick to just create a blank `T
 
 ### configure
 Configure needs to be called with the rules and defaults for the options object.
-It takes two functions; `defaults` and `invalid`, the last of which MUST exist.
+It takes two functions; `defaults` and `invalid`, the first of which MUST exist.
 Both functions take the same arguments as the tournament constructor; `(numPlayers, opts)`.
 
 ```js
@@ -125,16 +125,15 @@ SomeTournament.configure({
     return null; // OK
   },
   defaults: function (numPlayers, opts) {
-    var o = {}; // don't modify input arguments
-    o.someOption = Array.isArray(opts.someOption) ? opts.someOption : [];
-    return o;
+    opts.someOption = Array.isArray(opts.someOption) ? opts.someOption : [];
+    return opts;
   }
 });
 ```
 
 `invalid` ensures that tournament rules are upheld. If you have specific rules, these will be guarded on for construction along with whatever invalid rules specified by the tournament class you are inheriting from. Note that we already verify that `numPlayers` is an integer for you.
 
-`defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect. It should return a new object rather than modify the input one.
+`defaults` is there to help ensure that the `opts` object passed into `invalid` and the tournament constructor match what you'd expect.
 
 #### default examples
 You should try to set the default options in a sensible enough way so that you can construct a tournament without actually specifying the second argument at all. All currently compliant tournaments have sensible defaults:

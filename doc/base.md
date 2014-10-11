@@ -3,7 +3,7 @@ All tournament types follow a very simple principle. There is always only:
 
  - One tournament creation mechanism
  - One tournament mutator - `.score`
-  - One common way of doing statistics/tracking progress
+ - One common way of doing statistics/tracking progress
 
 Each tournament implementation inherits from a common base class. A large amount of logic can be shared because only rules are different. This base class is exported for other tournament implementors, and is documented herein.
 
@@ -242,7 +242,7 @@ duel.upcoming(4); // 4 was knocked out
 ```
 
 ## Progress methods
-### trn.score(matchId, mapScore, allowPast) :: Boolean
+### trn.score(matchId, mapScore) :: Boolean
 The *only* way to move the tournament along. Sets `mapScore` on the match's `.m` property, provided `unscorable()` did not complain.
 If `trn.unscorable()` returns a String, this method will return `false` and log this string.
 Otherwise, this method will return true, and update the match.
@@ -348,23 +348,24 @@ masters.matches[2].id + ''; // 'R2'
 ```
 
 ## Serialization
-Every tournament instance can be coerced into a string:
+Every tournament instance has a `.state` array that represents the canonical state of the class. If you store the arguments used to create the tournament along with this state - i.e. the triple (numPlayers, opts, state) - you can use the `.restore` function to recreate an instance from the state.
 
 ```js
-var trn = new FFA(16, opts);
-var serialized = trn.toString();
+// create a Duel tournament
+var duel = new Duel(16, { last: Duel.LB });
+// then suppose you  maybe scored duel so that the state isn't blank
 
-var trn2 = FFA.parse(serialized);
+var data = { numPlayers: 16, options: { last: Duel.WB }, state: inst.state.slice() };
+// then store data in database
+
+// recreate from data:
+var duel2 = Duel.restore(data.numPlayers, data.options, data.state);
 ```
 
-NB: Not intended for database serialization, tournament's API is too volatile for that.
+Note that two additional properties are recommended to store:
 
-## Database Storage
-Every tournament instance is a state machine with a single mutator; `score`.
-You can use the [preservative](https://github.com/clux/preservative) module to proxy calls through it to store every such operation, and thus obtaining an ordered list of serializable operations to recreate state from.
-
-This state is safe to store in a json store when a tournament implementation goes stable.
-
+- `name` of the tournament should be stored (in case you want to use more than one tournament type)
+- `version` of the tournament implementation's package (if you want to be able to upgrade safely)
 
 ## Multi-Stage Tournaments
 Multi-staged tournaments can be created by using `Klass.from(instance, numProgressors)` that is built in on every `Tournament` subclass when using `Tournament.sub` or `Tournament.inherit`.
