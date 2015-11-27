@@ -1,3 +1,7 @@
+3.1.0 / 2015-XX-XX
+===================
+ * `_opts` is no longer enumerable
+
 3.0.0 / 2014-10-11
 ===================
  * Remove `Klass.parse` and `toString` on all implementations
