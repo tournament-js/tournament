@@ -1,4 +1,4 @@
-4.0.0 / 2015-XX-XX
+3.1.0 / 2015-XX-XX
 ===================
  * `_opts` is no longer enumerable
  * `Tournament.defaults` now configures a `log` object (default `console` if unset)
