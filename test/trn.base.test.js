@@ -40,15 +40,27 @@ exports.mockDuel = function (t) {
 
   t.equal(Duel.invalid, undefined, "Duel.invalid does not exist yet");
   t.equal(Duel.defaults, undefined, "Duel.defaults does not exist yet");
-  Duel.configure({ invalid: function (np, opts) {
-      if (np !== 8) {
-        return "This is a stupid 8p implementation only";
-      }
-      return null;
+  var invalidFn = function (np, opts) {
+    if (np !== 8) {
+      return "This is a stupid 8p implementation only";
+    }
+    return null;
+  };
+
+  Duel.configure({invalid: invalidFn});
+  t.equal(Duel.invalid(), "numPlayers must be a finite integer", "invalid flow");
+  t.deepEqual(Duel.defaults(), { log: console },
+    "configure creates defaults fn which delegates to Base"
+  );
+
+  // re-configure, but with a defaults implementation that discards logs
+  Duel.configure({
+    invalid: invalidFn,
+    defaults: function (np, opts) {
+      opts.log = { error: function () {} };
+      return opts;
     }
   });
-  t.equal(Duel.invalid(), "numPlayers must be a finite integer", "invalid flow");
-  t.deepEqual(Duel.defaults(), {}, "configure creates blank obj default fn");
 
   try {
     new Duel(5);

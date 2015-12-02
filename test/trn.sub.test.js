@@ -19,7 +19,8 @@ SomeT.prototype._progress = function (match) {
   this.opts.progressCalled(match);
 };
 SomeT.defaults = function (np, opts) {
-  opts = opts || {};
+  opts = opts || {}; // NB: this is a hacky implementation not using .configure
+  opts.log = { error: function () {} }; // ignore logs
   opts.progressCalled = opts.progressCalled || function () {};
   return opts;
 };

@@ -51,9 +51,8 @@ SomeTournament.configure({
   },
   // optional:
   defaults: function (numPlayers, opts) {
-    var o = {};
-    o.someOption = Boolean(opts.someOption);
-    return o;
+    opts.someOption = Boolean(opts.someOption);
+    return opts;
   }
 });
 
