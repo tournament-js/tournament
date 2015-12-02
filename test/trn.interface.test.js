@@ -1,7 +1,8 @@
 var Challenge = require('./challenge')
-  , Base = require(process.env.TOURNAMENT_COV ? '../lib-cov/tournament' : '../');
+  , Base = require('../')
+  , test = require('bandage');
 
-exports.inheritance = function (t) {
+test('inheritance', function *(t) {
   var commonStatics = ['invalid', 'restore']
     //, commonMethods = ['progress', 'verify', 'early', 'limbo', 'results']
     , commonMethods = ['results']
@@ -29,10 +30,9 @@ exports.inheritance = function (t) {
       t.equal(typeof inst[m], 'function', m + ' exists on instance');
     }
   });
-  t.done();
-};
+});
 
-exports.interface = function (t) {
+test('interface', function *(t) {
   // statics
   var comparators = ['compareMatches', 'compareRes', 'compareZip', 'sorted'];
   var rawHelpers = ['sub'];
@@ -53,6 +53,4 @@ exports.interface = function (t) {
     t.equal(typeof Base.prototype[m], 'function', m + ' is on Tournament.prototype');
     t.equal(typeof b[m], 'function', m + ' is on a base instance');
   });
-
-  t.done();
-};
+});

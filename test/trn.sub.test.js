@@ -1,4 +1,5 @@
-var Base = require(process.env.TOURNAMENT_COV ? '../lib-cov/tournament' : '../');
+var Base = require('../')
+  , test = require('bandage');
 
 var SomeT = Base.sub('SomeT', function (opts, initParent) {
   this.opts = opts;
@@ -34,8 +35,8 @@ var attachInvalid = function () {
   };
 };
 
-exports.sub = function (t) {
-  t.expect(15); // so we know if some stuff never happened
+test('sub', function *(t) {
+  t.plan(15); // so we know if some stuff never happened
 
   // ensure we have to implement invalid
   try { new SomeT(4); }
@@ -86,6 +87,4 @@ exports.sub = function (t) {
       { seed: 4, wins: 0, for: 0, against: 0, pos: 4 }
     ], "default results"
   );
-
-  t.done();
-};
+});

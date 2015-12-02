@@ -1,4 +1,4 @@
-var Base = require(process.env.TOURNAMENT_COV ? '../lib-cov/tournament' : '../');
+var Base = require('../');
 
 var Challenge = Base.sub('Challenge', function (opts, initParent) {
   var ms = [];

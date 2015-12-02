@@ -1,6 +1,7 @@
-var Challenge = require('./challenge');
+var Challenge = require('./challenge')
+  , test = require('bandage');
 
-exports.serialize = function (t) {
+test('serialize', function *(t) {
   var inst = new Challenge(2, {});
   t.ok(inst instanceof Challenge, "inst is a " + Challenge.name + " instance");
   t.ok(inst.matches.length, 'some matches must have been made');
@@ -11,5 +12,4 @@ exports.serialize = function (t) {
   var copy = Challenge.restore(2, {}, inst.state);
   t.deepEqual(copy.matches, inst.matches, 'recreated matches');
   t.deepEqual(copy.state, inst.state, 'state reassembled itself');
-  t.done();
-};
+});

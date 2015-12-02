@@ -1,12 +1,13 @@
 var $ = require('interlude')
-  , Base = require(process.env.TOURNAMENT_COV ? '../lib-cov/tournament' : '../')
-  , comp = Base.compareMatches;
+  , Base = require('../')
+  , comp = Base.compareMatches
+  , test = require('bandage');
 
 var scoreHacker = function (m) {
   m.m = m.p[0] < m.p[1] ? [1,0] : [0,1];
 };
 
-exports.defaultFlow = function (t) {
+test('defaultFlow', function *(t) {
   var Tmp = Base.sub('Fake', function (opts, initParent) {
     t.equal(opts.hi, 'there', 'defaults gets called on opts');
     initParent([]);
@@ -18,11 +19,9 @@ exports.defaultFlow = function (t) {
     }
   });
   t.deepEqual(Tmp.defaults(5), { hi: 'there' }, 'specified defaults exists');
+});
 
-  new Tmp(2); // calls t.done() - NB: no invalid implementation so passes that too
-};
-
-exports.mockDuel = function (t) {
+test('mockDuel', function *(t) {
   var Duel = Base.sub('FakeDuel', function (opts, initParent) {
     // to avoid deps, just give out some normal looking Duel matches
     // but pre-progressed, because we aren't testing that
@@ -74,7 +73,6 @@ exports.mockDuel = function (t) {
   const WB = 1;
   const LB = 2;
 
-
   // 1. match partitioning helpers
   t.deepEqual(d.findMatch({s:WB, r:1, m:1}),
     { id: { s: 1, r: 1, m: 1 }, p: [ 1, 8 ] },
@@ -107,7 +105,6 @@ exports.mockDuel = function (t) {
   t.equal(d.findMatchesRanged({r:3}, {r:2}).length, 0, "invalid range 1");
   t.equal(d.findMatchesRanged({s:LB}, {s:WB}).length, 0, "invalid range 2");
   t.equal(d.findMatchesRanged({s:LB, r:3}).length, 0, "out of bounds");
-
 
   // 2. current and next round helpers
   t.deepEqual(d.currentRound(), d.rounds()[0], "current === round 1");
@@ -142,12 +139,9 @@ exports.mockDuel = function (t) {
 
   d.findMatches({s:1, r:3}).forEach(scoreHacker);
   t.deepEqual(d.upcoming(1), [], "no matches left for p1");
+});
 
-  t.done();
-};
-
-
-exports.mockGroupStage = function (t) {
+test('mockGroupStage', function *(t) {
   var GS = Base.sub('FakeGroupStage', function (opts, initParent) {
     // 16 players in groups of 4 like match list
     initParent([
@@ -180,7 +174,6 @@ exports.mockGroupStage = function (t) {
   GS.configure({ invalid: $.constant(null) });
 
   var gs = new GS(16, { groupSize: 4 }); // NB: options irrelevant now
-
 
   // 1. match partitioning helpers
   t.deepEqual(gs.findMatch({s:1, r:1, m:1}),
@@ -226,7 +219,6 @@ exports.mockGroupStage = function (t) {
     "G2 R1->R4 === flattenend sections()[1]"
   );
 
-
   // 2. player helpers
   t.equal(gs.matchesFor(1).length, 3, "player 1 battles 3 others in group 1");
   t.deepEqual(gs.players({s:1}), [1, 5, 12, 16], "group 1 players");
@@ -245,7 +237,6 @@ exports.mockGroupStage = function (t) {
   $.range(16).forEach(function (n) {
     t.equal(gs.resultsFor(n).seed, n, "resultsFor " + n);
   });
-
 
   // 3. current and next round helpers
   t.deepEqual(gs.currentRound(1), gs.findMatches({s:1, r:1}), "current === G1R1");
@@ -276,13 +267,9 @@ exports.mockGroupStage = function (t) {
   t.equal(gs.currentRound(), undefined, "no current round after end");
   t.equal(gs.nextRound(1), undefined, "no next round for group 1 after end");
   t.equal(gs.nextRound(), undefined, "no next round after end");
+});
 
-
-  t.done();
-};
-
-exports.comparators = function (t) {
+test('comparators', function *(t) {
   var m = { id : {}, p: [4,3,2,1], m: [1,2,4,3] };
   t.deepEqual(Base.sorted(m), [2,1,3,4], 'players in order using T.sorted');
-  t.done();
-};
+});
