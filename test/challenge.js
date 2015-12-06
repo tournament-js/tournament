@@ -11,7 +11,7 @@ var Challenge = Base.sub('Challenge', function (opts, initParent) {
 Challenge.configure({
   invalid: function (np) {
     if (np % 2 !== 0) {
-      return "Challenge can only have a multiple of two players";
+      return 'Challenge can only have a multiple of two players';
     }
     return null;
   }
