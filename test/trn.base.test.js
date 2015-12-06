@@ -14,9 +14,7 @@ test('defaultFlow', function *(t) {
     t.done();
   });
   Tmp.configure({
-    defaults: function (np, opts) {
-      return { hi: 'there' };
-    }
+    defaults: function () { return { hi: 'there' }; }
   });
   t.deepEqual(Tmp.defaults(5), { hi: 'there' }, 'specified defaults exists');
 });
@@ -61,13 +59,13 @@ test('mockDuel', function *(t) {
     }
   });
 
-  try {
-    new Duel(5);
-  }
-  catch (e) {
-    var exp = "Cannot construct FakeDuel: "  + Duel.invalid(4);
-    t.equal(e.message, exp, "invalid throws with invReason using Klass.name");
-  }
+  var failConstruct = function *() {
+    return new Duel(5);
+  };
+  var exp = "Cannot construct FakeDuel: "  + Duel.invalid(4);
+  yield t.throws(failConstruct, /FakeDuel: This is a stupid 8p implementation only/,
+    'rejected constructs references invalid reason and tournament name'
+  );
 
   var d = new Duel(8);
   const WB = 1;
