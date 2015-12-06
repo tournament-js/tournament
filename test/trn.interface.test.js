@@ -2,55 +2,81 @@ var Challenge = require('./challenge')
   , Base = require('../')
   , test = require('bandage');
 
+var inheritableStatics = [
+  'configure',
+  'defaults',
+  'invalid',
+  'inherit',
+  'sub',
+  'from'
+];
+// restore is only on subclass
+var subStatics = inheritableStatics.concat('restore');
+var baseStatics = [
+  'compareMatches',
+  'compareRes',
+  'compareZip',
+  'isInteger',
+  'sorted',
+  'resTieCompute',
+  'resultEntry',
+  'matchTieCompute'
+].concat(inheritableStatics);
+
+var methods = [
+  'isDone',
+  'unscorable',
+  'score',
+  'results',
+  'resultsFor',
+  'upcoming',
+  'isPlayable',
+  'findMatch',
+  'findMatches',
+  'findMatchesRanged',
+  'rounds',
+  'sections',
+  'currentRound',
+  'nextRound',
+  'matchesFor',
+  'players'
+];
+
+var properties = ['matches', 'numPlayers'];
+
+var virtuals = ['_verify', '_progress', '_early', '_safe', '_initResult'];
+
 test('inheritance', function *(t) {
-  var commonStatics = ['invalid', 'restore']
-    //, commonMethods = ['progress', 'verify', 'early', 'limbo', 'results']
-    , commonMethods = ['results']
-    , baseMethods = ['findMatch', 'findMatches', 'rounds']
-    , commonMembers = ['matches', 'numPlayers'];
-
-
   var C = Challenge;
-  commonStatics.forEach(function (s) {
-    t.ok(C[s], s + " static exists");
-    t.equal(typeof C[s], 'function', s + ' static is indeed a function type');
-  });
-
-  commonMethods.forEach(function (m) {
-    t.ok(C.prototype[m], m + " method exists");
-    t.equal(typeof C.prototype[m], 'function', m + ' method is indeed a function');
+  subStatics.forEach(function (s) {
+    t.type(C[s], 'function', s + ' static on subclass');
   });
 
   var inst = new Challenge(2);
-  commonMembers.concat(baseMethods).forEach(function (m) {
+  properties.forEach(function (m) {
     t.ok(inst[m], m + ' exists on instance');
   });
-  commonMethods.forEach(function (m) {
-    if (inst[m]) { // doesn't have to be implemented
-      t.equal(typeof inst[m], 'function', m + ' exists on instance');
-    }
+  methods.concat(virtuals).forEach(function (m) {
+    t.type(inst[m], 'function', m + ' method on instance');
+    t.type(C.prototype[m], 'function', m + ' methods on prototype');
   });
 });
 
 test('interface', function *(t) {
-  // statics
-  var comparators = ['compareMatches', 'compareRes', 'compareZip', 'sorted'];
-  var rawHelpers = ['sub'];
-  comparators.concat(rawHelpers).forEach(function (s) {
-    t.equal(typeof Base[s], 'function', s + ' is a function');
+  baseStatics.forEach(function (s) {
+    t.type(Base[s], 'function', s + ' is a function');
   });
-  t.equal(typeof Base.NONE, 'number', 'None exists on Base as a number');
-  t.equal(Base.NONE, 0, "Tournament.NONE === 0");
+  t.type(Base.NONE, 'number', 'None exists on Base as a number');
+  t.eq(Base.NONE, 0, 'Tournament.NONE is 0');
+  t.eq(baseStatics.concat('NONE').sort(), Object.keys(Base).sort(),
+    'expected properties on base'
+  );
 
-  // methods
-  var mainInterface = ['isDone', 'upcoming', 'unscorable', 'score']
-    , finders = ['findMatch', 'findMatches', 'findMatchesRanged']
-    , splitters = ['rounds', 'sections', 'currentRound', 'nextRound']
-    , trackers = ['matchesFor', 'players']
-    , methods = mainInterface.concat(finders, splitters, trackers);
   var b = new Base([]); // will work, just doesn't do anything
   methods.forEach(function (m) {
-    t.equal(typeof Base.prototype[m], 'function', m + ' is on Tournament.prototype');
-    t.equal(typeof b[m], 'function', m + ' is on a base instance');
+    t.type(Base.prototype[m], 'function', m + ' is on Tournament.prototype');
+    t.type(b[m], 'function', m + ' is on a base instance');
   });
+  // verify that we have all expected methods
+  t.eq(methods, Object.keys(Base.prototype), 'expected prototype methods on base');
 });
