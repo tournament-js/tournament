@@ -1,3 +1,7 @@
+3.1.1 / 2015-12-06
+===================
+  * Unbreak subclasses of implementations - better `_opts` fix
+
 3.1.0 / 2015-12-06
 ===================
  * `_opts` is no longer enumerable
