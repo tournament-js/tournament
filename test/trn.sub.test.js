@@ -31,7 +31,7 @@ test('sub', function *(t) {
   // ensure we have to implement invalid
   var ctorCheck = function *() {
     return new SomeT(1);
-  }
+  };
   yield t.throws(ctorCheck, /SomeT must implement an Invalid/, 'invalid fn missing');
 
   // attach invalid fn manually
