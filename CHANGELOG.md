@@ -1,3 +1,7 @@
+3.2.0 / 2016-07-15
+===================
+  * Expose a `metadata` getter method, and allow `restore` to take its output as input - fixes #32
+
 3.1.1 / 2015-12-06
 ===================
   * Unbreak subclasses of implementations - better `_opts` fix
