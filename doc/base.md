@@ -367,6 +367,36 @@ Note that two additional properties are recommended to store:
 - `name` of the tournament should be stored (in case you want to use more than one tournament type)
 - `version` of the tournament implementation's package (if you want to be able to upgrade safely)
 
+### Serializing Metadata
+Tournament is not designed for anything but the core progression mechanics, so if you need sport/game specific logic, it's typically better to build on top of tournament.
+
+Since this is a common endeavor, the `data` key on each match is reserved, and tournament comes with some methods to help serialize any extra state you wish to attach to a match object.
+
+```js
+// create a Duel tournament
+var duel = new Duel(16, { last: Duel.LB });
+
+duel.matches.slice(0, 5).forEach(function (m) {
+  if (duel.score(m.id, [1,0])) {
+    m.data = { my: 'customData' }; // save some data on the match
+  }
+})
+
+// All necessary info can be retrieved, as above, but with an extra call:
+var data = {
+  numPlayers: 16,
+  options: { last: Duel.WB },
+  state: inst.state.slice(),
+  metadata: inst.metadata()
+};
+// you can store data in database safely
+
+// and recreate later from data as above, but pass in metadata as well:
+var duel2 = Duel.restore(data.numPlayers, data.options, data.state, data.metadata);
+```
+
+Note that you are fully responsible for sanity checking this data. You may wish to ensure you only write to a match's `data` key if the scoring succeeds, but this depends on what you are building. This is where tournament's responsibility ends.
+
 ## Multi-Stage Tournaments
 Multi-staged tournaments can be created by using `Klass.from(instance, numProgressors)` that is built in on every `Tournament` subclass when using `Tournament.sub` or `Tournament.inherit`.
 

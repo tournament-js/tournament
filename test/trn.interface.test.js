@@ -34,6 +34,7 @@ var methods = [
   'findMatch',
   'findMatches',
   'findMatchesRanged',
+  'metadata',
   'rounds',
   'sections',
   'currentRound',
